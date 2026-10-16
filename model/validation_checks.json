@@ -1,0 +1,124 @@
+{
+  "dialect": "DuckDB",
+  "checks": [
+    {
+      "id": "C01",
+      "rule_ids": [
+        "R34"
+      ],
+      "description": "Posted journals have at least two lines and balance independently.",
+      "sql": "SELECT j.journal_id FROM journal j LEFT JOIN journal_line l USING(journal_id)\nWHERE j.status='POSTED' GROUP BY j.journal_id\nHAVING count(l.journal_line_id)<2 OR coalesce(sum(CASE WHEN direction='DEBIT' THEN amount ELSE -amount END),0)<>0",
+      "coverage_limit": "Does not verify that the chosen ledger accounts are economically correct."
+    },
+    {
+      "id": "C02",
+      "rule_ids": [
+        "R35"
+      ],
+      "description": "Mapped entries and ledger lines agree on direction and currency.",
+      "sql": "SELECT p.posting_link_id FROM posting_link p JOIN account_entry e USING(account_entry_id)\nJOIN account a ON a.account_id=e.account_id JOIN journal_line l USING(journal_line_id) JOIN journal j USING(journal_id)\nWHERE p.allocated_amount<=0 OR e.direction<>l.direction OR a.currency_id<>j.currency_id OR j.status<>'POSTED'",
+      "coverage_limit": "Tests mapped pairs; does not prove that all source entries were supplied."
+    },
+    {
+      "id": "C03",
+      "rule_ids": [
+        "R35"
+      ],
+      "description": "Mapped entry allocations are complete and ledger lines are not overallocated.",
+      "sql": "SELECT 'entry:'||e.account_entry_id AS item FROM account_entry e JOIN posting_link p USING(account_entry_id)\nGROUP BY e.account_entry_id,e.amount HAVING sum(p.allocated_amount)<>e.amount\nUNION ALL SELECT 'line:'||l.journal_line_id FROM journal_line l JOIN posting_link p USING(journal_line_id)\nGROUP BY l.journal_line_id,l.amount HAVING sum(p.allocated_amount)>l.amount",
+      "coverage_limit": "Entries without any mapping are outside this check; separate source-completeness reconciliation is required."
+    },
+    {
+      "id": "C04",
+      "rule_ids": [
+        "R13"
+      ],
+      "description": "Statement closing balances reconcile to their listed entries.",
+      "sql": "SELECT s.statement_id FROM statement s LEFT JOIN statement_line sl USING(statement_id)\nLEFT JOIN account_entry e USING(account_entry_id) GROUP BY s.statement_id,s.opening_balance,s.closing_balance\nHAVING s.closing_balance<>s.opening_balance+coalesce(sum(CASE WHEN e.direction='DEBIT' THEN e.amount ELSE -e.amount END),0)",
+      "coverage_limit": "Checks listed entries; C05 checks membership and account/date scope."
+    },
+    {
+      "id": "C05",
+      "rule_ids": [
+        "R13"
+      ],
+      "description": "Statement lines use the right account/date and every in-cycle entry is listed.",
+      "sql": "SELECT 'line:'||sl.statement_line_id AS item FROM statement_line sl JOIN statement s USING(statement_id) JOIN account_entry e USING(account_entry_id)\nWHERE e.account_id<>s.account_id OR e.posted_on<s.period_start OR e.posted_on>=s.period_end_exclusive\nUNION ALL SELECT 'missing:'||s.statement_id||':'||e.account_entry_id FROM statement s JOIN account_entry e ON e.account_id=s.account_id AND e.posted_on>=s.period_start AND e.posted_on<s.period_end_exclusive\nLEFT JOIN statement_line sl ON sl.statement_id=s.statement_id AND sl.account_entry_id=e.account_entry_id WHERE sl.statement_line_id IS NULL",
+      "coverage_limit": "Does not detect overlapping statement cycles or verify minimum-payment policy."
+    },
+    {
+      "id": "C06",
+      "rule_ids": [
+        "R08"
+      ],
+      "description": "Refund references are valid and cumulative refunds do not exceed purchases.",
+      "sql": "SELECT t.card_transaction_id FROM card_transaction t LEFT JOIN card_transaction p ON t.original_transaction_id=p.card_transaction_id\nWHERE (t.kind='PURCHASE' AND t.original_transaction_id IS NOT NULL)\nOR (t.kind='REFUND' AND (p.card_transaction_id IS NULL OR p.kind<>'PURCHASE' OR p.card_id<>t.card_id OR p.merchant_id<>t.merchant_id OR p.currency_id<>t.currency_id OR t.posted_on<p.posted_on))\nUNION ALL SELECT p.card_transaction_id FROM card_transaction p JOIN card_transaction r ON r.original_transaction_id=p.card_transaction_id AND r.kind='REFUND'\nGROUP BY p.card_transaction_id,p.amount HAVING sum(r.amount)>p.amount",
+      "coverage_limit": "Network-specific refund exceptions and chargebacks are not modeled."
+    },
+    {
+      "id": "C07",
+      "rule_ids": [
+        "R25",
+        "R26"
+      ],
+      "description": "Posted deposit orders have exactly the expected customer-account entries.",
+      "sql": "WITH latest AS (SELECT payment_order_id,status FROM payment_event QUALIFY row_number() OVER(PARTITION BY payment_order_id ORDER BY occurred_at DESC)=1),\ncounts AS (SELECT o.payment_order_id,o.kind,o.amount,o.source_account_id,o.destination_account_id,o.beneficiary_id,o.currency_id,\ncount(e.account_entry_id) AS n,\ncount(e.account_entry_id) FILTER(WHERE e.account_id=o.source_account_id AND e.direction='DEBIT' AND e.amount=o.amount AND a.currency_id=o.currency_id) AS debits,\ncount(e.account_entry_id) FILTER(WHERE e.account_id=o.destination_account_id AND e.direction='CREDIT' AND e.amount=o.amount AND a.currency_id=o.currency_id) AS credits\nFROM payment_order o JOIN latest s USING(payment_order_id) LEFT JOIN account_entry e ON e.payment_order_id=o.payment_order_id AND e.kind='DEPOSIT_PAYMENT'\nLEFT JOIN account a ON a.account_id=e.account_id WHERE s.status IN ('POSTED','SETTLED') GROUP BY ALL)\nSELECT payment_order_id FROM counts WHERE debits<>1 OR (kind='INTERNAL' AND (n<>2 OR credits<>1 OR destination_account_id IS NULL OR source_account_id=destination_account_id OR beneficiary_id IS NOT NULL)) OR (kind='OUTBOUND' AND (n<>1 OR beneficiary_id IS NULL OR destination_account_id IS NOT NULL))",
+      "coverage_limit": "Only final POSTED/SETTLED orders are checked; transition matrices, account product eligibility and failed-order reversals need additional checks."
+    },
+    {
+      "id": "C08",
+      "rule_ids": [
+        "R27"
+      ],
+      "description": "Outbound settlement agrees with instructions and SETTLED status has evidence.",
+      "sql": "SELECT s.payment_settlement_id AS item FROM payment_settlement s JOIN payment_order o USING(payment_order_id)\nWHERE o.kind<>'OUTBOUND' OR s.settled_amount<>o.amount OR s.currency_id<>o.currency_id\nUNION ALL SELECT o.payment_order_id FROM payment_order o JOIN (SELECT payment_order_id,status FROM payment_event QUALIFY row_number() OVER(PARTITION BY payment_order_id ORDER BY occurred_at DESC)=1) e USING(payment_order_id)\nLEFT JOIN payment_settlement s USING(payment_order_id) WHERE e.status='SETTLED' AND (s.payment_settlement_id IS NULL OR o.kind<>'OUTBOUND')",
+      "coverage_limit": "Partial settlement, returns and settlement-date calendars are excluded."
+    },
+    {
+      "id": "C09",
+      "rule_ids": [
+        "R31"
+      ],
+      "description": "Scheduled principal totals each contracted loan principal.",
+      "sql": "SELECT c.loan_contract_id FROM loan_contract c LEFT JOIN loan_schedule_item s USING(loan_contract_id)\nGROUP BY c.loan_contract_id,c.principal_amount HAVING coalesce(sum(s.principal_due),0)<>c.principal_amount",
+      "coverage_limit": "Does not generate interest or check all schedule dates."
+    },
+    {
+      "id": "C10",
+      "rule_ids": [
+        "R32"
+      ],
+      "description": "Loan funding has one matching loan debit and deposit credit.",
+      "sql": "SELECT d.loan_disbursement_id FROM loan_disbursement d JOIN loan_contract c USING(loan_contract_id)\nLEFT JOIN account_entry e ON e.loan_disbursement_id=d.loan_disbursement_id AND e.kind='LOAN_DRAW'\nGROUP BY d.loan_disbursement_id,d.amount,d.destination_account_id,d.disbursed_on,c.account_id,c.principal_amount,c.accepted_on\nHAVING d.amount<>c.principal_amount OR d.disbursed_on<c.accepted_on OR count(e.account_entry_id)<>2\nOR count(e.account_entry_id) FILTER(WHERE e.account_id=c.account_id AND e.direction='DEBIT' AND e.amount=d.amount)<>1\nOR count(e.account_entry_id) FILTER(WHERE e.account_id=d.destination_account_id AND e.direction='CREDIT' AND e.amount=d.amount)<>1",
+      "coverage_limit": "Does not verify borrower eligibility or the destination product kind."
+    },
+    {
+      "id": "C11",
+      "rule_ids": [
+        "R33"
+      ],
+      "description": "Posted loan repayments create only their principal reduction on the loan account.",
+      "sql": "SELECT r.loan_repayment_id FROM loan_repayment r JOIN loan_contract c USING(loan_contract_id)\nLEFT JOIN account_entry e ON e.loan_repayment_id=r.loan_repayment_id AND e.kind='LOAN_REPAYMENT'\nWHERE r.status='POSTED' GROUP BY r.loan_repayment_id,r.principal_amount,r.interest_amount,c.account_id\nHAVING r.principal_amount<0 OR r.interest_amount<0 OR r.principal_amount+r.interest_amount<=0\nOR count(e.account_entry_id)<>CASE WHEN r.principal_amount>0 THEN 1 ELSE 0 END\nOR count(e.account_entry_id) FILTER(WHERE e.account_id=c.account_id AND e.direction='CREDIT' AND e.amount=r.principal_amount)<>CASE WHEN r.principal_amount>0 THEN 1 ELSE 0 END",
+      "coverage_limit": "Does not validate installment allocation, principal overpayment or interest-ledger completeness."
+    },
+    {
+      "id": "C12",
+      "rule_ids": [
+        "R10"
+      ],
+      "description": "Every account entry uses exactly its permitted source reference.",
+      "sql": "SELECT account_entry_id FROM account_entry WHERE\n (CASE WHEN card_transaction_id IS NOT NULL THEN 1 ELSE 0 END + CASE WHEN payment_id IS NOT NULL THEN 1 ELSE 0 END + CASE WHEN fee_type_id IS NOT NULL THEN 1 ELSE 0 END + CASE WHEN reverses_entry_id IS NOT NULL THEN 1 ELSE 0 END + CASE WHEN payment_order_id IS NOT NULL THEN 1 ELSE 0 END + CASE WHEN loan_disbursement_id IS NOT NULL THEN 1 ELSE 0 END + CASE WHEN loan_repayment_id IS NOT NULL THEN 1 ELSE 0 END) <> CASE WHEN kind='ADJUSTMENT' THEN 0 ELSE 1 END\n OR (kind='CARD' AND card_transaction_id IS NULL) OR (kind='PAYMENT' AND payment_id IS NULL) OR (kind='FEE' AND fee_type_id IS NULL) OR (kind='REVERSAL' AND reverses_entry_id IS NULL) OR (kind='DEPOSIT_PAYMENT' AND payment_order_id IS NULL) OR (kind='LOAN_DRAW' AND loan_disbursement_id IS NULL) OR (kind='LOAN_REPAYMENT' AND loan_repayment_id IS NULL)",
+      "coverage_limit": "Source linkage alone does not validate the source amount or lifecycle."
+    },
+    {
+      "id": "C13",
+      "rule_ids": [
+        "R09",
+        "R34"
+      ],
+      "description": "Posted transaction and journal amounts are strictly positive.",
+      "sql": "SELECT 'entry:'||account_entry_id AS item FROM account_entry WHERE amount<=0\nUNION ALL SELECT 'card:'||card_transaction_id FROM card_transaction WHERE amount<=0\nUNION ALL SELECT 'line:'||journal_line_id FROM journal_line WHERE amount<=0\nUNION ALL SELECT 'order:'||payment_order_id FROM payment_order WHERE amount<=0",
+      "coverage_limit": "Applies to these four tables only; signed balances and nonnegative schedule amounts follow separate conventions."
+    }
+  ]
+}

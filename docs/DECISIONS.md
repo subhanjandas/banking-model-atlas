@@ -31,3 +31,11 @@ These are initial project decisions, open to review. They are not statements of 
 - What entity and relationship detail level is most readable at different zoom levels?
 
 The first five questions limit production use. They do not prevent a clearly labeled educational explorer from showing the current model.
+
+## Expansion decisions — model 0.2.0
+
+We added 24 entities because four questions were missing: how a customer is onboarded, how deposit money moves, how a term loan is funded, and how account activity reaches accounting. Six entities per added domain keep each explanation bounded. This is a portfolio reference, not a prescribed enterprise decomposition.
+
+Payment orders and settlements are separate because intent is different from observed movement. Loan applications and contracts are separate because a declined request must not become a loan. Customer entries and journals are separate because they serve different grains and accounting purposes. A posting link records allocation explicitly rather than assuming a one-to-one join.
+
+DuckDB makes the examples easy to run without cloud costs. The trade-off is a dialect-specific export, no operational concurrency model and no migration framework. Selected negative tests are stronger evidence than a larger untested diagram, but do not implement the complete rule catalogue.

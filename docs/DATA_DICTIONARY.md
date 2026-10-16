@@ -166,7 +166,7 @@ A named deposit or credit-card offering.
 |---|---|---|---|---|
 | `product_id` | `string` | false | identifier | Stable synthetic identifier for product. |
 | `name` | `string` | false | internal | Fictional marketing name. |
-| `kind` | `string` | false | internal | Account family supported by this product. Allowed: DEPOSIT, CREDIT_CARD. |
+| `kind` | `string` | false | internal | Account family supported by this product. Allowed: DEPOSIT, CREDIT_CARD, TERM_LOAN. |
 
 **Unique keys:** Primary key only.
 
@@ -195,7 +195,7 @@ A dated edition of product terms.
 
 **Notes:** Existing accounts retain their booked version after the offering closes. APR calculations are out of scope.
 
-**Rules:** R01
+**Rules:** R01, R23
 
 ## fee_type
 
@@ -219,7 +219,7 @@ A category of account fee.
 
 ## account
 
-A customer-facing deposit or credit-card account.
+A customer-facing deposit, credit-card or term-loan account.
 
 **Grain:** One account contract.
 
@@ -238,7 +238,7 @@ A customer-facing deposit or credit-card account.
 
 **Notes:** Kind is derived through product_version and product. Account numbers are not stored.
 
-**Rules:** R01, R02, R04, R05, R11, R14, R15, R18, R20
+**Rules:** R01, R02, R04, R05, R11, R14, R15, R18, R20, R23, R25, R30, R35
 
 ## account_holder
 
@@ -259,9 +259,9 @@ Ownership or signing authority over an account.
 
 **Unique keys:** Primary key only.
 
-**Notes:** Deposits can have joint owners. Credit-card accounts have one primary owner; supplementary card users are not account owners.
+**Notes:** Deposits can have joint owners. Credit-card and term-loan accounts have one primary owner; supplementary card users are not account owners.
 
-**Rules:** R02, R03, R16
+**Rules:** R02, R03, R16, R30
 
 ## account_status_event
 
@@ -302,7 +302,7 @@ The credit agreement attached to a credit-card account.
 
 **Unique keys:** account_id
 
-**Notes:** Exactly one facility for each credit-card account; none for deposit accounts. Loans and underwriting are excluded.
+**Notes:** One facility for each credit-card account. Fixed-term loans have a separate loan_contract; underwriting decisions are supplied, not calculated.
 
 **Rules:** R04
 
@@ -503,17 +503,20 @@ An immutable customer-account movement used for statement presentation.
 | `payment_id` | `string` | true | identifier | Repayment behind this entry, if any. |
 | `fee_type_id` | `string` | true | identifier | Fee category when this is a fee. |
 | `reverses_entry_id` | `string` | true | identifier | Earlier entry reversed by this entry. |
-| `kind` | `string` | false | internal | Business source of the entry. Allowed: CARD, PAYMENT, FEE, ADJUSTMENT, REVERSAL. |
+| `kind` | `string` | false | internal | Business source of the entry. Allowed: CARD, PAYMENT, FEE, ADJUSTMENT, REVERSAL, DEPOSIT_PAYMENT, LOAN_DRAW, LOAN_REPAYMENT. |
 | `direction` | `string` | false | internal | Customer-account debit or credit. Allowed: DEBIT, CREDIT. |
 | `amount` | `decimal(18,2)` | false | financial | Positive amount in account currency. |
 | `posted_on` | `date` | false | internal | Booking business date. |
 | `description` | `string` | false | internal | Short statement narrative. |
+| `payment_order_id` | `string` | true | identifier | Deposit payment instruction behind this entry, if any. |
+| `loan_disbursement_id` | `string` | true | identifier | Loan draw behind this principal or deposit entry, if any. |
+| `loan_repayment_id` | `string` | true | identifier | Loan repayment behind a principal reduction, if any. |
 
 **Unique keys:** Primary key only.
 
-**Notes:** These are account subledger-style entries, not a balanced general ledger. A separate rule defines balance signs by account kind.
+**Notes:** Customer-facing account entries form a subledger view. The separate journal and posting_link entities support accounting and reconciliation; the model is not a complete bank ledger platform.
 
-**Rules:** R09, R10, R11, R12, R13, R15
+**Rules:** R09, R10, R11, R12, R13, R15, R26, R32, R33, R35
 
 ## payment
 
@@ -600,7 +603,7 @@ A supplied end-of-day account balance.
 | `account_balance_snapshot_id` | `string` | false | identifier | Stable synthetic identifier for account balance snapshot. |
 | `account_id` | `string` | false | identifier | Account summarized. |
 | `as_of_date` | `date` | false | internal | Business date of the snapshot. |
-| `balance_amount` | `decimal(18,2)` | false | financial | Signed deposit funds or signed credit-card amount owed, according to account kind. |
+| `balance_amount` | `decimal(18,2)` | false | financial | Signed deposit funds or credit-card/term-loan amount owed, according to product kind. |
 
 **Unique keys:** account_id, as_of_date
 
@@ -672,4 +675,565 @@ A lifecycle event within a dispute case.
 **Notes:** Chargeback messages, evidence files and provisional-credit postings are deferred.
 
 **Rules:** R17
+
+## onboarding_case
+
+A customer onboarding or refresh workflow.
+
+**Grain:** One onboarding case for an existing customer identity.
+
+**Primary key:** onboarding_case_id
+
+| Column | Type | Nullable | Classification | Definition |
+|---|---|---|---|---|
+| `onboarding_case_id` | `string` | false | identifier | Stable synthetic identifier for onboarding case. |
+| `customer_id` | `string` | false | identifier | Person whose relationship is being reviewed. |
+| `opened_at` | `timestamp` | false | internal | UTC time the case opened. |
+| `case_type` | `string` | false | internal | Reason for this workflow. Allowed: INITIAL, REFRESH. |
+| `status` | `string` | false | internal | Current workflow outcome. Allowed: OPEN, APPROVED, DECLINED, WITHDRAWN. |
+| `closed_at` | `timestamp` | true | internal | UTC closure time, if complete. |
+
+**Unique keys:** Primary key only.
+
+**Notes:** The customer ID may exist before an account is approved. Workflow status is a current snapshot; full workflow events are deferred.
+
+**Rules:** R22, R23, R24
+
+## identity_check
+
+A recorded identity-verification attempt, without identity documents.
+
+**Grain:** One identity check attempt within an onboarding case.
+
+**Primary key:** identity_check_id
+
+| Column | Type | Nullable | Classification | Definition |
+|---|---|---|---|---|
+| `identity_check_id` | `string` | false | identifier | Stable synthetic identifier for identity check. |
+| `onboarding_case_id` | `string` | false | identifier | Case requiring this check. |
+| `method` | `string` | false | internal | Illustrative method category. Allowed: DOCUMENT_REVIEW, TRUSTED_SOURCE. |
+| `outcome` | `string` | false | internal | Recorded result. Allowed: PASS, FAIL, REVIEW. |
+| `checked_at` | `timestamp` | false | internal | UTC time of the check. |
+| `evidence_reference` | `string` | false | personal | Synthetic opaque reference; no document number or image. |
+
+**Unique keys:** Primary key only.
+
+**Notes:** No identity provider integration or statutory verification claim. Repeat attempts are separate rows.
+
+**Rules:** R22
+
+## kyc_review
+
+A due-diligence review outcome recorded for a case.
+
+**Grain:** One review attempt within an onboarding case.
+
+**Primary key:** kyc_review_id
+
+| Column | Type | Nullable | Classification | Definition |
+|---|---|---|---|---|
+| `kyc_review_id` | `string` | false | identifier | Stable synthetic identifier for kyc review. |
+| `onboarding_case_id` | `string` | false | identifier | Case being reviewed. |
+| `outcome` | `string` | false | internal | Recorded reviewer outcome. Allowed: PASS, FAIL, REVIEW. |
+| `reviewed_at` | `timestamp` | false | internal | UTC review time. |
+| `rationale_code` | `string` | false | internal | Synthetic policy rationale code. |
+
+**Unique keys:** Primary key only.
+
+**Notes:** A PASS is a fictional workflow outcome, not proof of compliance. No sensitive review narrative is included.
+
+**Rules:** R22
+
+## screening_review
+
+A screening result and subsequent review outcome.
+
+**Grain:** One screening attempt within an onboarding case.
+
+**Primary key:** screening_review_id
+
+| Column | Type | Nullable | Classification | Definition |
+|---|---|---|---|---|
+| `screening_review_id` | `string` | false | identifier | Stable synthetic identifier for screening review. |
+| `onboarding_case_id` | `string` | false | identifier | Case associated with the screening. |
+| `screening_type` | `string` | false | internal | Illustrative screening purpose. Allowed: SANCTIONS, PEP. |
+| `outcome` | `string` | false | internal | Recorded result. Allowed: CLEAR, REVIEW, CONFIRMED. |
+| `screened_at` | `timestamp` | false | internal | UTC time screening occurred. |
+
+**Unique keys:** Primary key only.
+
+**Notes:** No live lists, matched names or automated decisions. Potential matches require separate human review outside this demo.
+
+**Rules:** R22
+
+## customer_risk_assessment
+
+A dated internal customer risk classification.
+
+**Grain:** One assessment event for one customer.
+
+**Primary key:** customer_risk_assessment_id
+
+| Column | Type | Nullable | Classification | Definition |
+|---|---|---|---|---|
+| `customer_risk_assessment_id` | `string` | false | identifier | Stable synthetic identifier for customer risk assessment. |
+| `customer_id` | `string` | false | identifier | Customer being assessed. |
+| `onboarding_case_id` | `string` | true | identifier | Related onboarding or refresh case, if applicable. |
+| `risk_band` | `string` | false | internal | Illustrative internal classification. Allowed: LOW, MEDIUM, HIGH. |
+| `assessed_at` | `timestamp` | false | internal | UTC assessment time. |
+| `next_review_on` | `date` | false | internal | Planned review date. |
+
+**Unique keys:** Primary key only.
+
+**Notes:** No scoring algorithm or risk inference is implemented. Latest assessment gives current classification.
+
+**Rules:** R24
+
+## product_application
+
+A request to open a deposit or credit-card product.
+
+**Grain:** One product application submitted by a customer.
+
+**Primary key:** product_application_id
+
+| Column | Type | Nullable | Classification | Definition |
+|---|---|---|---|---|
+| `product_application_id` | `string` | false | identifier | Stable synthetic identifier for product application. |
+| `customer_id` | `string` | false | identifier | Applicant. |
+| `product_version_id` | `string` | false | identifier | Requested offering. |
+| `onboarding_case_id` | `string` | false | identifier | Onboarding case supporting the application. |
+| `submitted_at` | `timestamp` | false | internal | UTC submission time. |
+| `status` | `string` | false | internal | Application outcome. Allowed: SUBMITTED, APPROVED, DECLINED, WITHDRAWN. |
+| `booked_account_id` | `string` | true | identifier | Account opened after approval, if booked. |
+
+**Unique keys:** booked_account_id
+
+**Notes:** Term-loan applications use loan_application. Approval need not mean an account has already been booked.
+
+**Rules:** R23
+
+## beneficiary
+
+A payee saved by a customer for an external payment.
+
+**Grain:** One customer-owned beneficiary record.
+
+**Primary key:** beneficiary_id
+
+| Column | Type | Nullable | Classification | Definition |
+|---|---|---|---|---|
+| `beneficiary_id` | `string` | false | identifier | Stable synthetic identifier for beneficiary. |
+| `customer_id` | `string` | false | identifier | Customer who saved the payee. |
+| `display_name` | `string` | false | personal | Invented payee label. |
+| `routing_reference` | `string` | false | personal | Opaque synthetic destination reference; not a real account number. |
+| `status` | `string` | false | internal | Current availability. Allowed: ACTIVE, DISABLED. |
+
+**Unique keys:** Primary key only.
+
+**Notes:** An external payee is not assumed to be another modeled customer. Beneficiary changes and fraud controls are deferred.
+
+**Rules:** R25
+
+## standing_order
+
+A recurring instruction template for an external payment.
+
+**Grain:** One standing-order arrangement.
+
+**Primary key:** standing_order_id
+
+| Column | Type | Nullable | Classification | Definition |
+|---|---|---|---|---|
+| `standing_order_id` | `string` | false | identifier | Stable synthetic identifier for standing order. |
+| `source_account_id` | `string` | false | identifier | Deposit account to debit. |
+| `beneficiary_id` | `string` | false | identifier | Saved external destination. |
+| `amount` | `decimal(18,2)` | false | financial | Positive amount per scheduled execution. |
+| `frequency` | `string` | false | internal | Supported recurrence. Allowed: MONTHLY. |
+| `starts_on` | `date` | false | internal | First eligible date. |
+| `ends_on` | `date` | true | internal | Last eligible date, inclusive. |
+| `status` | `string` | false | internal | Current instruction state. Allowed: ACTIVE, CANCELLED. |
+
+**Unique keys:** Primary key only.
+
+**Notes:** Each execution creates a separate payment_order. Holiday calendars, retry logic and a scheduler are not implemented.
+
+**Rules:** R28
+
+## payment_order
+
+An instruction to move funds from a deposit account.
+
+**Grain:** One customer-authorized internal or outbound payment instruction.
+
+**Primary key:** payment_order_id
+
+| Column | Type | Nullable | Classification | Definition |
+|---|---|---|---|---|
+| `payment_order_id` | `string` | false | identifier | Stable synthetic identifier for payment order. |
+| `source_account_id` | `string` | false | identifier | Deposit account funding the instruction. |
+| `destination_account_id` | `string` | true | identifier | Internal deposit destination; absent for external instructions. |
+| `beneficiary_id` | `string` | true | identifier | External payee; absent for internal instructions. |
+| `standing_order_id` | `string` | true | identifier | Recurring template that produced the order, if any. |
+| `channel_id` | `string` | false | identifier | Channel accepting the instruction. |
+| `currency_id` | `string` | false | identifier | Instruction currency. |
+| `kind` | `string` | false | internal | Supported instruction type. Allowed: INTERNAL, OUTBOUND. |
+| `amount` | `decimal(18,2)` | false | financial | Positive instructed amount. |
+| `requested_at` | `timestamp` | false | internal | UTC acceptance time. |
+| `requested_execution_on` | `date` | false | internal | Requested business execution date. |
+| `idempotency_key` | `string` | false | internal | Unique client-request key in this single-bank scenario. |
+
+**Unique keys:** idempotency_key
+
+**Notes:** Status comes from payment_event. Internal movements have two customer-account entries; external ones have one.
+
+**Rules:** R25, R26, R27, R28
+
+## payment_event
+
+A lifecycle event for a deposit payment instruction.
+
+**Grain:** One execution event for an order.
+
+**Primary key:** payment_event_id
+
+| Column | Type | Nullable | Classification | Definition |
+|---|---|---|---|---|
+| `payment_event_id` | `string` | false | identifier | Stable synthetic identifier for payment event. |
+| `payment_order_id` | `string` | false | identifier | Instruction being progressed. |
+| `status` | `string` | false | internal | New execution state. Allowed: RECEIVED, VALIDATED, POSTED, SETTLED, FAILED, CANCELLED. |
+| `occurred_at` | `timestamp` | false | internal | UTC event time. |
+| `reason_code` | `string` | false | internal | Project-local processing reason. |
+
+**Unique keys:** payment_order_id, occurred_at
+
+**Notes:** Latest event gives status. Posting and external settlement are separate milestones.
+
+**Rules:** R26, R27, R29
+
+## payment_settlement
+
+An observed external settlement result.
+
+**Grain:** One settlement observation for an outbound order.
+
+**Primary key:** payment_settlement_id
+
+| Column | Type | Nullable | Classification | Definition |
+|---|---|---|---|---|
+| `payment_settlement_id` | `string` | false | identifier | Stable synthetic identifier for payment settlement. |
+| `payment_order_id` | `string` | false | identifier | Outbound order being settled. |
+| `currency_id` | `string` | false | identifier | Settlement currency. |
+| `settled_amount` | `decimal(18,2)` | false | financial | Positive settled amount. |
+| `settled_on` | `date` | false | internal | Settlement business date. |
+| `external_reference` | `string` | false | internal | Synthetic clearing reference. |
+
+**Unique keys:** payment_order_id
+
+**Notes:** One full settlement per order in this version. Partial settlement, returns and incoming rails are deferred.
+
+**Rules:** R27
+
+## account_hold
+
+A temporary reservation of funds on a deposit account.
+
+**Grain:** One reservation associated with a payment order.
+
+**Primary key:** account_hold_id
+
+| Column | Type | Nullable | Classification | Definition |
+|---|---|---|---|---|
+| `account_hold_id` | `string` | false | identifier | Stable synthetic identifier for account hold. |
+| `account_id` | `string` | false | identifier | Deposit account with reserved funds. |
+| `payment_order_id` | `string` | false | identifier | Order causing the reservation. |
+| `amount` | `decimal(18,2)` | false | financial | Positive reserved amount. |
+| `placed_at` | `timestamp` | false | internal | UTC reservation time. |
+| `released_at` | `timestamp` | true | internal | UTC release time; null means still held. |
+| `expires_at` | `timestamp` | false | internal | UTC expiry time. |
+
+**Unique keys:** Primary key only.
+
+**Notes:** Holds affect availability but are not booked account entries. Full available-balance computation is deferred.
+
+**Rules:** R28
+
+## loan_application
+
+A request for a fixed-term consumer loan.
+
+**Grain:** One application by one primary borrower.
+
+**Primary key:** loan_application_id
+
+| Column | Type | Nullable | Classification | Definition |
+|---|---|---|---|---|
+| `loan_application_id` | `string` | false | identifier | Stable synthetic identifier for loan application. |
+| `customer_id` | `string` | false | identifier | Applicant and proposed borrower. |
+| `product_version_id` | `string` | false | identifier | Requested TERM_LOAN product. |
+| `onboarding_case_id` | `string` | false | identifier | Supporting onboarding case. |
+| `requested_principal` | `decimal(18,2)` | false | financial | Positive requested principal in CAD. |
+| `requested_term_months` | `integer` | false | internal | Positive requested term. |
+| `submitted_at` | `timestamp` | false | internal | UTC submission time. |
+
+**Unique keys:** Primary key only.
+
+**Notes:** Co-borrowers, collateral and underwriting models are deferred.
+
+**Rules:** R30
+
+## credit_decision
+
+A recorded lending decision for an application.
+
+**Grain:** One dated decision on an application.
+
+**Primary key:** credit_decision_id
+
+| Column | Type | Nullable | Classification | Definition |
+|---|---|---|---|---|
+| `credit_decision_id` | `string` | false | identifier | Stable synthetic identifier for credit decision. |
+| `loan_application_id` | `string` | false | identifier | Application considered. |
+| `outcome` | `string` | false | internal | Decision outcome. Allowed: APPROVED, DECLINED, REFER. |
+| `approved_principal` | `decimal(18,2)` | true | financial | Approved principal; present only for APPROVED. |
+| `approved_term_months` | `integer` | true | internal | Approved term; present only for APPROVED. |
+| `decided_at` | `timestamp` | false | internal | UTC decision time. |
+| `expires_on` | `date` | false | internal | Last valid acceptance date. |
+
+**Unique keys:** Primary key only.
+
+**Notes:** Decisions are supplied synthetic outcomes, not a credit scoring engine. Subsequent decisions are separate rows.
+
+**Rules:** R30, R37
+
+## loan_contract
+
+An accepted fixed-term loan agreement.
+
+**Grain:** One loan contract and its loan account.
+
+**Primary key:** loan_contract_id
+
+| Column | Type | Nullable | Classification | Definition |
+|---|---|---|---|---|
+| `loan_contract_id` | `string` | false | identifier | Stable synthetic identifier for loan contract. |
+| `account_id` | `string` | false | identifier | TERM_LOAN account representing the principal obligation. |
+| `credit_decision_id` | `string` | false | identifier | Approved decision accepted by the borrower. |
+| `principal_amount` | `decimal(18,2)` | false | financial | Contracted principal in account currency. |
+| `term_months` | `integer` | false | internal | Positive contractual term. |
+| `accepted_on` | `date` | false | internal | Contract acceptance date. |
+| `matures_on` | `date` | false | internal | Contractual maturity date. |
+
+**Unique keys:** account_id; credit_decision_id
+
+**Notes:** Rates, interest accrual, modifications, arrears and impairment are out of scope. Schedule interest values are supplied.
+
+**Rules:** R30, R31, R32, R33
+
+## loan_schedule_item
+
+An expected installment in a supplied repayment schedule.
+
+**Grain:** One installment for a loan contract.
+
+**Primary key:** loan_schedule_item_id
+
+| Column | Type | Nullable | Classification | Definition |
+|---|---|---|---|---|
+| `loan_schedule_item_id` | `string` | false | identifier | Stable synthetic identifier for loan schedule item. |
+| `loan_contract_id` | `string` | false | identifier | Contract being scheduled. |
+| `installment_number` | `integer` | false | internal | Positive sequence within the loan. |
+| `due_on` | `date` | false | internal | Due date. |
+| `principal_due` | `decimal(18,2)` | false | financial | Nonnegative scheduled principal. |
+| `interest_due` | `decimal(18,2)` | false | financial | Nonnegative supplied interest amount. |
+
+**Unique keys:** loan_contract_id, installment_number
+
+**Notes:** This version stores a schedule; it does not calculate amortization or allocate payments to installments.
+
+**Rules:** R31
+
+## loan_disbursement
+
+A funded principal draw on a loan contract.
+
+**Grain:** One completed principal disbursement.
+
+**Primary key:** loan_disbursement_id
+
+| Column | Type | Nullable | Classification | Definition |
+|---|---|---|---|---|
+| `loan_disbursement_id` | `string` | false | identifier | Stable synthetic identifier for loan disbursement. |
+| `loan_contract_id` | `string` | false | identifier | Contract providing the funds. |
+| `destination_account_id` | `string` | false | identifier | Internal deposit account receiving proceeds. |
+| `amount` | `decimal(18,2)` | false | financial | Positive principal disbursed. |
+| `disbursed_on` | `date` | false | internal | Funding business date. |
+
+**Unique keys:** loan_contract_id
+
+**Notes:** One full disbursement to a deposit account in this release. External funding and progressive draws are deferred.
+
+**Rules:** R32
+
+## loan_repayment
+
+A received external repayment against a loan.
+
+**Grain:** One received repayment with supplied principal/interest split.
+
+**Primary key:** loan_repayment_id
+
+| Column | Type | Nullable | Classification | Definition |
+|---|---|---|---|---|
+| `loan_repayment_id` | `string` | false | identifier | Stable synthetic identifier for loan repayment. |
+| `loan_contract_id` | `string` | false | identifier | Loan being repaid. |
+| `principal_amount` | `decimal(18,2)` | false | financial | Nonnegative principal portion. |
+| `interest_amount` | `decimal(18,2)` | false | financial | Nonnegative interest portion. |
+| `received_on` | `date` | false | internal | Receipt business date. |
+| `status` | `string` | false | internal | Current processing state. Allowed: PENDING, POSTED, FAILED. |
+
+**Unique keys:** Primary key only.
+
+**Notes:** Only the principal portion reduces the loan account balance. Interest goes to the accounting journal. Payment allocation and delinquency calculation are deferred.
+
+**Rules:** R33
+
+## gl_account
+
+An account in the fictional bank chart of accounts.
+
+**Grain:** One general-ledger account.
+
+**Primary key:** gl_account_id
+
+| Column | Type | Nullable | Classification | Definition |
+|---|---|---|---|---|
+| `gl_account_id` | `string` | false | identifier | Stable synthetic identifier for gl account. |
+| `code` | `string` | false | internal | Unique project-local ledger code. |
+| `name` | `string` | false | internal | Ledger account description. |
+| `account_class` | `string` | false | internal | Financial statement classification. Allowed: ASSET, LIABILITY, EQUITY, INCOME, EXPENSE. |
+| `normal_balance` | `string` | false | internal | Expected normal balance side. Allowed: DEBIT, CREDIT. |
+
+**Unique keys:** code
+
+**Notes:** This is a small illustrative chart, not a regulatory chart of accounts.
+
+**Rules:** R38
+
+## journal
+
+A set of accounting lines posted together.
+
+**Grain:** One single-currency journal for one legal entity.
+
+**Primary key:** journal_id
+
+| Column | Type | Nullable | Classification | Definition |
+|---|---|---|---|---|
+| `journal_id` | `string` | false | identifier | Stable synthetic identifier for journal. |
+| `currency_id` | `string` | false | identifier | Common currency of all lines. |
+| `legal_entity_code` | `string` | false | internal | Single legal entity represented. Allowed: MHB_BANK. |
+| `booked_on` | `date` | false | internal | Accounting business date. |
+| `status` | `string` | false | internal | Journal lifecycle state. Allowed: DRAFT, POSTED. |
+| `description` | `string` | false | internal | Synthetic accounting narrative. |
+| `source_reference` | `string` | false | internal | Unique producer event reference for idempotent ingestion. |
+
+**Unique keys:** source_reference
+
+**Notes:** Every POSTED journal must balance independently. Journals are immutable after posting; corrections use new journals.
+
+**Rules:** R34, R35
+
+## journal_line
+
+One debit or credit within an accounting journal.
+
+**Grain:** One line within one journal.
+
+**Primary key:** journal_line_id
+
+| Column | Type | Nullable | Classification | Definition |
+|---|---|---|---|---|
+| `journal_line_id` | `string` | false | identifier | Stable synthetic identifier for journal line. |
+| `journal_id` | `string` | false | identifier | Journal containing the line. |
+| `gl_account_id` | `string` | false | identifier | Ledger account affected. |
+| `line_number` | `integer` | false | internal | Positive sequence within the journal. |
+| `direction` | `string` | false | internal | Accounting debit or credit. Allowed: DEBIT, CREDIT. |
+| `amount` | `decimal(18,2)` | false | financial | Positive amount in journal currency. |
+
+**Unique keys:** journal_id, line_number
+
+**Notes:** A journal has at least two lines when posted. Bank general-ledger balances and customer-account balances have different meanings.
+
+**Rules:** R34, R35, R38
+
+## posting_link
+
+A reconciliation mapping from customer-account activity to a ledger line.
+
+**Grain:** One allocation of an account entry to a journal line.
+
+**Primary key:** posting_link_id
+
+| Column | Type | Nullable | Classification | Definition |
+|---|---|---|---|---|
+| `posting_link_id` | `string` | false | identifier | Stable synthetic identifier for posting link. |
+| `account_entry_id` | `string` | false | identifier | Customer-account entry being mapped. |
+| `journal_line_id` | `string` | false | identifier | Related ledger line. |
+| `allocated_amount` | `decimal(18,2)` | false | financial | Positive mapped portion of the account entry. |
+
+**Unique keys:** account_entry_id, journal_line_id
+
+**Notes:** The mapped line uses the same debit/credit direction and currency as the account entry. Counterpart ledger lines need not have customer-account entries.
+
+**Rules:** R35
+
+## reconciliation_run
+
+A recorded comparison between two financial record sets.
+
+**Grain:** One reconciliation execution for one business date and scope.
+
+**Primary key:** reconciliation_run_id
+
+| Column | Type | Nullable | Classification | Definition |
+|---|---|---|---|---|
+| `reconciliation_run_id` | `string` | false | identifier | Stable synthetic identifier for reconciliation run. |
+| `business_date` | `date` | false | internal | Date being reconciled. |
+| `scope` | `string` | false | internal | Comparison being performed. Allowed: ACCOUNT_TO_GL, PAYMENT_TO_SETTLEMENT, STATEMENT_TO_ENTRIES. |
+| `started_at` | `timestamp` | false | internal | UTC start time. |
+| `completed_at` | `timestamp` | true | internal | UTC completion time. |
+| `status` | `string` | false | internal | Execution outcome. Allowed: RUNNING, COMPLETE, FAILED. |
+
+**Unique keys:** Primary key only.
+
+**Notes:** A COMPLETE run may still contain unmatched items; completion does not mean reconciliation succeeded.
+
+**Rules:** R36
+
+## reconciliation_item
+
+A match or exception recorded by a reconciliation run.
+
+**Grain:** One comparison outcome within one run.
+
+**Primary key:** reconciliation_item_id
+
+| Column | Type | Nullable | Classification | Definition |
+|---|---|---|---|---|
+| `reconciliation_item_id` | `string` | false | identifier | Stable synthetic identifier for reconciliation item. |
+| `reconciliation_run_id` | `string` | false | identifier | Run that produced the outcome. |
+| `account_entry_id` | `string` | true | identifier | Entry involved when comparing account and ledger records. |
+| `journal_line_id` | `string` | true | identifier | Ledger line involved when available. |
+| `payment_order_id` | `string` | true | identifier | Order involved when comparing payments and settlement. |
+| `statement_id` | `string` | true | identifier | Statement involved when comparing billing totals. |
+| `outcome` | `string` | false | internal | Comparison result. Allowed: MATCHED, UNMATCHED, AMOUNT_MISMATCH. |
+| `difference_amount` | `decimal(18,2)` | false | financial | Signed left-side minus right-side difference in CAD. |
+| `explanation` | `string` | false | internal | Synthetic explanation of the match or exception. |
+
+**Unique keys:** Primary key only.
+
+**Notes:** References are conditional on run scope. A reconciliation result is evidence, not a financial posting.
+
+**Rules:** R36
 

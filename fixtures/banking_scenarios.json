@@ -1,0 +1,1173 @@
+{
+  "description": "All records are synthetic. Opening deposit balance D1=1000.00 is assumed, not a journal generated here.",
+  "opening_balances": {
+    "D1": "1000.00",
+    "D2": "0.00",
+    "CC1": "0.00",
+    "LN1": "0.00"
+  },
+  "expected_closing_balances": {
+    "D1": "1750.00",
+    "D2": "175.00",
+    "CC1": "50.00",
+    "LN1": "900.00"
+  },
+  "tables": {
+    "currency": [
+      {
+        "currency_id": "CAD",
+        "code": "CAD",
+        "minor_unit_digits": 2
+      }
+    ],
+    "branch": [
+      {
+        "branch_id": "BR1",
+        "branch_code": "MHB001",
+        "name": "Maple Harbour Digital",
+        "province_code": "ON"
+      }
+    ],
+    "channel": [
+      {
+        "channel_id": "WEB",
+        "code": "WEB",
+        "name": "Online banking"
+      }
+    ],
+    "customer": [
+      {
+        "customer_id": "C1",
+        "display_name": "Alex Example",
+        "customer_since": "2026-01-01",
+        "segment": "STANDARD",
+        "status": "ACTIVE"
+      },
+      {
+        "customer_id": "C2",
+        "display_name": "Sam Example",
+        "customer_since": "2026-01-01",
+        "segment": "STANDARD",
+        "status": "ACTIVE"
+      }
+    ],
+    "product": [
+      {
+        "product_id": "PD",
+        "name": "Everyday Deposit",
+        "kind": "DEPOSIT"
+      },
+      {
+        "product_id": "PC",
+        "name": "Everyday Card",
+        "kind": "CREDIT_CARD"
+      },
+      {
+        "product_id": "PL",
+        "name": "Personal Term Loan",
+        "kind": "TERM_LOAN"
+      }
+    ],
+    "product_version": [
+      {
+        "product_version_id": "VPD",
+        "product_id": "PD",
+        "version_number": 1,
+        "effective_from": "2026-01-01",
+        "terms_summary": "Synthetic demonstration terms."
+      },
+      {
+        "product_version_id": "VPC",
+        "product_id": "PC",
+        "version_number": 1,
+        "effective_from": "2026-01-01",
+        "terms_summary": "Synthetic demonstration terms."
+      },
+      {
+        "product_version_id": "VPL",
+        "product_id": "PL",
+        "version_number": 1,
+        "effective_from": "2026-01-01",
+        "terms_summary": "Synthetic demonstration terms."
+      }
+    ],
+    "account": [
+      {
+        "account_id": "D1",
+        "product_version_id": "VPD",
+        "branch_id": "BR1",
+        "currency_id": "CAD",
+        "opened_on": "2026-09-01"
+      },
+      {
+        "account_id": "D2",
+        "product_version_id": "VPD",
+        "branch_id": "BR1",
+        "currency_id": "CAD",
+        "opened_on": "2026-09-01"
+      },
+      {
+        "account_id": "CC1",
+        "product_version_id": "VPC",
+        "branch_id": "BR1",
+        "currency_id": "CAD",
+        "opened_on": "2026-09-01"
+      },
+      {
+        "account_id": "LN1",
+        "product_version_id": "VPL",
+        "branch_id": "BR1",
+        "currency_id": "CAD",
+        "opened_on": "2026-09-01"
+      }
+    ],
+    "account_holder": [
+      {
+        "account_holder_id": "HD1",
+        "account_id": "D1",
+        "customer_id": "C1",
+        "role": "PRIMARY",
+        "valid_from": "2026-09-01"
+      },
+      {
+        "account_holder_id": "HD2",
+        "account_id": "D2",
+        "customer_id": "C2",
+        "role": "PRIMARY",
+        "valid_from": "2026-09-01"
+      },
+      {
+        "account_holder_id": "HCC1",
+        "account_id": "CC1",
+        "customer_id": "C1",
+        "role": "PRIMARY",
+        "valid_from": "2026-09-01"
+      },
+      {
+        "account_holder_id": "HLN1",
+        "account_id": "LN1",
+        "customer_id": "C1",
+        "role": "PRIMARY",
+        "valid_from": "2026-09-01"
+      }
+    ],
+    "account_status_event": [
+      {
+        "account_status_event_id": "SD1",
+        "account_id": "D1",
+        "status": "OPEN",
+        "effective_at": "2026-09-01T10:00:00",
+        "reason": "Synthetic account opening"
+      },
+      {
+        "account_status_event_id": "SD2",
+        "account_id": "D2",
+        "status": "OPEN",
+        "effective_at": "2026-09-01T10:00:00",
+        "reason": "Synthetic account opening"
+      },
+      {
+        "account_status_event_id": "SCC1",
+        "account_id": "CC1",
+        "status": "OPEN",
+        "effective_at": "2026-09-01T10:00:00",
+        "reason": "Synthetic account opening"
+      },
+      {
+        "account_status_event_id": "SLN1",
+        "account_id": "LN1",
+        "status": "OPEN",
+        "effective_at": "2026-09-01T10:00:00",
+        "reason": "Synthetic account opening"
+      }
+    ],
+    "credit_facility": [
+      {
+        "credit_facility_id": "CF1",
+        "account_id": "CC1",
+        "approved_on": "2026-09-01",
+        "currency_id": "CAD"
+      }
+    ],
+    "credit_limit_event": [
+      {
+        "credit_limit_event_id": "CL1",
+        "credit_facility_id": "CF1",
+        "effective_at": "2026-09-01T10:00:00",
+        "limit_amount": "5000.00",
+        "reason": "Initial approval"
+      }
+    ],
+    "card": [
+      {
+        "card_id": "CARD1",
+        "account_id": "CC1",
+        "issued_on": "2026-09-01",
+        "expires_on": "2029-09-30"
+      }
+    ],
+    "card_assignment": [
+      {
+        "card_assignment_id": "CA1",
+        "card_id": "CARD1",
+        "customer_id": "C2",
+        "role": "SUPPLEMENTARY",
+        "valid_from": "2026-09-01"
+      }
+    ],
+    "card_status_event": [
+      {
+        "card_status_event_id": "CS1",
+        "card_id": "CARD1",
+        "status": "ISSUED",
+        "effective_at": "2026-09-01T10:00:00"
+      },
+      {
+        "card_status_event_id": "CS2",
+        "card_id": "CARD1",
+        "status": "ACTIVE",
+        "effective_at": "2026-09-02T10:00:00"
+      }
+    ],
+    "merchant_category": [
+      {
+        "merchant_category_id": "MC1",
+        "code": "RETAIL_DEMO",
+        "name": "Illustrative retail"
+      }
+    ],
+    "merchant": [
+      {
+        "merchant_id": "M1",
+        "merchant_category_id": "MC1",
+        "name": "Example Store",
+        "country_code": "CA"
+      }
+    ],
+    "card_authorization": [
+      {
+        "card_authorization_id": "AUTH1",
+        "card_id": "CARD1",
+        "merchant_id": "M1",
+        "currency_id": "CAD",
+        "requested_amount": "120.00",
+        "requested_at": "2026-09-10T15:00:00",
+        "decision": "APPROVED",
+        "channel_id": "WEB"
+      }
+    ],
+    "card_transaction": [
+      {
+        "card_transaction_id": "PUR1",
+        "card_id": "CARD1",
+        "merchant_id": "M1",
+        "currency_id": "CAD",
+        "authorization_id": "AUTH1",
+        "kind": "PURCHASE",
+        "amount": "120.00",
+        "occurred_at": "2026-09-10T15:00:00",
+        "posted_on": "2026-09-11"
+      },
+      {
+        "card_transaction_id": "REF1",
+        "card_id": "CARD1",
+        "merchant_id": "M1",
+        "currency_id": "CAD",
+        "original_transaction_id": "PUR1",
+        "kind": "REFUND",
+        "amount": "20.00",
+        "occurred_at": "2026-09-12T15:00:00",
+        "posted_on": "2026-09-13"
+      }
+    ],
+    "payment": [
+      {
+        "payment_id": "CP1",
+        "account_id": "CC1",
+        "channel_id": "WEB",
+        "currency_id": "CAD",
+        "amount": "50.00",
+        "received_at": "2026-09-15T15:00:00",
+        "status": "POSTED"
+      }
+    ],
+    "onboarding_case": [
+      {
+        "onboarding_case_id": "ON1",
+        "customer_id": "C1",
+        "opened_at": "2026-08-20T12:00:00",
+        "case_type": "INITIAL",
+        "status": "APPROVED",
+        "closed_at": "2026-08-21T17:00:00"
+      }
+    ],
+    "identity_check": [
+      {
+        "identity_check_id": "ID1",
+        "onboarding_case_id": "ON1",
+        "method": "TRUSTED_SOURCE",
+        "outcome": "PASS",
+        "checked_at": "2026-08-21T12:00:00",
+        "evidence_reference": "SYNTHETIC_EVIDENCE_ONLY"
+      }
+    ],
+    "kyc_review": [
+      {
+        "kyc_review_id": "KYC1",
+        "onboarding_case_id": "ON1",
+        "outcome": "PASS",
+        "reviewed_at": "2026-08-21T13:00:00",
+        "rationale_code": "DEMO_REVIEW_COMPLETE"
+      }
+    ],
+    "screening_review": [
+      {
+        "screening_review_id": "SCR0",
+        "onboarding_case_id": "ON1",
+        "screening_type": "SANCTIONS",
+        "outcome": "CLEAR",
+        "screened_at": "2026-08-21T14:00:00"
+      },
+      {
+        "screening_review_id": "SCR1",
+        "onboarding_case_id": "ON1",
+        "screening_type": "PEP",
+        "outcome": "CLEAR",
+        "screened_at": "2026-08-21T14:00:00"
+      }
+    ],
+    "customer_risk_assessment": [
+      {
+        "customer_risk_assessment_id": "RISK1",
+        "customer_id": "C1",
+        "onboarding_case_id": "ON1",
+        "risk_band": "LOW",
+        "assessed_at": "2026-08-21T16:00:00",
+        "next_review_on": "2027-08-21"
+      }
+    ],
+    "product_application": [
+      {
+        "product_application_id": "PA1",
+        "customer_id": "C1",
+        "product_version_id": "VPD",
+        "onboarding_case_id": "ON1",
+        "submitted_at": "2026-08-21T17:00:00",
+        "status": "APPROVED",
+        "booked_account_id": "D1"
+      }
+    ],
+    "beneficiary": [
+      {
+        "beneficiary_id": "B1",
+        "customer_id": "C2",
+        "display_name": "Example Utility",
+        "routing_reference": "SYNTHETIC_ROUTE_001",
+        "status": "ACTIVE"
+      }
+    ],
+    "standing_order": [
+      {
+        "standing_order_id": "SO1",
+        "source_account_id": "D2",
+        "beneficiary_id": "B1",
+        "amount": "75.00",
+        "frequency": "MONTHLY",
+        "starts_on": "2026-09-20",
+        "status": "ACTIVE"
+      }
+    ],
+    "payment_order": [
+      {
+        "payment_order_id": "PO_INT",
+        "source_account_id": "D1",
+        "destination_account_id": "D2",
+        "channel_id": "WEB",
+        "currency_id": "CAD",
+        "kind": "INTERNAL",
+        "amount": "250.00",
+        "requested_at": "2026-09-16T12:00:00",
+        "requested_execution_on": "2026-09-16",
+        "idempotency_key": "SYNTH_INT_001"
+      },
+      {
+        "payment_order_id": "PO_OUT",
+        "source_account_id": "D2",
+        "beneficiary_id": "B1",
+        "standing_order_id": "SO1",
+        "channel_id": "WEB",
+        "currency_id": "CAD",
+        "kind": "OUTBOUND",
+        "amount": "75.00",
+        "requested_at": "2026-09-20T12:00:00",
+        "requested_execution_on": "2026-09-20",
+        "idempotency_key": "SYNTH_OUT_001"
+      }
+    ],
+    "payment_event": [
+      {
+        "payment_event_id": "PO_INT0",
+        "payment_order_id": "PO_INT",
+        "status": "RECEIVED",
+        "occurred_at": "2026-09-16T12:00:00",
+        "reason_code": "DEMO_RECEIVED"
+      },
+      {
+        "payment_event_id": "PO_INT1",
+        "payment_order_id": "PO_INT",
+        "status": "VALIDATED",
+        "occurred_at": "2026-09-16T13:00:00",
+        "reason_code": "DEMO_VALIDATED"
+      },
+      {
+        "payment_event_id": "PO_INT2",
+        "payment_order_id": "PO_INT",
+        "status": "POSTED",
+        "occurred_at": "2026-09-16T14:00:00",
+        "reason_code": "DEMO_POSTED"
+      },
+      {
+        "payment_event_id": "PO_OUT0",
+        "payment_order_id": "PO_OUT",
+        "status": "RECEIVED",
+        "occurred_at": "2026-09-20T12:00:00",
+        "reason_code": "DEMO_RECEIVED"
+      },
+      {
+        "payment_event_id": "PO_OUT1",
+        "payment_order_id": "PO_OUT",
+        "status": "VALIDATED",
+        "occurred_at": "2026-09-20T13:00:00",
+        "reason_code": "DEMO_VALIDATED"
+      },
+      {
+        "payment_event_id": "PO_OUT2",
+        "payment_order_id": "PO_OUT",
+        "status": "POSTED",
+        "occurred_at": "2026-09-20T14:00:00",
+        "reason_code": "DEMO_POSTED"
+      },
+      {
+        "payment_event_id": "PO_OUT3",
+        "payment_order_id": "PO_OUT",
+        "status": "SETTLED",
+        "occurred_at": "2026-09-20T15:00:00",
+        "reason_code": "DEMO_SETTLED"
+      }
+    ],
+    "payment_settlement": [
+      {
+        "payment_settlement_id": "SET1",
+        "payment_order_id": "PO_OUT",
+        "currency_id": "CAD",
+        "settled_amount": "75.00",
+        "settled_on": "2026-09-20",
+        "external_reference": "SYNTHETIC_CLEARING_001"
+      }
+    ],
+    "account_hold": [
+      {
+        "account_hold_id": "HOLD1",
+        "account_id": "D2",
+        "payment_order_id": "PO_OUT",
+        "amount": "75.00",
+        "placed_at": "2026-09-20T12:00:00",
+        "released_at": "2026-09-20T14:00:00",
+        "expires_at": "2026-09-21T12:00:00"
+      }
+    ],
+    "loan_application": [
+      {
+        "loan_application_id": "LA1",
+        "customer_id": "C1",
+        "product_version_id": "VPL",
+        "onboarding_case_id": "ON1",
+        "requested_principal": "1000.00",
+        "requested_term_months": 10,
+        "submitted_at": "2026-08-25T12:00:00"
+      }
+    ],
+    "credit_decision": [
+      {
+        "credit_decision_id": "CD1",
+        "loan_application_id": "LA1",
+        "outcome": "APPROVED",
+        "approved_principal": "1000.00",
+        "approved_term_months": 10,
+        "decided_at": "2026-08-26T12:00:00",
+        "expires_on": "2026-09-15"
+      }
+    ],
+    "loan_contract": [
+      {
+        "loan_contract_id": "LC1",
+        "account_id": "LN1",
+        "credit_decision_id": "CD1",
+        "principal_amount": "1000.00",
+        "term_months": 10,
+        "accepted_on": "2026-09-01",
+        "matures_on": "2027-07-01"
+      }
+    ],
+    "loan_schedule_item": [
+      {
+        "loan_schedule_item_id": "LS1",
+        "loan_contract_id": "LC1",
+        "installment_number": 1,
+        "due_on": "2026-10-01",
+        "principal_due": "100.00",
+        "interest_due": "10.00"
+      },
+      {
+        "loan_schedule_item_id": "LS2",
+        "loan_contract_id": "LC1",
+        "installment_number": 2,
+        "due_on": "2026-11-01",
+        "principal_due": "100.00",
+        "interest_due": "10.00"
+      },
+      {
+        "loan_schedule_item_id": "LS3",
+        "loan_contract_id": "LC1",
+        "installment_number": 3,
+        "due_on": "2026-12-01",
+        "principal_due": "100.00",
+        "interest_due": "10.00"
+      },
+      {
+        "loan_schedule_item_id": "LS4",
+        "loan_contract_id": "LC1",
+        "installment_number": 4,
+        "due_on": "2027-01-01",
+        "principal_due": "100.00",
+        "interest_due": "10.00"
+      },
+      {
+        "loan_schedule_item_id": "LS5",
+        "loan_contract_id": "LC1",
+        "installment_number": 5,
+        "due_on": "2027-02-01",
+        "principal_due": "100.00",
+        "interest_due": "10.00"
+      },
+      {
+        "loan_schedule_item_id": "LS6",
+        "loan_contract_id": "LC1",
+        "installment_number": 6,
+        "due_on": "2027-03-01",
+        "principal_due": "100.00",
+        "interest_due": "10.00"
+      },
+      {
+        "loan_schedule_item_id": "LS7",
+        "loan_contract_id": "LC1",
+        "installment_number": 7,
+        "due_on": "2027-04-01",
+        "principal_due": "100.00",
+        "interest_due": "10.00"
+      },
+      {
+        "loan_schedule_item_id": "LS8",
+        "loan_contract_id": "LC1",
+        "installment_number": 8,
+        "due_on": "2027-05-01",
+        "principal_due": "100.00",
+        "interest_due": "10.00"
+      },
+      {
+        "loan_schedule_item_id": "LS9",
+        "loan_contract_id": "LC1",
+        "installment_number": 9,
+        "due_on": "2027-06-01",
+        "principal_due": "100.00",
+        "interest_due": "10.00"
+      },
+      {
+        "loan_schedule_item_id": "LS10",
+        "loan_contract_id": "LC1",
+        "installment_number": 10,
+        "due_on": "2027-07-01",
+        "principal_due": "100.00",
+        "interest_due": "10.00"
+      }
+    ],
+    "loan_disbursement": [
+      {
+        "loan_disbursement_id": "LD1",
+        "loan_contract_id": "LC1",
+        "destination_account_id": "D1",
+        "amount": "1000.00",
+        "disbursed_on": "2026-09-17"
+      }
+    ],
+    "loan_repayment": [
+      {
+        "loan_repayment_id": "LR1",
+        "loan_contract_id": "LC1",
+        "principal_amount": "100.00",
+        "interest_amount": "10.00",
+        "received_on": "2026-09-25",
+        "status": "POSTED"
+      }
+    ],
+    "account_entry": [
+      {
+        "account_entry_id": "E_PUR",
+        "account_id": "CC1",
+        "kind": "CARD",
+        "direction": "DEBIT",
+        "amount": "120.00",
+        "posted_on": "2026-09-11",
+        "description": "Synthetic card",
+        "card_transaction_id": "PUR1"
+      },
+      {
+        "account_entry_id": "E_REF",
+        "account_id": "CC1",
+        "kind": "CARD",
+        "direction": "CREDIT",
+        "amount": "20.00",
+        "posted_on": "2026-09-13",
+        "description": "Synthetic card",
+        "card_transaction_id": "REF1"
+      },
+      {
+        "account_entry_id": "E_CP",
+        "account_id": "CC1",
+        "kind": "PAYMENT",
+        "direction": "CREDIT",
+        "amount": "50.00",
+        "posted_on": "2026-09-15",
+        "description": "Synthetic payment",
+        "payment_id": "CP1"
+      },
+      {
+        "account_entry_id": "E_TD",
+        "account_id": "D1",
+        "kind": "DEPOSIT_PAYMENT",
+        "direction": "DEBIT",
+        "amount": "250.00",
+        "posted_on": "2026-09-16",
+        "description": "Synthetic deposit payment",
+        "payment_order_id": "PO_INT"
+      },
+      {
+        "account_entry_id": "E_TC",
+        "account_id": "D2",
+        "kind": "DEPOSIT_PAYMENT",
+        "direction": "CREDIT",
+        "amount": "250.00",
+        "posted_on": "2026-09-16",
+        "description": "Synthetic deposit payment",
+        "payment_order_id": "PO_INT"
+      },
+      {
+        "account_entry_id": "E_LD",
+        "account_id": "LN1",
+        "kind": "LOAN_DRAW",
+        "direction": "DEBIT",
+        "amount": "1000.00",
+        "posted_on": "2026-09-17",
+        "description": "Synthetic loan draw",
+        "loan_disbursement_id": "LD1"
+      },
+      {
+        "account_entry_id": "E_LF",
+        "account_id": "D1",
+        "kind": "LOAN_DRAW",
+        "direction": "CREDIT",
+        "amount": "1000.00",
+        "posted_on": "2026-09-17",
+        "description": "Synthetic loan draw",
+        "loan_disbursement_id": "LD1"
+      },
+      {
+        "account_entry_id": "E_OUT",
+        "account_id": "D2",
+        "kind": "DEPOSIT_PAYMENT",
+        "direction": "DEBIT",
+        "amount": "75.00",
+        "posted_on": "2026-09-20",
+        "description": "Synthetic deposit payment",
+        "payment_order_id": "PO_OUT"
+      },
+      {
+        "account_entry_id": "E_LR",
+        "account_id": "LN1",
+        "kind": "LOAN_REPAYMENT",
+        "direction": "CREDIT",
+        "amount": "100.00",
+        "posted_on": "2026-09-25",
+        "description": "Synthetic loan repayment",
+        "loan_repayment_id": "LR1"
+      }
+    ],
+    "statement": [
+      {
+        "statement_id": "ST1",
+        "account_id": "CC1",
+        "period_start": "2026-09-01",
+        "period_end_exclusive": "2026-10-01",
+        "issued_on": "2026-10-01",
+        "due_on": "2026-10-22",
+        "opening_balance": "0.00",
+        "closing_balance": "50.00",
+        "minimum_due": "10.00"
+      }
+    ],
+    "statement_line": [
+      {
+        "statement_line_id": "SL1",
+        "statement_id": "ST1",
+        "account_entry_id": "E_PUR",
+        "line_number": 1,
+        "narrative": "Synthetic E_PUR"
+      },
+      {
+        "statement_line_id": "SL2",
+        "statement_id": "ST1",
+        "account_entry_id": "E_REF",
+        "line_number": 2,
+        "narrative": "Synthetic E_REF"
+      },
+      {
+        "statement_line_id": "SL3",
+        "statement_id": "ST1",
+        "account_entry_id": "E_CP",
+        "line_number": 3,
+        "narrative": "Synthetic E_CP"
+      }
+    ],
+    "account_balance_snapshot": [
+      {
+        "account_balance_snapshot_id": "BAL_CC1",
+        "account_id": "CC1",
+        "as_of_date": "2026-09-30",
+        "balance_amount": "50.00"
+      },
+      {
+        "account_balance_snapshot_id": "BAL_D1",
+        "account_id": "D1",
+        "as_of_date": "2026-09-30",
+        "balance_amount": "1750.00"
+      },
+      {
+        "account_balance_snapshot_id": "BAL_D2",
+        "account_id": "D2",
+        "as_of_date": "2026-09-30",
+        "balance_amount": "175.00"
+      },
+      {
+        "account_balance_snapshot_id": "BAL_LN1",
+        "account_id": "LN1",
+        "as_of_date": "2026-09-30",
+        "balance_amount": "900.00"
+      }
+    ],
+    "gl_account": [
+      {
+        "gl_account_id": "G_CASH",
+        "code": "G_CASH",
+        "name": "Settlement cash",
+        "account_class": "ASSET",
+        "normal_balance": "DEBIT"
+      },
+      {
+        "gl_account_id": "G_CARD",
+        "code": "G_CARD",
+        "name": "Credit-card receivables",
+        "account_class": "ASSET",
+        "normal_balance": "DEBIT"
+      },
+      {
+        "gl_account_id": "G_LOAN",
+        "code": "G_LOAN",
+        "name": "Term-loan principal",
+        "account_class": "ASSET",
+        "normal_balance": "DEBIT"
+      },
+      {
+        "gl_account_id": "G_DEP",
+        "code": "G_DEP",
+        "name": "Customer deposits",
+        "account_class": "LIABILITY",
+        "normal_balance": "CREDIT"
+      },
+      {
+        "gl_account_id": "G_CLEAR",
+        "code": "G_CLEAR",
+        "name": "Settlement payable",
+        "account_class": "LIABILITY",
+        "normal_balance": "CREDIT"
+      },
+      {
+        "gl_account_id": "G_INT",
+        "code": "G_INT",
+        "name": "Loan interest income",
+        "account_class": "INCOME",
+        "normal_balance": "CREDIT"
+      }
+    ],
+    "journal": [
+      {
+        "journal_id": "J_PUR",
+        "currency_id": "CAD",
+        "legal_entity_code": "MHB_BANK",
+        "booked_on": "2026-09-11",
+        "status": "POSTED",
+        "description": "Synthetic J_PUR",
+        "source_reference": "SRC_J_PUR"
+      },
+      {
+        "journal_id": "J_REF",
+        "currency_id": "CAD",
+        "legal_entity_code": "MHB_BANK",
+        "booked_on": "2026-09-13",
+        "status": "POSTED",
+        "description": "Synthetic J_REF",
+        "source_reference": "SRC_J_REF"
+      },
+      {
+        "journal_id": "J_CP",
+        "currency_id": "CAD",
+        "legal_entity_code": "MHB_BANK",
+        "booked_on": "2026-09-15",
+        "status": "POSTED",
+        "description": "Synthetic J_CP",
+        "source_reference": "SRC_J_CP"
+      },
+      {
+        "journal_id": "J_INT",
+        "currency_id": "CAD",
+        "legal_entity_code": "MHB_BANK",
+        "booked_on": "2026-09-16",
+        "status": "POSTED",
+        "description": "Synthetic J_INT",
+        "source_reference": "SRC_J_INT"
+      },
+      {
+        "journal_id": "J_LOAN",
+        "currency_id": "CAD",
+        "legal_entity_code": "MHB_BANK",
+        "booked_on": "2026-09-17",
+        "status": "POSTED",
+        "description": "Synthetic J_LOAN",
+        "source_reference": "SRC_J_LOAN"
+      },
+      {
+        "journal_id": "J_OUT",
+        "currency_id": "CAD",
+        "legal_entity_code": "MHB_BANK",
+        "booked_on": "2026-09-20",
+        "status": "POSTED",
+        "description": "Synthetic J_OUT",
+        "source_reference": "SRC_J_OUT"
+      },
+      {
+        "journal_id": "J_SETTLE",
+        "currency_id": "CAD",
+        "legal_entity_code": "MHB_BANK",
+        "booked_on": "2026-09-20",
+        "status": "POSTED",
+        "description": "Synthetic J_SETTLE",
+        "source_reference": "SRC_J_SETTLE"
+      },
+      {
+        "journal_id": "J_REPAY",
+        "currency_id": "CAD",
+        "legal_entity_code": "MHB_BANK",
+        "booked_on": "2026-09-25",
+        "status": "POSTED",
+        "description": "Synthetic J_REPAY",
+        "source_reference": "SRC_J_REPAY"
+      }
+    ],
+    "journal_line": [
+      {
+        "journal_line_id": "J_PUR_1",
+        "journal_id": "J_PUR",
+        "gl_account_id": "G_CARD",
+        "line_number": 1,
+        "direction": "DEBIT",
+        "amount": "120.00"
+      },
+      {
+        "journal_line_id": "J_PUR_2",
+        "journal_id": "J_PUR",
+        "gl_account_id": "G_CLEAR",
+        "line_number": 2,
+        "direction": "CREDIT",
+        "amount": "120.00"
+      },
+      {
+        "journal_line_id": "J_REF_1",
+        "journal_id": "J_REF",
+        "gl_account_id": "G_CLEAR",
+        "line_number": 1,
+        "direction": "DEBIT",
+        "amount": "20.00"
+      },
+      {
+        "journal_line_id": "J_REF_2",
+        "journal_id": "J_REF",
+        "gl_account_id": "G_CARD",
+        "line_number": 2,
+        "direction": "CREDIT",
+        "amount": "20.00"
+      },
+      {
+        "journal_line_id": "J_CP_1",
+        "journal_id": "J_CP",
+        "gl_account_id": "G_CASH",
+        "line_number": 1,
+        "direction": "DEBIT",
+        "amount": "50.00"
+      },
+      {
+        "journal_line_id": "J_CP_2",
+        "journal_id": "J_CP",
+        "gl_account_id": "G_CARD",
+        "line_number": 2,
+        "direction": "CREDIT",
+        "amount": "50.00"
+      },
+      {
+        "journal_line_id": "J_INT_1",
+        "journal_id": "J_INT",
+        "gl_account_id": "G_DEP",
+        "line_number": 1,
+        "direction": "DEBIT",
+        "amount": "250.00"
+      },
+      {
+        "journal_line_id": "J_INT_2",
+        "journal_id": "J_INT",
+        "gl_account_id": "G_DEP",
+        "line_number": 2,
+        "direction": "CREDIT",
+        "amount": "250.00"
+      },
+      {
+        "journal_line_id": "J_LOAN_1",
+        "journal_id": "J_LOAN",
+        "gl_account_id": "G_LOAN",
+        "line_number": 1,
+        "direction": "DEBIT",
+        "amount": "1000.00"
+      },
+      {
+        "journal_line_id": "J_LOAN_2",
+        "journal_id": "J_LOAN",
+        "gl_account_id": "G_DEP",
+        "line_number": 2,
+        "direction": "CREDIT",
+        "amount": "1000.00"
+      },
+      {
+        "journal_line_id": "J_OUT_1",
+        "journal_id": "J_OUT",
+        "gl_account_id": "G_DEP",
+        "line_number": 1,
+        "direction": "DEBIT",
+        "amount": "75.00"
+      },
+      {
+        "journal_line_id": "J_OUT_2",
+        "journal_id": "J_OUT",
+        "gl_account_id": "G_CLEAR",
+        "line_number": 2,
+        "direction": "CREDIT",
+        "amount": "75.00"
+      },
+      {
+        "journal_line_id": "J_SETTLE_1",
+        "journal_id": "J_SETTLE",
+        "gl_account_id": "G_CLEAR",
+        "line_number": 1,
+        "direction": "DEBIT",
+        "amount": "75.00"
+      },
+      {
+        "journal_line_id": "J_SETTLE_2",
+        "journal_id": "J_SETTLE",
+        "gl_account_id": "G_CASH",
+        "line_number": 2,
+        "direction": "CREDIT",
+        "amount": "75.00"
+      },
+      {
+        "journal_line_id": "J_REPAY_1",
+        "journal_id": "J_REPAY",
+        "gl_account_id": "G_CASH",
+        "line_number": 1,
+        "direction": "DEBIT",
+        "amount": "110.00"
+      },
+      {
+        "journal_line_id": "J_REPAY_2",
+        "journal_id": "J_REPAY",
+        "gl_account_id": "G_LOAN",
+        "line_number": 2,
+        "direction": "CREDIT",
+        "amount": "100.00"
+      },
+      {
+        "journal_line_id": "J_REPAY_3",
+        "journal_id": "J_REPAY",
+        "gl_account_id": "G_INT",
+        "line_number": 3,
+        "direction": "CREDIT",
+        "amount": "10.00"
+      }
+    ],
+    "posting_link": [
+      {
+        "posting_link_id": "MAP_E_PUR",
+        "account_entry_id": "E_PUR",
+        "journal_line_id": "J_PUR_1",
+        "allocated_amount": "120.00"
+      },
+      {
+        "posting_link_id": "MAP_E_REF",
+        "account_entry_id": "E_REF",
+        "journal_line_id": "J_REF_2",
+        "allocated_amount": "20.00"
+      },
+      {
+        "posting_link_id": "MAP_E_CP",
+        "account_entry_id": "E_CP",
+        "journal_line_id": "J_CP_2",
+        "allocated_amount": "50.00"
+      },
+      {
+        "posting_link_id": "MAP_E_TD",
+        "account_entry_id": "E_TD",
+        "journal_line_id": "J_INT_1",
+        "allocated_amount": "250.00"
+      },
+      {
+        "posting_link_id": "MAP_E_TC",
+        "account_entry_id": "E_TC",
+        "journal_line_id": "J_INT_2",
+        "allocated_amount": "250.00"
+      },
+      {
+        "posting_link_id": "MAP_E_LD",
+        "account_entry_id": "E_LD",
+        "journal_line_id": "J_LOAN_1",
+        "allocated_amount": "1000.00"
+      },
+      {
+        "posting_link_id": "MAP_E_LF",
+        "account_entry_id": "E_LF",
+        "journal_line_id": "J_LOAN_2",
+        "allocated_amount": "1000.00"
+      },
+      {
+        "posting_link_id": "MAP_E_OUT",
+        "account_entry_id": "E_OUT",
+        "journal_line_id": "J_OUT_1",
+        "allocated_amount": "75.00"
+      },
+      {
+        "posting_link_id": "MAP_E_LR",
+        "account_entry_id": "E_LR",
+        "journal_line_id": "J_REPAY_2",
+        "allocated_amount": "100.00"
+      }
+    ],
+    "reconciliation_run": [
+      {
+        "reconciliation_run_id": "REC1",
+        "business_date": "2026-09-30",
+        "scope": "ACCOUNT_TO_GL",
+        "started_at": "2026-10-01T01:00:00",
+        "completed_at": "2026-10-01T01:05:00",
+        "status": "COMPLETE"
+      }
+    ],
+    "reconciliation_item": [
+      {
+        "reconciliation_item_id": "RI_E_PUR",
+        "reconciliation_run_id": "REC1",
+        "account_entry_id": "E_PUR",
+        "journal_line_id": "J_PUR_1",
+        "outcome": "MATCHED",
+        "difference_amount": "0.00",
+        "explanation": "Synthetic equal-amount mapping"
+      },
+      {
+        "reconciliation_item_id": "RI_E_REF",
+        "reconciliation_run_id": "REC1",
+        "account_entry_id": "E_REF",
+        "journal_line_id": "J_REF_2",
+        "outcome": "MATCHED",
+        "difference_amount": "0.00",
+        "explanation": "Synthetic equal-amount mapping"
+      },
+      {
+        "reconciliation_item_id": "RI_E_CP",
+        "reconciliation_run_id": "REC1",
+        "account_entry_id": "E_CP",
+        "journal_line_id": "J_CP_2",
+        "outcome": "MATCHED",
+        "difference_amount": "0.00",
+        "explanation": "Synthetic equal-amount mapping"
+      },
+      {
+        "reconciliation_item_id": "RI_E_TD",
+        "reconciliation_run_id": "REC1",
+        "account_entry_id": "E_TD",
+        "journal_line_id": "J_INT_1",
+        "outcome": "MATCHED",
+        "difference_amount": "0.00",
+        "explanation": "Synthetic equal-amount mapping"
+      },
+      {
+        "reconciliation_item_id": "RI_E_TC",
+        "reconciliation_run_id": "REC1",
+        "account_entry_id": "E_TC",
+        "journal_line_id": "J_INT_2",
+        "outcome": "MATCHED",
+        "difference_amount": "0.00",
+        "explanation": "Synthetic equal-amount mapping"
+      },
+      {
+        "reconciliation_item_id": "RI_E_LD",
+        "reconciliation_run_id": "REC1",
+        "account_entry_id": "E_LD",
+        "journal_line_id": "J_LOAN_1",
+        "outcome": "MATCHED",
+        "difference_amount": "0.00",
+        "explanation": "Synthetic equal-amount mapping"
+      },
+      {
+        "reconciliation_item_id": "RI_E_LF",
+        "reconciliation_run_id": "REC1",
+        "account_entry_id": "E_LF",
+        "journal_line_id": "J_LOAN_2",
+        "outcome": "MATCHED",
+        "difference_amount": "0.00",
+        "explanation": "Synthetic equal-amount mapping"
+      },
+      {
+        "reconciliation_item_id": "RI_E_OUT",
+        "reconciliation_run_id": "REC1",
+        "account_entry_id": "E_OUT",
+        "journal_line_id": "J_OUT_1",
+        "outcome": "MATCHED",
+        "difference_amount": "0.00",
+        "explanation": "Synthetic equal-amount mapping"
+      },
+      {
+        "reconciliation_item_id": "RI_E_LR",
+        "reconciliation_run_id": "REC1",
+        "account_entry_id": "E_LR",
+        "journal_line_id": "J_REPAY_2",
+        "outcome": "MATCHED",
+        "difference_amount": "0.00",
+        "explanation": "Synthetic equal-amount mapping"
+      }
+    ]
+  }
+}

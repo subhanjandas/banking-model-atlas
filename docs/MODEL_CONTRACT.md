@@ -23,7 +23,7 @@ The explorer will read `model/banking.model.json`. This document and `scripts/va
 
 Each entity has a stable snake_case `id`, a `label`, a valid `domain`, a `description`, a `grain`, `columns`, `primary_key`, `unique_keys`, `notes`, and `rule_ids`. Version 1 supports single-column primary keys and foreign keys. Composite unique keys are supported as metadata.
 
-Each column has an entity-local ID, logical type, boolean nullability, description, and classification. Optional `allowed_values` contains a nonempty list of strings. Types are `string`, `integer`, `boolean`, `date`, `timestamp`, and `decimal(18,2)`. There is no dialect-specific DDL in Hour 1.
+Each column has an entity-local ID, logical type, boolean nullability, description, and classification. Optional `allowed_values` contains a nonempty list of strings. Types are `string`, `integer`, `boolean`, `date`, `timestamp`, and `decimal(18,2)`. The DuckDB exporter maps these logical types to executable DDL.
 
 Classifications are `identifier`, `personal`, `financial`, and `internal`. A synthetic identifier could link to a person in a real system and should not be treated as anonymous merely because it is not a name. Classification is explanatory; no policy enforcement is implied.
 
@@ -43,7 +43,7 @@ The viewer should highlight exactly those edges, not every edge between all sele
 
 ## Rules and enforcement
 
-Rules have IDs, entity references, a category, a statement, an enforcement plan, and implementation status. All rules currently use `specified_not_implemented`. Validation confirms that their metadata links are consistent, not that any transaction satisfies them.
+Rules have IDs, entity references, a category, a statement, an enforcement plan, and implementation status. All rules currently use `specified_not_implemented`. Metadata validation confirms their links. A separate validation_checks.json file records selected executable checks, linked rule IDs and coverage limits; full rule enforcement is still incomplete.
 
 The `enforcement` text on relationships is descriptive. It does not create database constraints. SQL exporters must declare what they can enforce, what remains informational, and which rules require row, cross-row, temporal, or aggregate checks.
 

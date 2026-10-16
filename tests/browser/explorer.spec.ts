@@ -37,7 +37,7 @@ test('both journeys, focus mode, reset, and history work',async({page})=>{
 test('downloads contain model and dictionary data',async({page})=>{
  await page.goto('./');await page.getByText('Download',{exact:true}).click();
  const pending=page.waitForEvent('download');await page.getByRole('button',{name:/Model JSON/}).click();const dl=await pending;
- const data=JSON.parse(await readFile((await dl.path())!,'utf8'));expect(data.entities).toHaveLength(30);expect(data.relationships).toHaveLength(45);
+ const data=JSON.parse(await readFile((await dl.path())!,'utf8'));expect(data.entities).toHaveLength(54);expect(data.relationships).toHaveLength(92);
  await page.getByText('Download',{exact:true}).click();const pending2=page.waitForEvent('download');await page.getByRole('button',{name:/Data dictionary/}).click();const dl2=await pending2;expect(await readFile((await dl2.path())!,'utf8')).toContain('minimum_due');
  await page.getByText('Download',{exact:true}).click();const pending3=page.waitForEvent('download');await page.getByRole('button',{name:/Current graph/}).click();const dl3=await pending3;expect((await readFile((await dl3.path())!)).subarray(1,4).toString()).toBe('PNG');
 });
@@ -51,4 +51,17 @@ test('mobile navigation and inspector remain usable without horizontal overflow'
 });
 test('unknown URL state is explained and the graph still loads',async({page})=>{
  await page.goto('./?entity=missing');await expect(page.getByRole('status')).toContainText('unknown selection');await expect(page.locator('canvas').first()).toBeVisible();
+});
+
+test('expanded journeys and executable schema download',async({page})=>{
+ for(const journey of ['onboard_a_customer','trace_a_deposit_payment','fund_a_term_loan','reconcile_to_the_ledger']){
+  await page.goto('./?view=tables&journey='+journey);
+  await expect(page.locator('.journey-strip')).toBeVisible();
+  await expect(page.locator('.journey-steps button')).toHaveCount(journey==='trace_a_deposit_payment'?6:7);
+ }
+ await page.screenshot({path:'test-results/accounting-journey.png',fullPage:true});
+ await page.getByText('Download',{exact:true}).click();
+ const pending=page.waitForEvent('download');await page.getByRole('button',{name:/DuckDB schema/}).click();
+ const file=await pending;const sql=await readFile((await file.path())!,'utf8');
+ expect(sql).toContain('CREATE TABLE "journal"');expect(sql).toContain('CREATE TABLE "loan_contract"');
 });

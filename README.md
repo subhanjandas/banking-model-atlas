@@ -4,35 +4,39 @@
 
 Imagine a customer calls about a purchase they do not recognize. The service team needs to connect a person, an account, a particular card, a merchant, a posted transaction, and a dispute case. Those are different things, often recorded by different systems. A good data model makes the connections explicit.
 
-Banking Model Atlas is being built to make those connections visible. The explorer lets you browse domains, search tables and columns, follow relationships, and read the business meaning behind each field. Two guided journeys show how the model helps answer everyday questions.
+Banking Model Atlas is being built to make those connections visible. The explorer lets you browse domains, search tables and columns, follow relationships, and read the business meaning behind each field. Six guided journeys show how the model helps answer everyday questions.
 
-**Current application release: `0.2.0` — interactive explorer.** The 30-entity model now has a browser interface with domain and table views, search, detailed inspectors, relationship focus, two guided journeys, shareable links, and JSON/dictionary/PNG downloads. The banking model remains version `0.1.0`. SQL exports, synthetic records and transaction-level validation are still future work.
+**Application 0.3.0 · model 0.2.0.** Explore 54 entities across 12 domains, with six guided journeys and JSON, dictionary, PNG and executable DuckDB schema downloads. The repository includes synthetic banking records and checks that reconcile selected account activity and journals.
 
-**Run it:** `npm ci` then `npm run dev` (Node.js 22.12+). See [the explorer guide](docs/EXPLORER_IMPLEMENTATION.md) for commands and implementation details. GitHub Pages publication is handled by the workflow once Pages is enabled for this repository.
+**[Open the live explorer](https://subhanjandas.github.io/banking-model-atlas/)** · [Run the banking demo](docs/SQL_AND_DEMO.md) · [Read the coverage boundaries](docs/VALIDATION_COVERAGE.md)
+
+Run the viewer with `npm ci` and `npm run dev` (Node.js 22.12+). GitHub Actions tests and publishes the site on pushes to `main`.
 
 ## What is in this project?
 
 | Item | Included |
 |---|---:|
-| Business domains | 8 |
-| Entities | 30 |
-| Documented columns | 161 |
-| Explicit relationships | 45 |
-| Specified business rules | 21 |
-| Guided journey definitions | 2 |
+| Business domains | 12 |
+| Entities | 54 |
+| Documented columns | 317 |
+| Explicit relationships | 92 |
+| Specified business rules | 38 |
+| Guided journey definitions | 6 |
 | Automated metadata tests | 18 |
-| Explorer unit tests | 16 |
-| Browser interaction scenarios | 6 |
+| Executable SQL tests | 16 |
+| Synthetic records | 137 |
+| Explorer unit tests | 20 |
+| Browser interaction scenarios | 7 |
 
 The JSON model is the source of truth. The catalogue, dictionary, relationship register, business-rule reference, and journey guide are generated from it. That means a description shown in the website comes from exactly the same place as the downloadable documentation.
 
 ## Meet the bank
 
-Maple Harbour Bank is fictional. It serves individual customers in Canada and offers deposit accounts and credit cards. Customers can open accounts, share a deposit account with another owner, receive a primary or supplementary credit card, make purchases, repay a credit-card account, receive monthly statements, and raise a dispute.
+Maple Harbour Bank is fictional. It serves individual customers in Canada and offers deposit accounts, credit cards and fixed-term loans. Customers can open accounts, share a deposit account with another owner, receive a primary or supplementary credit card, make purchases, repay a credit-card account, receive monthly statements, and raise a dispute.
 
 We use realistic situations without claiming to reproduce any actual bank's architecture. No employer schemas, customer records, internal documents, or private business rules are included. The definitions are original design choices for this project. All future examples must be synthetic.
 
-The strongest coverage is credit-card servicing. Deposit accounts are included to explain shared account concepts and joint ownership, but deposit payment rails and debit-card processing are outside this release. Calling that boundary out matters: a small model can be useful without pretending to cover every part of a bank.
+The model now follows onboarding, deposit transfers, lending and selected accounting entries alongside card servicing. These are deliberately connected: a loan application leads to a contract, funding affects customer accounts, and booked entries can be traced to journal lines. Each connection answers a business question.
 
 ## A few terms before the diagram
 
@@ -54,6 +58,11 @@ A foreign-key arrow cannot express every rule. It can say that a refund points t
 | Merchants and activity | merchant_category, merchant, card_authorization, card_transaction, account_entry | Follow an attempted purchase through posting and its effect on an account. |
 | Payments and statements | payment, statement, statement_line, account_balance_snapshot | Explain repayments, issued billing documents, and supplied daily balances. |
 | Disputes | dispute_reason, dispute, dispute_event | Record a claim and follow the case without confusing it with a refund. |
+
+| Onboarding | onboarding_case, identity_check, kyc_review, screening_review, customer_risk_assessment, product_application | Preserve decisions and evidence references without pretending to implement a compliance engine. |
+| Deposit payments | beneficiary, standing_order, payment_order, payment_event, payment_settlement, account_hold | Separate a request to move money from its lifecycle and settlement observation. |
+| Lending | loan_application, credit_decision, loan_contract, loan_schedule_item, loan_disbursement, loan_repayment | Keep an application, approved contract, funding and principal repayment distinct. |
+| Accounting and reconciliation | gl_account, journal, journal_line, posting_link, reconciliation_run, reconciliation_item | Explain balanced journals and trace selected customer entries to the ledger. |
 
 Read the [entity catalogue](docs/ENTITY_CATALOGUE.md) for every entity's definition and grain, or the [data dictionary](docs/DATA_DICTIONARY.md) for every column.
 
@@ -91,9 +100,9 @@ For a credit-card account, the statement closes at opening balance plus debits m
 
 ### Account entries are not a complete general ledger
 
-`account_entry` explains a debit or credit visible on a customer's account. It is useful for statements and reconciliation. It does not include balancing journal legs, a chart of accounts, or the bank's general ledger.
+`account_entry` explains a debit or credit visible on a customer's account. It is useful for statements and reconciliation. A separate accounting domain supplies a small chart of accounts, balanced journal legs and explicit posting links. Customer activity and accounting keep separate grains; the demo checks their selected mappings. Opening trial balances, period closing and a complete general-ledger platform are outside scope.
 
-For deposit accounts, credits increase funds and debits reduce them. For credit-card accounts, debits increase the amount owed and credits reduce it. Keeping the account kind explicit avoids presenting one sign convention as correct for every balance.
+For deposit accounts, credits increase funds and debits reduce them. For credit-card and term-loan accounts, debits increase the amount owed and credits reduce it. Keeping the account kind explicit avoids presenting one sign convention as correct for every balance.
 
 ### We keep selected history without inventing an enterprise temporal framework
 
@@ -101,11 +110,19 @@ Account and card status changes are events. Ownership and card assignments have 
 
 Other attributes, including customer segment and merchant category, are current-state values in this release. We do not claim that every attribute can be reconstructed at every historical moment. Event transition matrices and corrections to late-arriving events need more work before a production implementation.
 
-## Two journeys through the graph
+## Six journeys through the graph
 
 **Investigate a disputed purchase.** Start with the person, identify the card they could use at the purchase time, find the posted purchase and merchant, then examine the dispute and its history. The model keeps the financial event and case lifecycle distinct.
 
 **Explain a monthly statement.** Start with an account and statement, inspect its lines and booked entries, then branch into purchases, repayments, and fees. This is a set of related paths, not an instruction to join every table into one giant query. Joining several one-to-many tables without controlling the grain can multiply amounts.
+
+**Onboard a customer.** Follow an application through recorded identity, KYC and screening outcomes. The model stores outcomes; it does not decide whether a real customer meets legal requirements.
+
+**Trace a deposit payment.** Follow a payment instruction, its events, its destination and a settlement observation. A request being accepted is different from money being settled.
+
+**Fund a term loan.** Connect an application and decision to a contract, principal account, repayment schedule and disbursement.
+
+**Reconcile to the ledger.** Trace a customer entry through its allocation to journal lines and a reconciliation observation. Aggregating at the right grain prevents counting the same money twice.
 
 The exact highlighted entities and edges are stored in the model and documented in [JOURNEYS.md](docs/JOURNEYS.md).
 
@@ -113,31 +130,34 @@ The exact highlighted entities and edges are stored in the model and documented 
 
 The left panel contains domains and search. The centre shows the graph. Selecting an entity or relationship opens a right-hand inspector with definitions, grain, columns, keys, and business rules.
 
-The Domains view emphasizes the eight business areas; the Tables view shows grouped entities and key fields. These are explicit view controls, rather than automatic zoom transitions. Full column lists live in the inspector so the canvas remains readable. Search finds entity and column names and column descriptions. Table focus shows immediate neighbours, and journey presets highlight a meaningful subset of the model.
+The Domains view emphasizes the twelve business areas; the Tables view shows grouped entities and key fields. These are explicit view controls, rather than automatic zoom transitions. Full column lists live in the inspector so the canvas remains readable. Search finds entity and column names and column descriptions. Table focus shows immediate neighbours, and journey presets highlight a meaningful subset of the model.
 
 The stack is React, TypeScript, Vite, and Cytoscape.js. The viewer runs entirely in the browser from versioned model metadata. Database access and AI generation are not required to explore the model. See the [explorer specification](docs/EXPLORER_SPEC.md) for interaction and acceptance criteria.
 
 ## Run the foundation checks
 
-Use Python 3.10 or newer. No third-party Python packages, database, cloud account, or credentials are required.
+Use Python 3.10 or newer. Metadata validation uses the standard library. The full replay also installs DuckDB; no database server, cloud account or credentials are required.
 
 From the repository root:
 
 ```bash
-python3 scripts/validate_model.py
-python3 -m unittest discover -s tests -v
-python3 scripts/render_docs.py --check
+python3 -m pip install -r requirements-demo.txt
+python3 replay.py
 ```
 
 After editing `model/banking.model.json`, regenerate the reference documents:
 
 ```bash
 python3 scripts/render_docs.py
+python3 scripts/export_sql.py
+python3 scripts/run_demo.py --write-report
 ```
 
 The validator checks metadata: identifiers, references, key types, cardinality consistency, rule links, and connected journey subgraphs. The tests deliberately break the model to verify that common errors are rejected.
 
-**These checks do not validate transaction records.** All 21 banking rules are currently marked `specified_not_implemented`. A structurally valid model is not evidence of regulatory compliance, correct balances, or production readiness.
+The full replay also executes all 54 tables, loads 137 synthetic records across 47 tables, checks all 92 relationships and runs 13 business-data checks. Negative tests deliberately introduce financial errors. See [the exact coverage and limits](docs/VALIDATION_COVERAGE.md).
+
+All 38 rules retain `specified_not_implemented` because their complete enforcement plans are not implemented. Selected executable checks cover parts of those specifications; they do not establish compliance or production readiness. The browser labels this distinction explicitly.
 
 ## Where to find things
 
@@ -158,14 +178,17 @@ The validator checks metadata: identifiers, references, key types, cardinality c
 | `src/` | React interface, graph adapter and model navigation. |
 | `docs/EXPLORER_IMPLEMENTATION.md` | How to run, test and understand the viewer. |
 | `scripts/` | Metadata validation, documentation generation and CI serving. |
-| `tests/` | Mutation tests for the metadata contract. |
+| `tests/` | Metadata, SQL negative-data, graph and browser tests. |
+| `fixtures/banking_scenarios.json` | Synthetic records with independently specified expected balances. |
+| `model/validation_checks.json` | Executable queries and explicit coverage limits. |
+| `generated/` | Reproducible DuckDB schema and observed demo report. |
 | `.github/workflows/validate.yml` | The same checks for GitHub Actions. |
 
 ## What we are leaving out
 
-This release excludes corporate customers, mortgages, installment loans, investments, treasury, a complete general ledger, payment clearing networks, foreign exchange, interest calculation, fraud scoring, regulatory reporting, and a compliance implementation. Authentication and access control are also outside the public metadata viewer.
+This release excludes corporate customers, mortgages, variable-rate loan engines, investments, treasury, a complete general ledger, payment clearing networks, foreign exchange, interest calculation, fraud scoring, regulatory reporting, and a compliance implementation. Authentication and access control are also outside the public metadata viewer.
 
-CAD is the only supported currency. UTC timestamps represent instants; America/Toronto determines business dates. Monetary columns use a logical decimal type. Future JSON sample amounts will be decimal strings rather than binary floating-point numbers.
+CAD is the only supported currency. UTC timestamps represent instants; America/Toronto determines business dates. Monetary columns use a logical decimal type. JSON sample amounts are decimal strings rather than binary floating-point numbers.
 
 Descriptions of personal fields are included to explain data classification, but actual personal data must never enter this repository. Classification labels are descriptive metadata, not masking policies or access controls.
 

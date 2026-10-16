@@ -1,3 +1,9 @@
+# Expanded executable scenario
+
+The current model includes onboarding, deposit payments, term loans and selected journals. See [SQL_AND_DEMO.md](SQL_AND_DEMO.md) for the current 137-record scenario, account balances and explicit boundaries.
+
+The original card-only worked example below documents the foundation release; its exclusions and amounts are historical, not the current coverage contract.
+
 # Scenario: Maple Harbour Bank
 
 Maple Harbour is a fictional Canadian retail bank. Its deposit products support individual and joint ownership. Its credit-card products have one primary account owner and can issue supplementary cards to other customers. All amounts are CAD. Only natural persons are modeled.

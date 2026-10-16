@@ -49,3 +49,50 @@ Read each row from the referencing table to the referenced table. Reverse cardin
 | `dispute__raised_by_customer_id` | `dispute.raised_by_customer_id` | `customer.customer_id` | exactly_one | zero_or_many | Customer raising the case. |
 | `dispute__dispute_reason_id` | `dispute.dispute_reason_id` | `dispute_reason.dispute_reason_id` | exactly_one | zero_or_many | Reason for the claim. |
 | `dispute_event__dispute_id` | `dispute_event.dispute_id` | `dispute.dispute_id` | exactly_one | zero_or_many | Case being progressed. |
+| `onboarding_case__customer_id` | `onboarding_case.customer_id` | `customer.customer_id` | exactly_one | zero_or_many | Person whose relationship is being reviewed. |
+| `identity_check__onboarding_case_id` | `identity_check.onboarding_case_id` | `onboarding_case.onboarding_case_id` | exactly_one | zero_or_many | Case requiring this check. |
+| `kyc_review__onboarding_case_id` | `kyc_review.onboarding_case_id` | `onboarding_case.onboarding_case_id` | exactly_one | zero_or_many | Case being reviewed. |
+| `screening_review__onboarding_case_id` | `screening_review.onboarding_case_id` | `onboarding_case.onboarding_case_id` | exactly_one | zero_or_many | Case associated with the screening. |
+| `customer_risk_assessment__customer_id` | `customer_risk_assessment.customer_id` | `customer.customer_id` | exactly_one | zero_or_many | Customer being assessed. |
+| `customer_risk_assessment__onboarding_case_id` | `customer_risk_assessment.onboarding_case_id` | `onboarding_case.onboarding_case_id` | zero_or_one | zero_or_many | Related onboarding or refresh case, if applicable. |
+| `product_application__customer_id` | `product_application.customer_id` | `customer.customer_id` | exactly_one | zero_or_many | Applicant. |
+| `product_application__product_version_id` | `product_application.product_version_id` | `product_version.product_version_id` | exactly_one | zero_or_many | Requested offering. |
+| `product_application__onboarding_case_id` | `product_application.onboarding_case_id` | `onboarding_case.onboarding_case_id` | exactly_one | zero_or_many | Onboarding case supporting the application. |
+| `product_application__booked_account_id` | `product_application.booked_account_id` | `account.account_id` | zero_or_one | zero_or_one | Account opened after approval, if booked. |
+| `beneficiary__customer_id` | `beneficiary.customer_id` | `customer.customer_id` | exactly_one | zero_or_many | Customer who saved the payee. |
+| `standing_order__source_account_id` | `standing_order.source_account_id` | `account.account_id` | exactly_one | zero_or_many | Deposit account to debit. |
+| `standing_order__beneficiary_id` | `standing_order.beneficiary_id` | `beneficiary.beneficiary_id` | exactly_one | zero_or_many | Saved external destination. |
+| `payment_order__source_account_id` | `payment_order.source_account_id` | `account.account_id` | exactly_one | zero_or_many | Deposit account funding the instruction. |
+| `payment_order__destination_account_id` | `payment_order.destination_account_id` | `account.account_id` | zero_or_one | zero_or_many | Internal deposit destination; absent for external instructions. |
+| `payment_order__beneficiary_id` | `payment_order.beneficiary_id` | `beneficiary.beneficiary_id` | zero_or_one | zero_or_many | External payee; absent for internal instructions. |
+| `payment_order__standing_order_id` | `payment_order.standing_order_id` | `standing_order.standing_order_id` | zero_or_one | zero_or_many | Recurring template that produced the order, if any. |
+| `payment_order__channel_id` | `payment_order.channel_id` | `channel.channel_id` | exactly_one | zero_or_many | Channel accepting the instruction. |
+| `payment_order__currency_id` | `payment_order.currency_id` | `currency.currency_id` | exactly_one | zero_or_many | Instruction currency. |
+| `payment_event__payment_order_id` | `payment_event.payment_order_id` | `payment_order.payment_order_id` | exactly_one | zero_or_many | Instruction being progressed. |
+| `payment_settlement__payment_order_id` | `payment_settlement.payment_order_id` | `payment_order.payment_order_id` | exactly_one | zero_or_one | Outbound order being settled. |
+| `payment_settlement__currency_id` | `payment_settlement.currency_id` | `currency.currency_id` | exactly_one | zero_or_many | Settlement currency. |
+| `account_hold__account_id` | `account_hold.account_id` | `account.account_id` | exactly_one | zero_or_many | Deposit account with reserved funds. |
+| `account_hold__payment_order_id` | `account_hold.payment_order_id` | `payment_order.payment_order_id` | exactly_one | zero_or_many | Order causing the reservation. |
+| `loan_application__customer_id` | `loan_application.customer_id` | `customer.customer_id` | exactly_one | zero_or_many | Applicant and proposed borrower. |
+| `loan_application__product_version_id` | `loan_application.product_version_id` | `product_version.product_version_id` | exactly_one | zero_or_many | Requested TERM_LOAN product. |
+| `loan_application__onboarding_case_id` | `loan_application.onboarding_case_id` | `onboarding_case.onboarding_case_id` | exactly_one | zero_or_many | Supporting onboarding case. |
+| `credit_decision__loan_application_id` | `credit_decision.loan_application_id` | `loan_application.loan_application_id` | exactly_one | zero_or_many | Application considered. |
+| `loan_contract__account_id` | `loan_contract.account_id` | `account.account_id` | exactly_one | zero_or_one | TERM_LOAN account representing the principal obligation. |
+| `loan_contract__credit_decision_id` | `loan_contract.credit_decision_id` | `credit_decision.credit_decision_id` | exactly_one | zero_or_one | Approved decision accepted by the borrower. |
+| `loan_schedule_item__loan_contract_id` | `loan_schedule_item.loan_contract_id` | `loan_contract.loan_contract_id` | exactly_one | zero_or_many | Contract being scheduled. |
+| `loan_disbursement__loan_contract_id` | `loan_disbursement.loan_contract_id` | `loan_contract.loan_contract_id` | exactly_one | zero_or_one | Contract providing the funds. |
+| `loan_disbursement__destination_account_id` | `loan_disbursement.destination_account_id` | `account.account_id` | exactly_one | zero_or_many | Internal deposit account receiving proceeds. |
+| `loan_repayment__loan_contract_id` | `loan_repayment.loan_contract_id` | `loan_contract.loan_contract_id` | exactly_one | zero_or_many | Loan being repaid. |
+| `journal__currency_id` | `journal.currency_id` | `currency.currency_id` | exactly_one | zero_or_many | Common currency of all lines. |
+| `journal_line__journal_id` | `journal_line.journal_id` | `journal.journal_id` | exactly_one | zero_or_many | Journal containing the line. |
+| `journal_line__gl_account_id` | `journal_line.gl_account_id` | `gl_account.gl_account_id` | exactly_one | zero_or_many | Ledger account affected. |
+| `posting_link__account_entry_id` | `posting_link.account_entry_id` | `account_entry.account_entry_id` | exactly_one | zero_or_many | Customer-account entry being mapped. |
+| `posting_link__journal_line_id` | `posting_link.journal_line_id` | `journal_line.journal_line_id` | exactly_one | zero_or_many | Related ledger line. |
+| `reconciliation_item__reconciliation_run_id` | `reconciliation_item.reconciliation_run_id` | `reconciliation_run.reconciliation_run_id` | exactly_one | zero_or_many | Run that produced the outcome. |
+| `reconciliation_item__account_entry_id` | `reconciliation_item.account_entry_id` | `account_entry.account_entry_id` | zero_or_one | zero_or_many | Entry involved when comparing account and ledger records. |
+| `reconciliation_item__journal_line_id` | `reconciliation_item.journal_line_id` | `journal_line.journal_line_id` | zero_or_one | zero_or_many | Ledger line involved when available. |
+| `reconciliation_item__payment_order_id` | `reconciliation_item.payment_order_id` | `payment_order.payment_order_id` | zero_or_one | zero_or_many | Order involved when comparing payments and settlement. |
+| `reconciliation_item__statement_id` | `reconciliation_item.statement_id` | `statement.statement_id` | zero_or_one | zero_or_many | Statement involved when comparing billing totals. |
+| `account_entry__payment_order_id` | `account_entry.payment_order_id` | `payment_order.payment_order_id` | zero_or_one | zero_or_many | Deposit payment instruction behind this entry, if any. |
+| `account_entry__loan_disbursement_id` | `account_entry.loan_disbursement_id` | `loan_disbursement.loan_disbursement_id` | zero_or_one | zero_or_many | Loan draw behind this principal or deposit entry, if any. |
+| `account_entry__loan_repayment_id` | `account_entry.loan_repayment_id` | `loan_repayment.loan_repayment_id` | zero_or_one | zero_or_many | Loan repayment behind a principal reduction, if any. |

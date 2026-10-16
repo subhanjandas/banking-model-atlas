@@ -1,6 +1,6 @@
 # Explorer specification
 
-Status: implemented in application 0.2.0, except SQL export. This is the original interaction contract; observed test results are recorded in VALIDATION.md.
+Status: implemented in application 0.3.0. This is the original interaction contract; observed test results are recorded in VALIDATION.md.
 
 ## Main task
 
@@ -30,7 +30,7 @@ Desktop uses all three panels. On narrow screens, navigation and details become 
 | Load shared URL | Restore domain/entity/journey where valid; unknown IDs show a friendly fallback. |
 | Download JSON | Return the exact version of metadata shown in the viewer. |
 | Download dictionary | Return definitions generated from that same metadata. |
-| Download SQL | Later milestone; button is absent until an implemented exporter exists. |
+| Download SQL | Download the generated, tested DuckDB schema. |
 
 Search must reveal a hidden match rather than silently selecting an invisible node. Selecting a new journey clears conflicting domain filters. Node dragging affects presentation only, not the underlying banking model. Self-references must be visible and selectable without obscuring table names.
 
@@ -42,7 +42,7 @@ The first layout should be deterministic and grouped by domain. Avoid constantly
 
 ## Definition of done for the first interactive release
 
-1. All 30 entities and 45 relationships derive from the JSON, with no duplicate hard-coded model.
+1. All 54 entities and 92 relationships derive from the JSON, with no duplicate hard-coded model.
 2. Search, domain filtering, neighbour focus and reset work together.
 3. Both journey presets select connected, meaningful subgraphs.
 4. Every entity and edge has a readable inspector; self-references work.

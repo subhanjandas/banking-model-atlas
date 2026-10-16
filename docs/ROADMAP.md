@@ -1,25 +1,15 @@
-# Roadmap and checkpoint status
+# Roadmap
 
-## Hour 1 — foundation
+## Delivered
 
-Completed locally: fictional scenario, 30-entity model, 161 column definitions, 45 relationships, 21 rule specifications, two connected journey definitions, metadata validator, 18 tests, generated reference documents, explorer specification and CI configuration.
+Application 0.3.0 / model 0.2.0 adds 24 entities to the original 30. Twelve domains and six connected journeys cover cards, onboarding, deposit payments, term lending and selected accounting. The graph retains filters, search, metadata panels, links and downloads. The DuckDB schema and synthetic demonstration are executable.
 
-Foundation published to `subhanjandas/banking-model-atlas` in commit `55e19d4`. The foundation GitHub Actions run passed.
+## Next meaningful extensions
 
-## Application 0.2.0 — explorer implemented
+1. Strengthen lifecycle checks: valid event transitions, ownership overlaps, replacement cycles and correction events.
+2. Add a bank opening trial balance and reconcile ledger account balances end to end. Current checks cover transaction journals and selected customer-entry mappings.
+3. Model payment returns and reversals with idempotent ingestion and late-arriving settlement observations.
+4. Introduce a clearly scoped analytical layer, such as daily card balances and payment reconciliation exceptions, with grain-safe queries.
+5. Add migration/version comparison before changing stable identifiers or column semantics.
 
-Implemented the application shell, all 30 tables, domain overview, graph navigation, entity and relationship inspectors, search and responsive drawers.
-
-Implemented both journeys, neighbourhood focus, URL state, and JSON/dictionary/PNG downloads. Browser tests target the production repository subpath. Publication depends on GitHub Pages configuration; see VALIDATION.md for the actual verification state.
-
-## Following — evidence and export
-
-Build one tested SQL dialect exporter. Generate synthetic data only after the business rules have executable tests. Turn the worked scenario into a reconciliation fixture. Add bad-data fixtures for refunds, ownership intervals, replacements and statement membership.
-
-## Longer term
-
-Statement reissues, fuller lifecycle transition rules, product migrations, provisional credits and a broader deposit-activity model. AI-assisted drafting is optional and must not replace deterministic structural checks or domain review.
-
-## Scope rule
-
-The one-day target is a polished educational explorer. Increasing entity count further should require a new business question, not a desire to make the graph larger. Public claims must distinguish specified, locally tested, and actually deployed features.
+More entities should answer a new business question. The project is an original fictional reference model, not an entire core-banking system or a claim of industry-standard compliance.

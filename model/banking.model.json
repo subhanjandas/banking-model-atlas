@@ -1,11 +1,11 @@
 {
   "schema_version": "1.0.0",
-  "model_version": "0.1.0",
+  "model_version": "0.2.0",
   "id": "banking_model_atlas",
   "title": "Banking Model Atlas",
-  "status": "foundation_draft",
+  "status": "educational_reference",
   "scenario": "Maple Harbour Bank \u2014 a fictional Canadian retail bank",
-  "description": "An original educational reference model for retail accounts and credit-card servicing. Not an operational bank schema.",
+  "description": "Original retail-banking reference model covering customers, deposits, credit cards, term loans, payments and accounting. Selected synthetic checks are executable; this is not a bank operating platform.",
   "business_timezone": "America/Toronto",
   "supported_currencies": [
     "CAD"
@@ -58,6 +58,30 @@
       "label": "Disputes",
       "description": "Customer claims and the progress of each case.",
       "color": "#bc665a"
+    },
+    {
+      "id": "onboarding",
+      "label": "Onboarding and due diligence",
+      "description": "Customer onboarding, identity evidence outcomes and product applications.",
+      "color": "#528c78"
+    },
+    {
+      "id": "payments",
+      "label": "Deposit payments",
+      "description": "Payment instructions, execution events, settlement and reserved funds.",
+      "color": "#437d9a"
+    },
+    {
+      "id": "lending",
+      "label": "Term lending",
+      "description": "Applications, decisions, contracts, schedules and principal movements.",
+      "color": "#8a719f"
+    },
+    {
+      "id": "accounting",
+      "label": "Accounting and reconciliation",
+      "description": "Double-entry journals, account-entry mappings and reconciliation exceptions.",
+      "color": "#a17751"
     }
   ],
   "entities": [
@@ -498,7 +522,8 @@
           "classification": "internal",
           "allowed_values": [
             "DEPOSIT",
-            "CREDIT_CARD"
+            "CREDIT_CARD",
+            "TERM_LOAN"
           ]
         }
       ],
@@ -571,7 +596,8 @@
         "Existing accounts retain their booked version after the offering closes. APR calculations are out of scope."
       ],
       "rule_ids": [
-        "R01"
+        "R01",
+        "R23"
       ],
       "unique_keys": [
         [
@@ -633,7 +659,7 @@
       "id": "account",
       "label": "Account",
       "domain": "accounts",
-      "description": "A customer-facing deposit or credit-card account.",
+      "description": "A customer-facing deposit, credit-card or term-loan account.",
       "grain": "One account contract.",
       "primary_key": [
         "account_id"
@@ -694,7 +720,11 @@
         "R14",
         "R15",
         "R18",
-        "R20"
+        "R20",
+        "R23",
+        "R25",
+        "R30",
+        "R35"
       ],
       "unique_keys": []
     },
@@ -756,12 +786,13 @@
         }
       ],
       "notes": [
-        "Deposits can have joint owners. Credit-card accounts have one primary owner; supplementary card users are not account owners."
+        "Deposits can have joint owners. Credit-card and term-loan accounts have one primary owner; supplementary card users are not account owners."
       ],
       "rule_ids": [
         "R02",
         "R03",
-        "R16"
+        "R16",
+        "R30"
       ],
       "unique_keys": []
     },
@@ -865,7 +896,7 @@
         }
       ],
       "notes": [
-        "Exactly one facility for each credit-card account; none for deposit accounts. Loans and underwriting are excluded."
+        "One facility for each credit-card account. Fixed-term loans have a separate loan_contract; underwriting decisions are supplied, not calculated."
       ],
       "rule_ids": [
         "R04"
@@ -1445,7 +1476,10 @@
             "PAYMENT",
             "FEE",
             "ADJUSTMENT",
-            "REVERSAL"
+            "REVERSAL",
+            "DEPOSIT_PAYMENT",
+            "LOAN_DRAW",
+            "LOAN_REPAYMENT"
           ]
         },
         {
@@ -1479,10 +1513,31 @@
           "nullable": false,
           "description": "Short statement narrative.",
           "classification": "internal"
+        },
+        {
+          "id": "payment_order_id",
+          "type": "string",
+          "nullable": true,
+          "description": "Deposit payment instruction behind this entry, if any.",
+          "classification": "identifier"
+        },
+        {
+          "id": "loan_disbursement_id",
+          "type": "string",
+          "nullable": true,
+          "description": "Loan draw behind this principal or deposit entry, if any.",
+          "classification": "identifier"
+        },
+        {
+          "id": "loan_repayment_id",
+          "type": "string",
+          "nullable": true,
+          "description": "Loan repayment behind a principal reduction, if any.",
+          "classification": "identifier"
         }
       ],
       "notes": [
-        "These are account subledger-style entries, not a balanced general ledger. A separate rule defines balance signs by account kind."
+        "Customer-facing account entries form a subledger view. The separate journal and posting_link entities support accounting and reconciliation; the model is not a complete bank ledger platform."
       ],
       "rule_ids": [
         "R09",
@@ -1490,7 +1545,11 @@
         "R11",
         "R12",
         "R13",
-        "R15"
+        "R15",
+        "R26",
+        "R32",
+        "R33",
+        "R35"
       ],
       "unique_keys": []
     },
@@ -1756,7 +1815,7 @@
           "id": "balance_amount",
           "type": "decimal(18,2)",
           "nullable": false,
-          "description": "Signed deposit funds or signed credit-card amount owed, according to account kind.",
+          "description": "Signed deposit funds or credit-card/term-loan amount owed, according to product kind.",
           "classification": "financial"
         }
       ],
@@ -1942,6 +2001,1712 @@
         "R17"
       ],
       "unique_keys": []
+    },
+    {
+      "id": "onboarding_case",
+      "label": "Onboarding Case",
+      "domain": "onboarding",
+      "description": "A customer onboarding or refresh workflow.",
+      "grain": "One onboarding case for an existing customer identity.",
+      "primary_key": [
+        "onboarding_case_id"
+      ],
+      "unique_keys": [],
+      "notes": [
+        "The customer ID may exist before an account is approved. Workflow status is a current snapshot; full workflow events are deferred."
+      ],
+      "rule_ids": [
+        "R22",
+        "R23",
+        "R24"
+      ],
+      "columns": [
+        {
+          "id": "onboarding_case_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for onboarding case.",
+          "classification": "identifier"
+        },
+        {
+          "id": "customer_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Person whose relationship is being reviewed.",
+          "classification": "identifier"
+        },
+        {
+          "id": "opened_at",
+          "type": "timestamp",
+          "nullable": false,
+          "description": "UTC time the case opened.",
+          "classification": "internal"
+        },
+        {
+          "id": "case_type",
+          "type": "string",
+          "nullable": false,
+          "description": "Reason for this workflow.",
+          "classification": "internal",
+          "allowed_values": [
+            "INITIAL",
+            "REFRESH"
+          ]
+        },
+        {
+          "id": "status",
+          "type": "string",
+          "nullable": false,
+          "description": "Current workflow outcome.",
+          "classification": "internal",
+          "allowed_values": [
+            "OPEN",
+            "APPROVED",
+            "DECLINED",
+            "WITHDRAWN"
+          ]
+        },
+        {
+          "id": "closed_at",
+          "type": "timestamp",
+          "nullable": true,
+          "description": "UTC closure time, if complete.",
+          "classification": "internal"
+        }
+      ]
+    },
+    {
+      "id": "identity_check",
+      "label": "Identity Check",
+      "domain": "onboarding",
+      "description": "A recorded identity-verification attempt, without identity documents.",
+      "grain": "One identity check attempt within an onboarding case.",
+      "primary_key": [
+        "identity_check_id"
+      ],
+      "unique_keys": [],
+      "notes": [
+        "No identity provider integration or statutory verification claim. Repeat attempts are separate rows."
+      ],
+      "rule_ids": [
+        "R22"
+      ],
+      "columns": [
+        {
+          "id": "identity_check_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for identity check.",
+          "classification": "identifier"
+        },
+        {
+          "id": "onboarding_case_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Case requiring this check.",
+          "classification": "identifier"
+        },
+        {
+          "id": "method",
+          "type": "string",
+          "nullable": false,
+          "description": "Illustrative method category.",
+          "classification": "internal",
+          "allowed_values": [
+            "DOCUMENT_REVIEW",
+            "TRUSTED_SOURCE"
+          ]
+        },
+        {
+          "id": "outcome",
+          "type": "string",
+          "nullable": false,
+          "description": "Recorded result.",
+          "classification": "internal",
+          "allowed_values": [
+            "PASS",
+            "FAIL",
+            "REVIEW"
+          ]
+        },
+        {
+          "id": "checked_at",
+          "type": "timestamp",
+          "nullable": false,
+          "description": "UTC time of the check.",
+          "classification": "internal"
+        },
+        {
+          "id": "evidence_reference",
+          "type": "string",
+          "nullable": false,
+          "description": "Synthetic opaque reference; no document number or image.",
+          "classification": "personal"
+        }
+      ]
+    },
+    {
+      "id": "kyc_review",
+      "label": "Kyc Review",
+      "domain": "onboarding",
+      "description": "A due-diligence review outcome recorded for a case.",
+      "grain": "One review attempt within an onboarding case.",
+      "primary_key": [
+        "kyc_review_id"
+      ],
+      "unique_keys": [],
+      "notes": [
+        "A PASS is a fictional workflow outcome, not proof of compliance. No sensitive review narrative is included."
+      ],
+      "rule_ids": [
+        "R22"
+      ],
+      "columns": [
+        {
+          "id": "kyc_review_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for kyc review.",
+          "classification": "identifier"
+        },
+        {
+          "id": "onboarding_case_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Case being reviewed.",
+          "classification": "identifier"
+        },
+        {
+          "id": "outcome",
+          "type": "string",
+          "nullable": false,
+          "description": "Recorded reviewer outcome.",
+          "classification": "internal",
+          "allowed_values": [
+            "PASS",
+            "FAIL",
+            "REVIEW"
+          ]
+        },
+        {
+          "id": "reviewed_at",
+          "type": "timestamp",
+          "nullable": false,
+          "description": "UTC review time.",
+          "classification": "internal"
+        },
+        {
+          "id": "rationale_code",
+          "type": "string",
+          "nullable": false,
+          "description": "Synthetic policy rationale code.",
+          "classification": "internal"
+        }
+      ]
+    },
+    {
+      "id": "screening_review",
+      "label": "Screening Review",
+      "domain": "onboarding",
+      "description": "A screening result and subsequent review outcome.",
+      "grain": "One screening attempt within an onboarding case.",
+      "primary_key": [
+        "screening_review_id"
+      ],
+      "unique_keys": [],
+      "notes": [
+        "No live lists, matched names or automated decisions. Potential matches require separate human review outside this demo."
+      ],
+      "rule_ids": [
+        "R22"
+      ],
+      "columns": [
+        {
+          "id": "screening_review_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for screening review.",
+          "classification": "identifier"
+        },
+        {
+          "id": "onboarding_case_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Case associated with the screening.",
+          "classification": "identifier"
+        },
+        {
+          "id": "screening_type",
+          "type": "string",
+          "nullable": false,
+          "description": "Illustrative screening purpose.",
+          "classification": "internal",
+          "allowed_values": [
+            "SANCTIONS",
+            "PEP"
+          ]
+        },
+        {
+          "id": "outcome",
+          "type": "string",
+          "nullable": false,
+          "description": "Recorded result.",
+          "classification": "internal",
+          "allowed_values": [
+            "CLEAR",
+            "REVIEW",
+            "CONFIRMED"
+          ]
+        },
+        {
+          "id": "screened_at",
+          "type": "timestamp",
+          "nullable": false,
+          "description": "UTC time screening occurred.",
+          "classification": "internal"
+        }
+      ]
+    },
+    {
+      "id": "customer_risk_assessment",
+      "label": "Customer Risk Assessment",
+      "domain": "onboarding",
+      "description": "A dated internal customer risk classification.",
+      "grain": "One assessment event for one customer.",
+      "primary_key": [
+        "customer_risk_assessment_id"
+      ],
+      "unique_keys": [],
+      "notes": [
+        "No scoring algorithm or risk inference is implemented. Latest assessment gives current classification."
+      ],
+      "rule_ids": [
+        "R24"
+      ],
+      "columns": [
+        {
+          "id": "customer_risk_assessment_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for customer risk assessment.",
+          "classification": "identifier"
+        },
+        {
+          "id": "customer_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Customer being assessed.",
+          "classification": "identifier"
+        },
+        {
+          "id": "onboarding_case_id",
+          "type": "string",
+          "nullable": true,
+          "description": "Related onboarding or refresh case, if applicable.",
+          "classification": "identifier"
+        },
+        {
+          "id": "risk_band",
+          "type": "string",
+          "nullable": false,
+          "description": "Illustrative internal classification.",
+          "classification": "internal",
+          "allowed_values": [
+            "LOW",
+            "MEDIUM",
+            "HIGH"
+          ]
+        },
+        {
+          "id": "assessed_at",
+          "type": "timestamp",
+          "nullable": false,
+          "description": "UTC assessment time.",
+          "classification": "internal"
+        },
+        {
+          "id": "next_review_on",
+          "type": "date",
+          "nullable": false,
+          "description": "Planned review date.",
+          "classification": "internal"
+        }
+      ]
+    },
+    {
+      "id": "product_application",
+      "label": "Product Application",
+      "domain": "onboarding",
+      "description": "A request to open a deposit or credit-card product.",
+      "grain": "One product application submitted by a customer.",
+      "primary_key": [
+        "product_application_id"
+      ],
+      "unique_keys": [
+        [
+          "booked_account_id"
+        ]
+      ],
+      "notes": [
+        "Term-loan applications use loan_application. Approval need not mean an account has already been booked."
+      ],
+      "rule_ids": [
+        "R23"
+      ],
+      "columns": [
+        {
+          "id": "product_application_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for product application.",
+          "classification": "identifier"
+        },
+        {
+          "id": "customer_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Applicant.",
+          "classification": "identifier"
+        },
+        {
+          "id": "product_version_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Requested offering.",
+          "classification": "identifier"
+        },
+        {
+          "id": "onboarding_case_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Onboarding case supporting the application.",
+          "classification": "identifier"
+        },
+        {
+          "id": "submitted_at",
+          "type": "timestamp",
+          "nullable": false,
+          "description": "UTC submission time.",
+          "classification": "internal"
+        },
+        {
+          "id": "status",
+          "type": "string",
+          "nullable": false,
+          "description": "Application outcome.",
+          "classification": "internal",
+          "allowed_values": [
+            "SUBMITTED",
+            "APPROVED",
+            "DECLINED",
+            "WITHDRAWN"
+          ]
+        },
+        {
+          "id": "booked_account_id",
+          "type": "string",
+          "nullable": true,
+          "description": "Account opened after approval, if booked.",
+          "classification": "identifier"
+        }
+      ]
+    },
+    {
+      "id": "beneficiary",
+      "label": "Beneficiary",
+      "domain": "payments",
+      "description": "A payee saved by a customer for an external payment.",
+      "grain": "One customer-owned beneficiary record.",
+      "primary_key": [
+        "beneficiary_id"
+      ],
+      "unique_keys": [],
+      "notes": [
+        "An external payee is not assumed to be another modeled customer. Beneficiary changes and fraud controls are deferred."
+      ],
+      "rule_ids": [
+        "R25"
+      ],
+      "columns": [
+        {
+          "id": "beneficiary_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for beneficiary.",
+          "classification": "identifier"
+        },
+        {
+          "id": "customer_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Customer who saved the payee.",
+          "classification": "identifier"
+        },
+        {
+          "id": "display_name",
+          "type": "string",
+          "nullable": false,
+          "description": "Invented payee label.",
+          "classification": "personal"
+        },
+        {
+          "id": "routing_reference",
+          "type": "string",
+          "nullable": false,
+          "description": "Opaque synthetic destination reference; not a real account number.",
+          "classification": "personal"
+        },
+        {
+          "id": "status",
+          "type": "string",
+          "nullable": false,
+          "description": "Current availability.",
+          "classification": "internal",
+          "allowed_values": [
+            "ACTIVE",
+            "DISABLED"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "standing_order",
+      "label": "Standing Order",
+      "domain": "payments",
+      "description": "A recurring instruction template for an external payment.",
+      "grain": "One standing-order arrangement.",
+      "primary_key": [
+        "standing_order_id"
+      ],
+      "unique_keys": [],
+      "notes": [
+        "Each execution creates a separate payment_order. Holiday calendars, retry logic and a scheduler are not implemented."
+      ],
+      "rule_ids": [
+        "R28"
+      ],
+      "columns": [
+        {
+          "id": "standing_order_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for standing order.",
+          "classification": "identifier"
+        },
+        {
+          "id": "source_account_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Deposit account to debit.",
+          "classification": "identifier"
+        },
+        {
+          "id": "beneficiary_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Saved external destination.",
+          "classification": "identifier"
+        },
+        {
+          "id": "amount",
+          "type": "decimal(18,2)",
+          "nullable": false,
+          "description": "Positive amount per scheduled execution.",
+          "classification": "financial"
+        },
+        {
+          "id": "frequency",
+          "type": "string",
+          "nullable": false,
+          "description": "Supported recurrence.",
+          "classification": "internal",
+          "allowed_values": [
+            "MONTHLY"
+          ]
+        },
+        {
+          "id": "starts_on",
+          "type": "date",
+          "nullable": false,
+          "description": "First eligible date.",
+          "classification": "internal"
+        },
+        {
+          "id": "ends_on",
+          "type": "date",
+          "nullable": true,
+          "description": "Last eligible date, inclusive.",
+          "classification": "internal"
+        },
+        {
+          "id": "status",
+          "type": "string",
+          "nullable": false,
+          "description": "Current instruction state.",
+          "classification": "internal",
+          "allowed_values": [
+            "ACTIVE",
+            "CANCELLED"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "payment_order",
+      "label": "Payment Order",
+      "domain": "payments",
+      "description": "An instruction to move funds from a deposit account.",
+      "grain": "One customer-authorized internal or outbound payment instruction.",
+      "primary_key": [
+        "payment_order_id"
+      ],
+      "unique_keys": [
+        [
+          "idempotency_key"
+        ]
+      ],
+      "notes": [
+        "Status comes from payment_event. Internal movements have two customer-account entries; external ones have one."
+      ],
+      "rule_ids": [
+        "R25",
+        "R26",
+        "R27",
+        "R28"
+      ],
+      "columns": [
+        {
+          "id": "payment_order_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for payment order.",
+          "classification": "identifier"
+        },
+        {
+          "id": "source_account_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Deposit account funding the instruction.",
+          "classification": "identifier"
+        },
+        {
+          "id": "destination_account_id",
+          "type": "string",
+          "nullable": true,
+          "description": "Internal deposit destination; absent for external instructions.",
+          "classification": "identifier"
+        },
+        {
+          "id": "beneficiary_id",
+          "type": "string",
+          "nullable": true,
+          "description": "External payee; absent for internal instructions.",
+          "classification": "identifier"
+        },
+        {
+          "id": "standing_order_id",
+          "type": "string",
+          "nullable": true,
+          "description": "Recurring template that produced the order, if any.",
+          "classification": "identifier"
+        },
+        {
+          "id": "channel_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Channel accepting the instruction.",
+          "classification": "identifier"
+        },
+        {
+          "id": "currency_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Instruction currency.",
+          "classification": "identifier"
+        },
+        {
+          "id": "kind",
+          "type": "string",
+          "nullable": false,
+          "description": "Supported instruction type.",
+          "classification": "internal",
+          "allowed_values": [
+            "INTERNAL",
+            "OUTBOUND"
+          ]
+        },
+        {
+          "id": "amount",
+          "type": "decimal(18,2)",
+          "nullable": false,
+          "description": "Positive instructed amount.",
+          "classification": "financial"
+        },
+        {
+          "id": "requested_at",
+          "type": "timestamp",
+          "nullable": false,
+          "description": "UTC acceptance time.",
+          "classification": "internal"
+        },
+        {
+          "id": "requested_execution_on",
+          "type": "date",
+          "nullable": false,
+          "description": "Requested business execution date.",
+          "classification": "internal"
+        },
+        {
+          "id": "idempotency_key",
+          "type": "string",
+          "nullable": false,
+          "description": "Unique client-request key in this single-bank scenario.",
+          "classification": "internal"
+        }
+      ]
+    },
+    {
+      "id": "payment_event",
+      "label": "Payment Event",
+      "domain": "payments",
+      "description": "A lifecycle event for a deposit payment instruction.",
+      "grain": "One execution event for an order.",
+      "primary_key": [
+        "payment_event_id"
+      ],
+      "unique_keys": [
+        [
+          "payment_order_id",
+          "occurred_at"
+        ]
+      ],
+      "notes": [
+        "Latest event gives status. Posting and external settlement are separate milestones."
+      ],
+      "rule_ids": [
+        "R26",
+        "R27",
+        "R29"
+      ],
+      "columns": [
+        {
+          "id": "payment_event_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for payment event.",
+          "classification": "identifier"
+        },
+        {
+          "id": "payment_order_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Instruction being progressed.",
+          "classification": "identifier"
+        },
+        {
+          "id": "status",
+          "type": "string",
+          "nullable": false,
+          "description": "New execution state.",
+          "classification": "internal",
+          "allowed_values": [
+            "RECEIVED",
+            "VALIDATED",
+            "POSTED",
+            "SETTLED",
+            "FAILED",
+            "CANCELLED"
+          ]
+        },
+        {
+          "id": "occurred_at",
+          "type": "timestamp",
+          "nullable": false,
+          "description": "UTC event time.",
+          "classification": "internal"
+        },
+        {
+          "id": "reason_code",
+          "type": "string",
+          "nullable": false,
+          "description": "Project-local processing reason.",
+          "classification": "internal"
+        }
+      ]
+    },
+    {
+      "id": "payment_settlement",
+      "label": "Payment Settlement",
+      "domain": "payments",
+      "description": "An observed external settlement result.",
+      "grain": "One settlement observation for an outbound order.",
+      "primary_key": [
+        "payment_settlement_id"
+      ],
+      "unique_keys": [
+        [
+          "payment_order_id"
+        ]
+      ],
+      "notes": [
+        "One full settlement per order in this version. Partial settlement, returns and incoming rails are deferred."
+      ],
+      "rule_ids": [
+        "R27"
+      ],
+      "columns": [
+        {
+          "id": "payment_settlement_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for payment settlement.",
+          "classification": "identifier"
+        },
+        {
+          "id": "payment_order_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Outbound order being settled.",
+          "classification": "identifier"
+        },
+        {
+          "id": "currency_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Settlement currency.",
+          "classification": "identifier"
+        },
+        {
+          "id": "settled_amount",
+          "type": "decimal(18,2)",
+          "nullable": false,
+          "description": "Positive settled amount.",
+          "classification": "financial"
+        },
+        {
+          "id": "settled_on",
+          "type": "date",
+          "nullable": false,
+          "description": "Settlement business date.",
+          "classification": "internal"
+        },
+        {
+          "id": "external_reference",
+          "type": "string",
+          "nullable": false,
+          "description": "Synthetic clearing reference.",
+          "classification": "internal"
+        }
+      ]
+    },
+    {
+      "id": "account_hold",
+      "label": "Account Hold",
+      "domain": "payments",
+      "description": "A temporary reservation of funds on a deposit account.",
+      "grain": "One reservation associated with a payment order.",
+      "primary_key": [
+        "account_hold_id"
+      ],
+      "unique_keys": [],
+      "notes": [
+        "Holds affect availability but are not booked account entries. Full available-balance computation is deferred."
+      ],
+      "rule_ids": [
+        "R28"
+      ],
+      "columns": [
+        {
+          "id": "account_hold_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for account hold.",
+          "classification": "identifier"
+        },
+        {
+          "id": "account_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Deposit account with reserved funds.",
+          "classification": "identifier"
+        },
+        {
+          "id": "payment_order_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Order causing the reservation.",
+          "classification": "identifier"
+        },
+        {
+          "id": "amount",
+          "type": "decimal(18,2)",
+          "nullable": false,
+          "description": "Positive reserved amount.",
+          "classification": "financial"
+        },
+        {
+          "id": "placed_at",
+          "type": "timestamp",
+          "nullable": false,
+          "description": "UTC reservation time.",
+          "classification": "internal"
+        },
+        {
+          "id": "released_at",
+          "type": "timestamp",
+          "nullable": true,
+          "description": "UTC release time; null means still held.",
+          "classification": "internal"
+        },
+        {
+          "id": "expires_at",
+          "type": "timestamp",
+          "nullable": false,
+          "description": "UTC expiry time.",
+          "classification": "internal"
+        }
+      ]
+    },
+    {
+      "id": "loan_application",
+      "label": "Loan Application",
+      "domain": "lending",
+      "description": "A request for a fixed-term consumer loan.",
+      "grain": "One application by one primary borrower.",
+      "primary_key": [
+        "loan_application_id"
+      ],
+      "unique_keys": [],
+      "notes": [
+        "Co-borrowers, collateral and underwriting models are deferred."
+      ],
+      "rule_ids": [
+        "R30"
+      ],
+      "columns": [
+        {
+          "id": "loan_application_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for loan application.",
+          "classification": "identifier"
+        },
+        {
+          "id": "customer_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Applicant and proposed borrower.",
+          "classification": "identifier"
+        },
+        {
+          "id": "product_version_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Requested TERM_LOAN product.",
+          "classification": "identifier"
+        },
+        {
+          "id": "onboarding_case_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Supporting onboarding case.",
+          "classification": "identifier"
+        },
+        {
+          "id": "requested_principal",
+          "type": "decimal(18,2)",
+          "nullable": false,
+          "description": "Positive requested principal in CAD.",
+          "classification": "financial"
+        },
+        {
+          "id": "requested_term_months",
+          "type": "integer",
+          "nullable": false,
+          "description": "Positive requested term.",
+          "classification": "internal"
+        },
+        {
+          "id": "submitted_at",
+          "type": "timestamp",
+          "nullable": false,
+          "description": "UTC submission time.",
+          "classification": "internal"
+        }
+      ]
+    },
+    {
+      "id": "credit_decision",
+      "label": "Credit Decision",
+      "domain": "lending",
+      "description": "A recorded lending decision for an application.",
+      "grain": "One dated decision on an application.",
+      "primary_key": [
+        "credit_decision_id"
+      ],
+      "unique_keys": [],
+      "notes": [
+        "Decisions are supplied synthetic outcomes, not a credit scoring engine. Subsequent decisions are separate rows."
+      ],
+      "rule_ids": [
+        "R30",
+        "R37"
+      ],
+      "columns": [
+        {
+          "id": "credit_decision_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for credit decision.",
+          "classification": "identifier"
+        },
+        {
+          "id": "loan_application_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Application considered.",
+          "classification": "identifier"
+        },
+        {
+          "id": "outcome",
+          "type": "string",
+          "nullable": false,
+          "description": "Decision outcome.",
+          "classification": "internal",
+          "allowed_values": [
+            "APPROVED",
+            "DECLINED",
+            "REFER"
+          ]
+        },
+        {
+          "id": "approved_principal",
+          "type": "decimal(18,2)",
+          "nullable": true,
+          "description": "Approved principal; present only for APPROVED.",
+          "classification": "financial"
+        },
+        {
+          "id": "approved_term_months",
+          "type": "integer",
+          "nullable": true,
+          "description": "Approved term; present only for APPROVED.",
+          "classification": "internal"
+        },
+        {
+          "id": "decided_at",
+          "type": "timestamp",
+          "nullable": false,
+          "description": "UTC decision time.",
+          "classification": "internal"
+        },
+        {
+          "id": "expires_on",
+          "type": "date",
+          "nullable": false,
+          "description": "Last valid acceptance date.",
+          "classification": "internal"
+        }
+      ]
+    },
+    {
+      "id": "loan_contract",
+      "label": "Loan Contract",
+      "domain": "lending",
+      "description": "An accepted fixed-term loan agreement.",
+      "grain": "One loan contract and its loan account.",
+      "primary_key": [
+        "loan_contract_id"
+      ],
+      "unique_keys": [
+        [
+          "account_id"
+        ],
+        [
+          "credit_decision_id"
+        ]
+      ],
+      "notes": [
+        "Rates, interest accrual, modifications, arrears and impairment are out of scope. Schedule interest values are supplied."
+      ],
+      "rule_ids": [
+        "R30",
+        "R31",
+        "R32",
+        "R33"
+      ],
+      "columns": [
+        {
+          "id": "loan_contract_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for loan contract.",
+          "classification": "identifier"
+        },
+        {
+          "id": "account_id",
+          "type": "string",
+          "nullable": false,
+          "description": "TERM_LOAN account representing the principal obligation.",
+          "classification": "identifier"
+        },
+        {
+          "id": "credit_decision_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Approved decision accepted by the borrower.",
+          "classification": "identifier"
+        },
+        {
+          "id": "principal_amount",
+          "type": "decimal(18,2)",
+          "nullable": false,
+          "description": "Contracted principal in account currency.",
+          "classification": "financial"
+        },
+        {
+          "id": "term_months",
+          "type": "integer",
+          "nullable": false,
+          "description": "Positive contractual term.",
+          "classification": "internal"
+        },
+        {
+          "id": "accepted_on",
+          "type": "date",
+          "nullable": false,
+          "description": "Contract acceptance date.",
+          "classification": "internal"
+        },
+        {
+          "id": "matures_on",
+          "type": "date",
+          "nullable": false,
+          "description": "Contractual maturity date.",
+          "classification": "internal"
+        }
+      ]
+    },
+    {
+      "id": "loan_schedule_item",
+      "label": "Loan Schedule Item",
+      "domain": "lending",
+      "description": "An expected installment in a supplied repayment schedule.",
+      "grain": "One installment for a loan contract.",
+      "primary_key": [
+        "loan_schedule_item_id"
+      ],
+      "unique_keys": [
+        [
+          "loan_contract_id",
+          "installment_number"
+        ]
+      ],
+      "notes": [
+        "This version stores a schedule; it does not calculate amortization or allocate payments to installments."
+      ],
+      "rule_ids": [
+        "R31"
+      ],
+      "columns": [
+        {
+          "id": "loan_schedule_item_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for loan schedule item.",
+          "classification": "identifier"
+        },
+        {
+          "id": "loan_contract_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Contract being scheduled.",
+          "classification": "identifier"
+        },
+        {
+          "id": "installment_number",
+          "type": "integer",
+          "nullable": false,
+          "description": "Positive sequence within the loan.",
+          "classification": "internal"
+        },
+        {
+          "id": "due_on",
+          "type": "date",
+          "nullable": false,
+          "description": "Due date.",
+          "classification": "internal"
+        },
+        {
+          "id": "principal_due",
+          "type": "decimal(18,2)",
+          "nullable": false,
+          "description": "Nonnegative scheduled principal.",
+          "classification": "financial"
+        },
+        {
+          "id": "interest_due",
+          "type": "decimal(18,2)",
+          "nullable": false,
+          "description": "Nonnegative supplied interest amount.",
+          "classification": "financial"
+        }
+      ]
+    },
+    {
+      "id": "loan_disbursement",
+      "label": "Loan Disbursement",
+      "domain": "lending",
+      "description": "A funded principal draw on a loan contract.",
+      "grain": "One completed principal disbursement.",
+      "primary_key": [
+        "loan_disbursement_id"
+      ],
+      "unique_keys": [
+        [
+          "loan_contract_id"
+        ]
+      ],
+      "notes": [
+        "One full disbursement to a deposit account in this release. External funding and progressive draws are deferred."
+      ],
+      "rule_ids": [
+        "R32"
+      ],
+      "columns": [
+        {
+          "id": "loan_disbursement_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for loan disbursement.",
+          "classification": "identifier"
+        },
+        {
+          "id": "loan_contract_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Contract providing the funds.",
+          "classification": "identifier"
+        },
+        {
+          "id": "destination_account_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Internal deposit account receiving proceeds.",
+          "classification": "identifier"
+        },
+        {
+          "id": "amount",
+          "type": "decimal(18,2)",
+          "nullable": false,
+          "description": "Positive principal disbursed.",
+          "classification": "financial"
+        },
+        {
+          "id": "disbursed_on",
+          "type": "date",
+          "nullable": false,
+          "description": "Funding business date.",
+          "classification": "internal"
+        }
+      ]
+    },
+    {
+      "id": "loan_repayment",
+      "label": "Loan Repayment",
+      "domain": "lending",
+      "description": "A received external repayment against a loan.",
+      "grain": "One received repayment with supplied principal/interest split.",
+      "primary_key": [
+        "loan_repayment_id"
+      ],
+      "unique_keys": [],
+      "notes": [
+        "Only the principal portion reduces the loan account balance. Interest goes to the accounting journal. Payment allocation and delinquency calculation are deferred."
+      ],
+      "rule_ids": [
+        "R33"
+      ],
+      "columns": [
+        {
+          "id": "loan_repayment_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for loan repayment.",
+          "classification": "identifier"
+        },
+        {
+          "id": "loan_contract_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Loan being repaid.",
+          "classification": "identifier"
+        },
+        {
+          "id": "principal_amount",
+          "type": "decimal(18,2)",
+          "nullable": false,
+          "description": "Nonnegative principal portion.",
+          "classification": "financial"
+        },
+        {
+          "id": "interest_amount",
+          "type": "decimal(18,2)",
+          "nullable": false,
+          "description": "Nonnegative interest portion.",
+          "classification": "financial"
+        },
+        {
+          "id": "received_on",
+          "type": "date",
+          "nullable": false,
+          "description": "Receipt business date.",
+          "classification": "internal"
+        },
+        {
+          "id": "status",
+          "type": "string",
+          "nullable": false,
+          "description": "Current processing state.",
+          "classification": "internal",
+          "allowed_values": [
+            "PENDING",
+            "POSTED",
+            "FAILED"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "gl_account",
+      "label": "Gl Account",
+      "domain": "accounting",
+      "description": "An account in the fictional bank chart of accounts.",
+      "grain": "One general-ledger account.",
+      "primary_key": [
+        "gl_account_id"
+      ],
+      "unique_keys": [
+        [
+          "code"
+        ]
+      ],
+      "notes": [
+        "This is a small illustrative chart, not a regulatory chart of accounts."
+      ],
+      "rule_ids": [
+        "R38"
+      ],
+      "columns": [
+        {
+          "id": "gl_account_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for gl account.",
+          "classification": "identifier"
+        },
+        {
+          "id": "code",
+          "type": "string",
+          "nullable": false,
+          "description": "Unique project-local ledger code.",
+          "classification": "internal"
+        },
+        {
+          "id": "name",
+          "type": "string",
+          "nullable": false,
+          "description": "Ledger account description.",
+          "classification": "internal"
+        },
+        {
+          "id": "account_class",
+          "type": "string",
+          "nullable": false,
+          "description": "Financial statement classification.",
+          "classification": "internal",
+          "allowed_values": [
+            "ASSET",
+            "LIABILITY",
+            "EQUITY",
+            "INCOME",
+            "EXPENSE"
+          ]
+        },
+        {
+          "id": "normal_balance",
+          "type": "string",
+          "nullable": false,
+          "description": "Expected normal balance side.",
+          "classification": "internal",
+          "allowed_values": [
+            "DEBIT",
+            "CREDIT"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "journal",
+      "label": "Journal",
+      "domain": "accounting",
+      "description": "A set of accounting lines posted together.",
+      "grain": "One single-currency journal for one legal entity.",
+      "primary_key": [
+        "journal_id"
+      ],
+      "unique_keys": [
+        [
+          "source_reference"
+        ]
+      ],
+      "notes": [
+        "Every POSTED journal must balance independently. Journals are immutable after posting; corrections use new journals."
+      ],
+      "rule_ids": [
+        "R34",
+        "R35"
+      ],
+      "columns": [
+        {
+          "id": "journal_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for journal.",
+          "classification": "identifier"
+        },
+        {
+          "id": "currency_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Common currency of all lines.",
+          "classification": "identifier"
+        },
+        {
+          "id": "legal_entity_code",
+          "type": "string",
+          "nullable": false,
+          "description": "Single legal entity represented.",
+          "classification": "internal",
+          "allowed_values": [
+            "MHB_BANK"
+          ]
+        },
+        {
+          "id": "booked_on",
+          "type": "date",
+          "nullable": false,
+          "description": "Accounting business date.",
+          "classification": "internal"
+        },
+        {
+          "id": "status",
+          "type": "string",
+          "nullable": false,
+          "description": "Journal lifecycle state.",
+          "classification": "internal",
+          "allowed_values": [
+            "DRAFT",
+            "POSTED"
+          ]
+        },
+        {
+          "id": "description",
+          "type": "string",
+          "nullable": false,
+          "description": "Synthetic accounting narrative.",
+          "classification": "internal"
+        },
+        {
+          "id": "source_reference",
+          "type": "string",
+          "nullable": false,
+          "description": "Unique producer event reference for idempotent ingestion.",
+          "classification": "internal"
+        }
+      ]
+    },
+    {
+      "id": "journal_line",
+      "label": "Journal Line",
+      "domain": "accounting",
+      "description": "One debit or credit within an accounting journal.",
+      "grain": "One line within one journal.",
+      "primary_key": [
+        "journal_line_id"
+      ],
+      "unique_keys": [
+        [
+          "journal_id",
+          "line_number"
+        ]
+      ],
+      "notes": [
+        "A journal has at least two lines when posted. Bank general-ledger balances and customer-account balances have different meanings."
+      ],
+      "rule_ids": [
+        "R34",
+        "R35",
+        "R38"
+      ],
+      "columns": [
+        {
+          "id": "journal_line_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for journal line.",
+          "classification": "identifier"
+        },
+        {
+          "id": "journal_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Journal containing the line.",
+          "classification": "identifier"
+        },
+        {
+          "id": "gl_account_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Ledger account affected.",
+          "classification": "identifier"
+        },
+        {
+          "id": "line_number",
+          "type": "integer",
+          "nullable": false,
+          "description": "Positive sequence within the journal.",
+          "classification": "internal"
+        },
+        {
+          "id": "direction",
+          "type": "string",
+          "nullable": false,
+          "description": "Accounting debit or credit.",
+          "classification": "internal",
+          "allowed_values": [
+            "DEBIT",
+            "CREDIT"
+          ]
+        },
+        {
+          "id": "amount",
+          "type": "decimal(18,2)",
+          "nullable": false,
+          "description": "Positive amount in journal currency.",
+          "classification": "financial"
+        }
+      ]
+    },
+    {
+      "id": "posting_link",
+      "label": "Posting Link",
+      "domain": "accounting",
+      "description": "A reconciliation mapping from customer-account activity to a ledger line.",
+      "grain": "One allocation of an account entry to a journal line.",
+      "primary_key": [
+        "posting_link_id"
+      ],
+      "unique_keys": [
+        [
+          "account_entry_id",
+          "journal_line_id"
+        ]
+      ],
+      "notes": [
+        "The mapped line uses the same debit/credit direction and currency as the account entry. Counterpart ledger lines need not have customer-account entries."
+      ],
+      "rule_ids": [
+        "R35"
+      ],
+      "columns": [
+        {
+          "id": "posting_link_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for posting link.",
+          "classification": "identifier"
+        },
+        {
+          "id": "account_entry_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Customer-account entry being mapped.",
+          "classification": "identifier"
+        },
+        {
+          "id": "journal_line_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Related ledger line.",
+          "classification": "identifier"
+        },
+        {
+          "id": "allocated_amount",
+          "type": "decimal(18,2)",
+          "nullable": false,
+          "description": "Positive mapped portion of the account entry.",
+          "classification": "financial"
+        }
+      ]
+    },
+    {
+      "id": "reconciliation_run",
+      "label": "Reconciliation Run",
+      "domain": "accounting",
+      "description": "A recorded comparison between two financial record sets.",
+      "grain": "One reconciliation execution for one business date and scope.",
+      "primary_key": [
+        "reconciliation_run_id"
+      ],
+      "unique_keys": [],
+      "notes": [
+        "A COMPLETE run may still contain unmatched items; completion does not mean reconciliation succeeded."
+      ],
+      "rule_ids": [
+        "R36"
+      ],
+      "columns": [
+        {
+          "id": "reconciliation_run_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for reconciliation run.",
+          "classification": "identifier"
+        },
+        {
+          "id": "business_date",
+          "type": "date",
+          "nullable": false,
+          "description": "Date being reconciled.",
+          "classification": "internal"
+        },
+        {
+          "id": "scope",
+          "type": "string",
+          "nullable": false,
+          "description": "Comparison being performed.",
+          "classification": "internal",
+          "allowed_values": [
+            "ACCOUNT_TO_GL",
+            "PAYMENT_TO_SETTLEMENT",
+            "STATEMENT_TO_ENTRIES"
+          ]
+        },
+        {
+          "id": "started_at",
+          "type": "timestamp",
+          "nullable": false,
+          "description": "UTC start time.",
+          "classification": "internal"
+        },
+        {
+          "id": "completed_at",
+          "type": "timestamp",
+          "nullable": true,
+          "description": "UTC completion time.",
+          "classification": "internal"
+        },
+        {
+          "id": "status",
+          "type": "string",
+          "nullable": false,
+          "description": "Execution outcome.",
+          "classification": "internal",
+          "allowed_values": [
+            "RUNNING",
+            "COMPLETE",
+            "FAILED"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "reconciliation_item",
+      "label": "Reconciliation Item",
+      "domain": "accounting",
+      "description": "A match or exception recorded by a reconciliation run.",
+      "grain": "One comparison outcome within one run.",
+      "primary_key": [
+        "reconciliation_item_id"
+      ],
+      "unique_keys": [],
+      "notes": [
+        "References are conditional on run scope. A reconciliation result is evidence, not a financial posting."
+      ],
+      "rule_ids": [
+        "R36"
+      ],
+      "columns": [
+        {
+          "id": "reconciliation_item_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for reconciliation item.",
+          "classification": "identifier"
+        },
+        {
+          "id": "reconciliation_run_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Run that produced the outcome.",
+          "classification": "identifier"
+        },
+        {
+          "id": "account_entry_id",
+          "type": "string",
+          "nullable": true,
+          "description": "Entry involved when comparing account and ledger records.",
+          "classification": "identifier"
+        },
+        {
+          "id": "journal_line_id",
+          "type": "string",
+          "nullable": true,
+          "description": "Ledger line involved when available.",
+          "classification": "identifier"
+        },
+        {
+          "id": "payment_order_id",
+          "type": "string",
+          "nullable": true,
+          "description": "Order involved when comparing payments and settlement.",
+          "classification": "identifier"
+        },
+        {
+          "id": "statement_id",
+          "type": "string",
+          "nullable": true,
+          "description": "Statement involved when comparing billing totals.",
+          "classification": "identifier"
+        },
+        {
+          "id": "outcome",
+          "type": "string",
+          "nullable": false,
+          "description": "Comparison result.",
+          "classification": "internal",
+          "allowed_values": [
+            "MATCHED",
+            "UNMATCHED",
+            "AMOUNT_MISMATCH"
+          ]
+        },
+        {
+          "id": "difference_amount",
+          "type": "decimal(18,2)",
+          "nullable": false,
+          "description": "Signed left-side minus right-side difference in CAD.",
+          "classification": "financial"
+        },
+        {
+          "id": "explanation",
+          "type": "string",
+          "nullable": false,
+          "description": "Synthetic explanation of the match or exception.",
+          "classification": "internal"
+        }
+      ]
     }
   ],
   "relationships": [
@@ -2439,6 +4204,523 @@
       "target_to_source": "zero_or_many",
       "description": "Case being progressed.",
       "enforcement": "logical_reference; physical implementation deferred"
+    },
+    {
+      "id": "onboarding_case__customer_id",
+      "source_entity": "onboarding_case",
+      "source_column": "customer_id",
+      "target_entity": "customer",
+      "target_column": "customer_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Person whose relationship is being reviewed.",
+      "enforcement": "logical_reference; DuckDB export enforces non-self references"
+    },
+    {
+      "id": "identity_check__onboarding_case_id",
+      "source_entity": "identity_check",
+      "source_column": "onboarding_case_id",
+      "target_entity": "onboarding_case",
+      "target_column": "onboarding_case_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Case requiring this check.",
+      "enforcement": "logical_reference; DuckDB export enforces non-self references"
+    },
+    {
+      "id": "kyc_review__onboarding_case_id",
+      "source_entity": "kyc_review",
+      "source_column": "onboarding_case_id",
+      "target_entity": "onboarding_case",
+      "target_column": "onboarding_case_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Case being reviewed.",
+      "enforcement": "logical_reference; DuckDB export enforces non-self references"
+    },
+    {
+      "id": "screening_review__onboarding_case_id",
+      "source_entity": "screening_review",
+      "source_column": "onboarding_case_id",
+      "target_entity": "onboarding_case",
+      "target_column": "onboarding_case_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Case associated with the screening.",
+      "enforcement": "logical_reference; DuckDB export enforces non-self references"
+    },
+    {
+      "id": "customer_risk_assessment__customer_id",
+      "source_entity": "customer_risk_assessment",
+      "source_column": "customer_id",
+      "target_entity": "customer",
+      "target_column": "customer_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Customer being assessed.",
+      "enforcement": "logical_reference; DuckDB export enforces non-self references"
+    },
+    {
+      "id": "customer_risk_assessment__onboarding_case_id",
+      "source_entity": "customer_risk_assessment",
+      "source_column": "onboarding_case_id",
+      "target_entity": "onboarding_case",
+      "target_column": "onboarding_case_id",
+      "source_to_target": "zero_or_one",
+      "target_to_source": "zero_or_many",
+      "description": "Related onboarding or refresh case, if applicable.",
+      "enforcement": "logical_reference; DuckDB export enforces non-self references"
+    },
+    {
+      "id": "product_application__customer_id",
+      "source_entity": "product_application",
+      "source_column": "customer_id",
+      "target_entity": "customer",
+      "target_column": "customer_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Applicant.",
+      "enforcement": "logical_reference; DuckDB export enforces non-self references"
+    },
+    {
+      "id": "product_application__product_version_id",
+      "source_entity": "product_application",
+      "source_column": "product_version_id",
+      "target_entity": "product_version",
+      "target_column": "product_version_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Requested offering.",
+      "enforcement": "logical_reference; DuckDB export enforces non-self references"
+    },
+    {
+      "id": "product_application__onboarding_case_id",
+      "source_entity": "product_application",
+      "source_column": "onboarding_case_id",
+      "target_entity": "onboarding_case",
+      "target_column": "onboarding_case_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Onboarding case supporting the application.",
+      "enforcement": "logical_reference; DuckDB export enforces non-self references"
+    },
+    {
+      "id": "product_application__booked_account_id",
+      "source_entity": "product_application",
+      "source_column": "booked_account_id",
+      "target_entity": "account",
+      "target_column": "account_id",
+      "source_to_target": "zero_or_one",
+      "target_to_source": "zero_or_one",
+      "description": "Account opened after approval, if booked.",
+      "enforcement": "logical_reference; DuckDB export enforces non-self references"
+    },
+    {
+      "id": "beneficiary__customer_id",
+      "source_entity": "beneficiary",
+      "source_column": "customer_id",
+      "target_entity": "customer",
+      "target_column": "customer_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Customer who saved the payee.",
+      "enforcement": "logical_reference; DuckDB export enforces non-self references"
+    },
+    {
+      "id": "standing_order__source_account_id",
+      "source_entity": "standing_order",
+      "source_column": "source_account_id",
+      "target_entity": "account",
+      "target_column": "account_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Deposit account to debit.",
+      "enforcement": "logical_reference; DuckDB export enforces non-self references"
+    },
+    {
+      "id": "standing_order__beneficiary_id",
+      "source_entity": "standing_order",
+      "source_column": "beneficiary_id",
+      "target_entity": "beneficiary",
+      "target_column": "beneficiary_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Saved external destination.",
+      "enforcement": "logical_reference; DuckDB export enforces non-self references"
+    },
+    {
+      "id": "payment_order__source_account_id",
+      "source_entity": "payment_order",
+      "source_column": "source_account_id",
+      "target_entity": "account",
+      "target_column": "account_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Deposit account funding the instruction.",
+      "enforcement": "logical_reference; DuckDB export enforces non-self references"
+    },
+    {
+      "id": "payment_order__destination_account_id",
+      "source_entity": "payment_order",
+      "source_column": "destination_account_id",
+      "target_entity": "account",
+      "target_column": "account_id",
+      "source_to_target": "zero_or_one",
+      "target_to_source": "zero_or_many",
+      "description": "Internal deposit destination; absent for external instructions.",
+      "enforcement": "logical_reference; DuckDB export enforces non-self references"
+    },
+    {
+      "id": "payment_order__beneficiary_id",
+      "source_entity": "payment_order",
+      "source_column": "beneficiary_id",
+      "target_entity": "beneficiary",
+      "target_column": "beneficiary_id",
+      "source_to_target": "zero_or_one",
+      "target_to_source": "zero_or_many",
+      "description": "External payee; absent for internal instructions.",
+      "enforcement": "logical_reference; DuckDB export enforces non-self references"
+    },
+    {
+      "id": "payment_order__standing_order_id",
+      "source_entity": "payment_order",
+      "source_column": "standing_order_id",
+      "target_entity": "standing_order",
+      "target_column": "standing_order_id",
+      "source_to_target": "zero_or_one",
+      "target_to_source": "zero_or_many",
+      "description": "Recurring template that produced the order, if any.",
+      "enforcement": "logical_reference; DuckDB export enforces non-self references"
+    },
+    {
+      "id": "payment_order__channel_id",
+      "source_entity": "payment_order",
+      "source_column": "channel_id",
+      "target_entity": "channel",
+      "target_column": "channel_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Channel accepting the instruction.",
+      "enforcement": "logical_reference; DuckDB export enforces non-self references"
+    },
+    {
+      "id": "payment_order__currency_id",
+      "source_entity": "payment_order",
+      "source_column": "currency_id",
+      "target_entity": "currency",
+      "target_column": "currency_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Instruction currency.",
+      "enforcement": "logical_reference; DuckDB export enforces non-self references"
+    },
+    {
+      "id": "payment_event__payment_order_id",
+      "source_entity": "payment_event",
+      "source_column": "payment_order_id",
+      "target_entity": "payment_order",
+      "target_column": "payment_order_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Instruction being progressed.",
+      "enforcement": "logical_reference; DuckDB export enforces non-self references"
+    },
+    {
+      "id": "payment_settlement__payment_order_id",
+      "source_entity": "payment_settlement",
+      "source_column": "payment_order_id",
+      "target_entity": "payment_order",
+      "target_column": "payment_order_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_one",
+      "description": "Outbound order being settled.",
+      "enforcement": "logical_reference; DuckDB export enforces non-self references"
+    },
+    {
+      "id": "payment_settlement__currency_id",
+      "source_entity": "payment_settlement",
+      "source_column": "currency_id",
+      "target_entity": "currency",
+      "target_column": "currency_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Settlement currency.",
+      "enforcement": "logical_reference; DuckDB export enforces non-self references"
+    },
+    {
+      "id": "account_hold__account_id",
+      "source_entity": "account_hold",
+      "source_column": "account_id",
+      "target_entity": "account",
+      "target_column": "account_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Deposit account with reserved funds.",
+      "enforcement": "logical_reference; DuckDB export enforces non-self references"
+    },
+    {
+      "id": "account_hold__payment_order_id",
+      "source_entity": "account_hold",
+      "source_column": "payment_order_id",
+      "target_entity": "payment_order",
+      "target_column": "payment_order_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Order causing the reservation.",
+      "enforcement": "logical_reference; DuckDB export enforces non-self references"
+    },
+    {
+      "id": "loan_application__customer_id",
+      "source_entity": "loan_application",
+      "source_column": "customer_id",
+      "target_entity": "customer",
+      "target_column": "customer_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Applicant and proposed borrower.",
+      "enforcement": "logical_reference; DuckDB export enforces non-self references"
+    },
+    {
+      "id": "loan_application__product_version_id",
+      "source_entity": "loan_application",
+      "source_column": "product_version_id",
+      "target_entity": "product_version",
+      "target_column": "product_version_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Requested TERM_LOAN product.",
+      "enforcement": "logical_reference; DuckDB export enforces non-self references"
+    },
+    {
+      "id": "loan_application__onboarding_case_id",
+      "source_entity": "loan_application",
+      "source_column": "onboarding_case_id",
+      "target_entity": "onboarding_case",
+      "target_column": "onboarding_case_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Supporting onboarding case.",
+      "enforcement": "logical_reference; DuckDB export enforces non-self references"
+    },
+    {
+      "id": "credit_decision__loan_application_id",
+      "source_entity": "credit_decision",
+      "source_column": "loan_application_id",
+      "target_entity": "loan_application",
+      "target_column": "loan_application_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Application considered.",
+      "enforcement": "logical_reference; DuckDB export enforces non-self references"
+    },
+    {
+      "id": "loan_contract__account_id",
+      "source_entity": "loan_contract",
+      "source_column": "account_id",
+      "target_entity": "account",
+      "target_column": "account_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_one",
+      "description": "TERM_LOAN account representing the principal obligation.",
+      "enforcement": "logical_reference; DuckDB export enforces non-self references"
+    },
+    {
+      "id": "loan_contract__credit_decision_id",
+      "source_entity": "loan_contract",
+      "source_column": "credit_decision_id",
+      "target_entity": "credit_decision",
+      "target_column": "credit_decision_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_one",
+      "description": "Approved decision accepted by the borrower.",
+      "enforcement": "logical_reference; DuckDB export enforces non-self references"
+    },
+    {
+      "id": "loan_schedule_item__loan_contract_id",
+      "source_entity": "loan_schedule_item",
+      "source_column": "loan_contract_id",
+      "target_entity": "loan_contract",
+      "target_column": "loan_contract_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Contract being scheduled.",
+      "enforcement": "logical_reference; DuckDB export enforces non-self references"
+    },
+    {
+      "id": "loan_disbursement__loan_contract_id",
+      "source_entity": "loan_disbursement",
+      "source_column": "loan_contract_id",
+      "target_entity": "loan_contract",
+      "target_column": "loan_contract_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_one",
+      "description": "Contract providing the funds.",
+      "enforcement": "logical_reference; DuckDB export enforces non-self references"
+    },
+    {
+      "id": "loan_disbursement__destination_account_id",
+      "source_entity": "loan_disbursement",
+      "source_column": "destination_account_id",
+      "target_entity": "account",
+      "target_column": "account_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Internal deposit account receiving proceeds.",
+      "enforcement": "logical_reference; DuckDB export enforces non-self references"
+    },
+    {
+      "id": "loan_repayment__loan_contract_id",
+      "source_entity": "loan_repayment",
+      "source_column": "loan_contract_id",
+      "target_entity": "loan_contract",
+      "target_column": "loan_contract_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Loan being repaid.",
+      "enforcement": "logical_reference; DuckDB export enforces non-self references"
+    },
+    {
+      "id": "journal__currency_id",
+      "source_entity": "journal",
+      "source_column": "currency_id",
+      "target_entity": "currency",
+      "target_column": "currency_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Common currency of all lines.",
+      "enforcement": "logical_reference; DuckDB export enforces non-self references"
+    },
+    {
+      "id": "journal_line__journal_id",
+      "source_entity": "journal_line",
+      "source_column": "journal_id",
+      "target_entity": "journal",
+      "target_column": "journal_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Journal containing the line.",
+      "enforcement": "logical_reference; DuckDB export enforces non-self references"
+    },
+    {
+      "id": "journal_line__gl_account_id",
+      "source_entity": "journal_line",
+      "source_column": "gl_account_id",
+      "target_entity": "gl_account",
+      "target_column": "gl_account_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Ledger account affected.",
+      "enforcement": "logical_reference; DuckDB export enforces non-self references"
+    },
+    {
+      "id": "posting_link__account_entry_id",
+      "source_entity": "posting_link",
+      "source_column": "account_entry_id",
+      "target_entity": "account_entry",
+      "target_column": "account_entry_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Customer-account entry being mapped.",
+      "enforcement": "logical_reference; DuckDB export enforces non-self references"
+    },
+    {
+      "id": "posting_link__journal_line_id",
+      "source_entity": "posting_link",
+      "source_column": "journal_line_id",
+      "target_entity": "journal_line",
+      "target_column": "journal_line_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Related ledger line.",
+      "enforcement": "logical_reference; DuckDB export enforces non-self references"
+    },
+    {
+      "id": "reconciliation_item__reconciliation_run_id",
+      "source_entity": "reconciliation_item",
+      "source_column": "reconciliation_run_id",
+      "target_entity": "reconciliation_run",
+      "target_column": "reconciliation_run_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Run that produced the outcome.",
+      "enforcement": "logical_reference; DuckDB export enforces non-self references"
+    },
+    {
+      "id": "reconciliation_item__account_entry_id",
+      "source_entity": "reconciliation_item",
+      "source_column": "account_entry_id",
+      "target_entity": "account_entry",
+      "target_column": "account_entry_id",
+      "source_to_target": "zero_or_one",
+      "target_to_source": "zero_or_many",
+      "description": "Entry involved when comparing account and ledger records.",
+      "enforcement": "logical_reference; DuckDB export enforces non-self references"
+    },
+    {
+      "id": "reconciliation_item__journal_line_id",
+      "source_entity": "reconciliation_item",
+      "source_column": "journal_line_id",
+      "target_entity": "journal_line",
+      "target_column": "journal_line_id",
+      "source_to_target": "zero_or_one",
+      "target_to_source": "zero_or_many",
+      "description": "Ledger line involved when available.",
+      "enforcement": "logical_reference; DuckDB export enforces non-self references"
+    },
+    {
+      "id": "reconciliation_item__payment_order_id",
+      "source_entity": "reconciliation_item",
+      "source_column": "payment_order_id",
+      "target_entity": "payment_order",
+      "target_column": "payment_order_id",
+      "source_to_target": "zero_or_one",
+      "target_to_source": "zero_or_many",
+      "description": "Order involved when comparing payments and settlement.",
+      "enforcement": "logical_reference; DuckDB export enforces non-self references"
+    },
+    {
+      "id": "reconciliation_item__statement_id",
+      "source_entity": "reconciliation_item",
+      "source_column": "statement_id",
+      "target_entity": "statement",
+      "target_column": "statement_id",
+      "source_to_target": "zero_or_one",
+      "target_to_source": "zero_or_many",
+      "description": "Statement involved when comparing billing totals.",
+      "enforcement": "logical_reference; DuckDB export enforces non-self references"
+    },
+    {
+      "id": "account_entry__payment_order_id",
+      "source_entity": "account_entry",
+      "source_column": "payment_order_id",
+      "target_entity": "payment_order",
+      "target_column": "payment_order_id",
+      "source_to_target": "zero_or_one",
+      "target_to_source": "zero_or_many",
+      "description": "Deposit payment instruction behind this entry, if any.",
+      "enforcement": "logical_reference; DuckDB export enforces non-self references"
+    },
+    {
+      "id": "account_entry__loan_disbursement_id",
+      "source_entity": "account_entry",
+      "source_column": "loan_disbursement_id",
+      "target_entity": "loan_disbursement",
+      "target_column": "loan_disbursement_id",
+      "source_to_target": "zero_or_one",
+      "target_to_source": "zero_or_many",
+      "description": "Loan draw behind this principal or deposit entry, if any.",
+      "enforcement": "logical_reference; DuckDB export enforces non-self references"
+    },
+    {
+      "id": "account_entry__loan_repayment_id",
+      "source_entity": "account_entry",
+      "source_column": "loan_repayment_id",
+      "target_entity": "loan_repayment",
+      "target_column": "loan_repayment_id",
+      "source_to_target": "zero_or_one",
+      "target_to_source": "zero_or_many",
+      "description": "Loan repayment behind a principal reduction, if any.",
+      "enforcement": "logical_reference; DuckDB export enforces non-self references"
     }
   ],
   "rules": [
@@ -2462,7 +4744,7 @@
         "product"
       ],
       "category": "temporal",
-      "statement": "Every open account has exactly one active PRIMARY owner. JOINT roles are allowed only for deposit products; identical customer/account/role intervals must not overlap.",
+      "statement": "Every open account has exactly one active PRIMARY owner. JOINT roles are allowed only for deposits. Credit-card and term-loan accounts have one primary owner. Identical customer/account/role intervals must not overlap.",
       "enforcement_plan": "dataset_validation",
       "implementation_status": "specified_not_implemented"
     },
@@ -2559,7 +4841,7 @@
         "fee_type"
       ],
       "category": "conditional",
-      "statement": "CARD entries have only card_transaction_id populated among source references; PAYMENT has only payment_id; FEE has only fee_type_id; ADJUSTMENT has none; REVERSAL has only reverses_entry_id. Non-reversals have no reversal reference.",
+      "statement": "Exactly the source reference corresponding to kind is populated: CARD\u2192card_transaction_id, PAYMENT\u2192payment_id, FEE\u2192fee_type_id, REVERSAL\u2192reverses_entry_id, DEPOSIT_PAYMENT\u2192payment_order_id, LOAN_DRAW\u2192loan_disbursement_id, LOAN_REPAYMENT\u2192loan_repayment_id. ADJUSTMENT has none. All other source references are null.",
       "enforcement_plan": "dataset_validation",
       "implementation_status": "specified_not_implemented"
     },
@@ -2620,7 +4902,7 @@
         "product"
       ],
       "category": "reconciliation",
-      "statement": "Between consecutive daily snapshots, deposit balance changes by credits minus debits; credit-card amount owed changes by debits minus credits. A gap requires all intervening entries. Snapshots may be negative.",
+      "statement": "Between daily snapshots, deposits change by credits minus debits; credit-card and term-loan amounts owed change by debits minus credits. A gap requires all intervening entries. Snapshots may be negative; loan principal interest is accounted separately.",
       "enforcement_plan": "dataset_validation",
       "implementation_status": "specified_not_implemented"
     },
@@ -2694,6 +4976,207 @@
       ],
       "category": "temporal",
       "statement": "Consent decisions are immutable events. Current consent is the latest decision for the customer and purpose; absence means no recorded grant.",
+      "enforcement_plan": "dataset_validation",
+      "implementation_status": "specified_not_implemented"
+    },
+    {
+      "id": "R22",
+      "entities": [
+        "onboarding_case",
+        "identity_check",
+        "kyc_review",
+        "screening_review"
+      ],
+      "category": "cross_entity",
+      "statement": "An APPROVED onboarding case has a latest PASS identity check, latest PASS KYC review and latest CLEAR screening for each required type (SANCTIONS and PEP); all occur no later than closure. Ties within a check stream are disallowed.",
+      "enforcement_plan": "dataset_validation",
+      "implementation_status": "specified_not_implemented"
+    },
+    {
+      "id": "R23",
+      "entities": [
+        "product_application",
+        "onboarding_case",
+        "account",
+        "product_version"
+      ],
+      "category": "cross_entity",
+      "statement": "A booked product application is APPROVED, has an APPROVED case for the same applicant, and references an account opened with the requested product version. TERM_LOAN requests use loan_application instead.",
+      "enforcement_plan": "dataset_validation",
+      "implementation_status": "specified_not_implemented"
+    },
+    {
+      "id": "R24",
+      "entities": [
+        "customer_risk_assessment",
+        "onboarding_case"
+      ],
+      "category": "temporal",
+      "statement": "Risk assessment and linked case refer to the same customer. Next review date is after the assessment business date; no risk score is computed.",
+      "enforcement_plan": "dataset_validation",
+      "implementation_status": "specified_not_implemented"
+    },
+    {
+      "id": "R25",
+      "entities": [
+        "payment_order",
+        "account",
+        "beneficiary"
+      ],
+      "category": "conditional",
+      "statement": "An INTERNAL order has a non-null destination account, a null beneficiary and different source/destination accounts. An OUTBOUND order has a beneficiary and no destination account. Both accounts are deposits and currency matches the order; the initiating authority must be checked separately.",
+      "enforcement_plan": "dataset_validation",
+      "implementation_status": "specified_not_implemented"
+    },
+    {
+      "id": "R26",
+      "entities": [
+        "payment_order",
+        "payment_event",
+        "account_entry"
+      ],
+      "category": "reconciliation",
+      "statement": "Each POSTED or SETTLED internal order has exactly one DEPOSIT_PAYMENT debit on the source and one equal credit on the destination. An outbound order has exactly one source debit. Entries match amount and currency. FAILED or CANCELLED orders have no unreversed posting in this simplified version.",
+      "enforcement_plan": "dataset_validation",
+      "implementation_status": "specified_not_implemented"
+    },
+    {
+      "id": "R27",
+      "entities": [
+        "payment_settlement",
+        "payment_order",
+        "payment_event"
+      ],
+      "category": "reconciliation",
+      "statement": "Settlement belongs only to an OUTBOUND order. There is one full settlement per order with equal amount and currency. SETTLED requires a settlement observation; internal orders finish at POSTED.",
+      "enforcement_plan": "dataset_validation",
+      "implementation_status": "specified_not_implemented"
+    },
+    {
+      "id": "R28",
+      "entities": [
+        "account_hold",
+        "payment_order",
+        "standing_order"
+      ],
+      "category": "temporal",
+      "statement": "A hold uses its order source account, has positive amount, expires after placement and is not released before placement. A standing-order execution matches the template account, payee and amount; duplicate scheduled executions must be prevented by the scheduler.",
+      "enforcement_plan": "dataset_validation",
+      "implementation_status": "specified_not_implemented"
+    },
+    {
+      "id": "R29",
+      "entities": [
+        "payment_event"
+      ],
+      "category": "temporal",
+      "statement": "Within an order, event times are unique. Allowed transitions: RECEIVED\u2192VALIDATED/FAILED/CANCELLED; VALIDATED\u2192POSTED/FAILED/CANCELLED; POSTED\u2192SETTLED for outbound only. Returns after posting are a deferred process, not a FAILED rewrite.",
+      "enforcement_plan": "dataset_validation",
+      "implementation_status": "specified_not_implemented"
+    },
+    {
+      "id": "R30",
+      "entities": [
+        "loan_application",
+        "credit_decision",
+        "loan_contract",
+        "account",
+        "account_holder"
+      ],
+      "category": "cross_entity",
+      "statement": "A contract uses a non-expired APPROVED decision for the same application borrower and TERM_LOAN product. Contract principal and term equal the approved amounts. Approval is not automatic disbursement.",
+      "enforcement_plan": "dataset_validation",
+      "implementation_status": "specified_not_implemented"
+    },
+    {
+      "id": "R31",
+      "entities": [
+        "loan_schedule_item",
+        "loan_contract"
+      ],
+      "category": "aggregate",
+      "statement": "Installment numbers are unique and positive; principal and interest due are nonnegative. Scheduled principal totals contractual principal. Due dates do not precede acceptance or exceed maturity.",
+      "enforcement_plan": "dataset_validation",
+      "implementation_status": "specified_not_implemented"
+    },
+    {
+      "id": "R32",
+      "entities": [
+        "loan_disbursement",
+        "loan_contract",
+        "account_entry"
+      ],
+      "category": "reconciliation",
+      "statement": "One full disbursement equals contract principal and creates a LOAN_DRAW debit to the loan account and an equal credit to the internal deposit destination. Funding date is not before contract acceptance.",
+      "enforcement_plan": "dataset_validation",
+      "implementation_status": "specified_not_implemented"
+    },
+    {
+      "id": "R33",
+      "entities": [
+        "loan_repayment",
+        "loan_contract",
+        "account_entry"
+      ],
+      "category": "reconciliation",
+      "statement": "A POSTED repayment has nonnegative principal and interest and a positive total. Its principal portion creates one LOAN_REPAYMENT credit to the loan account when positive, and none when zero. Interest is journaled separately. Total principal repayments cannot exceed disbursed principal.",
+      "enforcement_plan": "dataset_validation",
+      "implementation_status": "specified_not_implemented"
+    },
+    {
+      "id": "R34",
+      "entities": [
+        "journal",
+        "journal_line"
+      ],
+      "category": "aggregate",
+      "statement": "Each POSTED journal contains at least two strictly positive lines and equal total debits and credits, in its one declared currency and legal entity. A DRAFT journal may be incomplete.",
+      "enforcement_plan": "dataset_validation",
+      "implementation_status": "specified_not_implemented"
+    },
+    {
+      "id": "R35",
+      "entities": [
+        "posting_link",
+        "account_entry",
+        "journal_line",
+        "journal",
+        "account"
+      ],
+      "category": "reconciliation",
+      "statement": "Allocated amounts are positive. For entries included in an ACCOUNT_TO_GL reconciliation, allocations must total the entry amount. Linked line direction and currency match the entry; allocations to one ledger line cannot exceed that line amount. Counterpart lines may be unmapped.",
+      "enforcement_plan": "dataset_validation",
+      "implementation_status": "specified_not_implemented"
+    },
+    {
+      "id": "R36",
+      "entities": [
+        "reconciliation_run",
+        "reconciliation_item"
+      ],
+      "category": "conditional",
+      "statement": "A COMPLETE run has a completion time no earlier than start. MATCHED items have zero difference. ACCOUNT_TO_GL items use account/ledger references; PAYMENT_TO_SETTLEMENT uses payment_order; STATEMENT_TO_ENTRIES uses statement. Exceptions may legitimately have a missing side.",
+      "enforcement_plan": "dataset_validation",
+      "implementation_status": "specified_not_implemented"
+    },
+    {
+      "id": "R37",
+      "entities": [
+        "credit_decision"
+      ],
+      "category": "conditional",
+      "statement": "Only APPROVED decisions contain positive approved principal and term. DECLINED and REFER have null approved amounts. Decision expiry is not before its decision business date.",
+      "enforcement_plan": "dataset_validation",
+      "implementation_status": "specified_not_implemented"
+    },
+    {
+      "id": "R38",
+      "entities": [
+        "gl_account",
+        "journal_line"
+      ],
+      "category": "row",
+      "statement": "Normal balance is DEBIT for ASSET and EXPENSE, CREDIT for LIABILITY, EQUITY and INCOME. Individual lines may be on either side; normal balance is not a prohibition on opposite entries.",
       "enforcement_plan": "dataset_validation",
       "implementation_status": "specified_not_implemented"
     }
@@ -2786,6 +5269,177 @@
         "account_entry__fee_type_id"
       ],
       "caveat": "This is a branching explanation, not a single SQL join path. Aggregate entries before joining optional source tables; the statement is not an interest calculator."
+    },
+    {
+      "id": "onboard_a_customer",
+      "title": "Onboard a customer",
+      "question": "What evidence and decisions precede opening an account?",
+      "steps": [
+        {
+          "entity": "customer",
+          "text": "Start with the person, not an approved account."
+        },
+        {
+          "entity": "onboarding_case",
+          "text": "Open a case for initial onboarding or refresh."
+        },
+        {
+          "entity": "identity_check",
+          "text": "Record identity-check attempts without document contents."
+        },
+        {
+          "entity": "kyc_review",
+          "text": "Inspect the due-diligence review outcome."
+        },
+        {
+          "entity": "screening_review",
+          "text": "Separate screening results from review decisions."
+        },
+        {
+          "entity": "product_application",
+          "text": "Follow the requested product to its booking."
+        },
+        {
+          "entity": "account",
+          "text": "Inspect the resulting account."
+        }
+      ],
+      "relationship_ids": [
+        "onboarding_case__customer_id",
+        "identity_check__onboarding_case_id",
+        "kyc_review__onboarding_case_id",
+        "screening_review__onboarding_case_id",
+        "product_application__onboarding_case_id",
+        "product_application__booked_account_id"
+      ],
+      "caveat": "These are illustrative workflow records, not an automated compliance system."
+    },
+    {
+      "id": "trace_a_deposit_payment",
+      "title": "Trace a deposit payment",
+      "question": "How does an instruction become a posting and an external settlement?",
+      "steps": [
+        {
+          "entity": "account",
+          "text": "Identify the source deposit account."
+        },
+        {
+          "entity": "payment_order",
+          "text": "Inspect the amount and destination type."
+        },
+        {
+          "entity": "beneficiary",
+          "text": "For outbound orders, identify the saved external payee."
+        },
+        {
+          "entity": "payment_event",
+          "text": "Read the execution history."
+        },
+        {
+          "entity": "payment_settlement",
+          "text": "Compare outbound instructions with settlement."
+        },
+        {
+          "entity": "account_entry",
+          "text": "Find the customer-account movement."
+        }
+      ],
+      "relationship_ids": [
+        "payment_order__source_account_id",
+        "payment_order__beneficiary_id",
+        "payment_event__payment_order_id",
+        "payment_settlement__payment_order_id",
+        "account_entry__payment_order_id"
+      ],
+      "caveat": "Internal transfers have two customer entries and no external settlement. The diagram is a branching view, not one row per joined result."
+    },
+    {
+      "id": "fund_a_term_loan",
+      "title": "Fund a term loan",
+      "question": "What separates a request, approval, contract and funded balance?",
+      "steps": [
+        {
+          "entity": "customer",
+          "text": "Identify the borrower."
+        },
+        {
+          "entity": "loan_application",
+          "text": "Read the requested amount and term."
+        },
+        {
+          "entity": "credit_decision",
+          "text": "Find the supplied credit decision."
+        },
+        {
+          "entity": "loan_contract",
+          "text": "Inspect the accepted terms."
+        },
+        {
+          "entity": "loan_disbursement",
+          "text": "Trace the funded amount."
+        },
+        {
+          "entity": "account",
+          "text": "Identify the internal deposit destination."
+        },
+        {
+          "entity": "loan_schedule_item",
+          "text": "Inspect the supplied installment schedule."
+        }
+      ],
+      "relationship_ids": [
+        "loan_application__customer_id",
+        "credit_decision__loan_application_id",
+        "loan_contract__credit_decision_id",
+        "loan_disbursement__loan_contract_id",
+        "loan_disbursement__destination_account_id",
+        "loan_schedule_item__loan_contract_id"
+      ],
+      "caveat": "This models supplied decisions and schedules. It does not underwrite borrowers or calculate interest."
+    },
+    {
+      "id": "reconcile_to_the_ledger",
+      "title": "Reconcile to the ledger",
+      "question": "Can customer-account activity be traced to balanced accounting?",
+      "steps": [
+        {
+          "entity": "account_entry",
+          "text": "Start with a booked customer-account entry."
+        },
+        {
+          "entity": "posting_link",
+          "text": "Inspect its allocated accounting mappings."
+        },
+        {
+          "entity": "journal_line",
+          "text": "Read the ledger debit or credit."
+        },
+        {
+          "entity": "gl_account",
+          "text": "Identify the ledger classification."
+        },
+        {
+          "entity": "journal",
+          "text": "Check the whole journal balances, not just one line."
+        },
+        {
+          "entity": "reconciliation_item",
+          "text": "Review recorded matches or exceptions."
+        },
+        {
+          "entity": "reconciliation_run",
+          "text": "Inspect the comparison scope and completion status."
+        }
+      ],
+      "relationship_ids": [
+        "posting_link__account_entry_id",
+        "posting_link__journal_line_id",
+        "journal_line__gl_account_id",
+        "journal_line__journal_id",
+        "reconciliation_item__account_entry_id",
+        "reconciliation_item__reconciliation_run_id"
+      ],
+      "caveat": "A balanced journal can still be economically wrong. Reconciliation and source completeness remain separate checks."
     }
   ]
 }

@@ -1,0 +1,47 @@
+"""Real SQL execution, including deliberately incorrect financial records."""
+import sys
+import unittest
+from pathlib import Path
+import duckdb
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
+from run_demo import database, report, violations, CHECKS, MODEL
+
+class DemoTests(unittest.TestCase):
+    def test_balances_and_schema(self):
+        with database() as db:
+            result=report(db)
+            self.assertEqual(result['closing_balances'],{'D1':'1750.00','D2':'175.00','CC1':'50.00','LN1':'900.00'})
+            self.assertEqual(len(db.execute('SHOW TABLES').fetchall()),54)
+    def test_check_metadata(self):
+        self.assertEqual(len({c['id'] for c in CHECKS}),13)
+        rules={r['id'] for r in MODEL['rules']}
+        for c in CHECKS:
+            self.assertTrue(c['coverage_limit'])
+            self.assertTrue(set(c['rule_ids'])<=rules)
+    def test_foreign_key_is_enforced(self):
+        with database() as db:
+            with self.assertRaises(duckdb.ConstraintException):
+                db.execute("UPDATE posting_link SET account_entry_id='missing'")
+
+MUTATIONS={
+'C01':"UPDATE journal_line SET amount=119 WHERE journal_line_id='J_PUR_1'",
+'C02':"UPDATE journal_line SET direction='CREDIT' WHERE journal_line_id='J_PUR_1'",
+'C03':"UPDATE posting_link SET allocated_amount=121 WHERE posting_link_id='MAP_E_PUR'",
+'C04':"UPDATE statement SET closing_balance=51",
+'C05':"UPDATE account_entry SET posted_on='2025-01-01' WHERE account_entry_id='E_PUR'",
+'C06':"UPDATE card_transaction SET amount=130 WHERE card_transaction_id='REF1'",
+'C07':"UPDATE payment_order SET amount=251 WHERE payment_order_id='PO_INT'",
+'C08':"UPDATE payment_settlement SET settled_amount=74 WHERE payment_settlement_id='SET1'",
+'C09':"UPDATE loan_schedule_item SET principal_due=99 WHERE loan_schedule_item_id='LS1'",
+'C10':"UPDATE account_entry SET amount=999 WHERE account_entry_id='E_LD'",
+'C11':"UPDATE account_entry SET amount=99 WHERE account_entry_id='E_LR'",
+'C12':"UPDATE account_entry SET kind='ADJUSTMENT' WHERE account_entry_id='E_PUR'",
+'C13':"UPDATE account_entry SET amount=-1 WHERE account_entry_id='E_PUR'",
+}
+def mutation_test(check,sql):
+    def test(self):
+        with database() as db:
+            db.execute(sql)
+            self.assertTrue(violations(db)[check],f'{check} failed to detect its bad-data fixture')
+    return test
+for check,sql in MUTATIONS.items():setattr(DemoTests,'test_reject_'+check,mutation_test(check,sql))

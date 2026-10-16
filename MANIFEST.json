@@ -1,14 +1,14 @@
 {
-  "version": "0.2.0",
-  "checkpoint": "Interactive explorer",
+  "version": "0.3.0",
+  "checkpoint": "Banking scenarios and executable schema",
   "files": [
     {
       "path": ".github/workflows/explorer.yml",
-      "sha256": "fc42eb83d79e6c60d846002882089877d59eb8df72629fecef96c93cb4c8b3e3"
+      "sha256": "82f8c780f30c8f9ac93039950949c02d15fe0ec198d4f5e45cd1219dd51af2a9"
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "3c2e70c449853e7c5ab6ca3e41ee113653bcae800403b6d421448ef56435a4c2"
+      "sha256": "7f3aaf8bcd49ba494cbea2785ef15c32d84469abbdab03956a8ef5076a002aa3"
     },
     {
       "path": ".gitignore",
@@ -16,7 +16,7 @@
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "58130a1e0aa36f83d8402542a86f73c9e0d139eb9cbc8302ab0445d21e8a1a2c"
+      "sha256": "30881d6301e3b6fefb9dc16376146ba858dbf19e44b5354313f67ea73457d639"
     },
     {
       "path": "LICENSE",
@@ -24,39 +24,39 @@
     },
     {
       "path": "README.md",
-      "sha256": "7b6cf98475f0ccaa30eaa72ebb5e5e53744bd86008a10c51a8fcab99ebf809c9"
+      "sha256": "e777f61127b42da019dda48621a7cb373cae5fa31055858143bd89b40162e67c"
     },
     {
       "path": "docs/BUSINESS_RULES.md",
-      "sha256": "80fd99f11cb9cb62580bec391abb1ff1c82cf98463e3590f3d475a1db4607346"
+      "sha256": "4b80da0cc466dee46fe492b5c9240a69a664e4f9d823c834ca779e26b0f1ecf4"
     },
     {
       "path": "docs/DATA_DICTIONARY.md",
-      "sha256": "c73c89ee4f82e4b20c0e76bbec920bdb5c3eb2af8c37635e88aadbb74673c66e"
+      "sha256": "eb7d83691e97542f8334961d07be0f6dd9616249654a5aadd8a8f1f187b75fb5"
     },
     {
       "path": "docs/DECISIONS.md",
-      "sha256": "3d65e4e84a75dabf8344fcba81e375edda740788eab491300084022daafbdb78"
+      "sha256": "e089a8b96977a61ece9d87af36f13a337fc738362b2903c5925b9cf341900d4a"
     },
     {
       "path": "docs/ENTITY_CATALOGUE.md",
-      "sha256": "b3c8a0cacf4606046961617e7462db54774e18ca597539a42179b3fc0843e184"
+      "sha256": "bdba8e29ad1aa600a7e22733ab43967de0509b17df12116df16e6fe8bc2cfef0"
     },
     {
       "path": "docs/EXPLORER_IMPLEMENTATION.md",
-      "sha256": "0d7b62af2484a12cdc007ad946b665d4d28d624a498be32c50ef3d4aaef839f3"
+      "sha256": "6dcab3ce8a9ec524ad371c1010c6319c74200f5efded81556612738d3e34f26d"
     },
     {
       "path": "docs/EXPLORER_SPEC.md",
-      "sha256": "131a27967ddbd51bc3093ad8e5ad72b796536cfdd4c31e72e78df9ba16385b96"
+      "sha256": "f3d305be6f50d10f2be4cbc5496a2e83c37b2ac55a0013f163e419f5469a57a6"
     },
     {
       "path": "docs/JOURNEYS.md",
-      "sha256": "a6a83a45933e18f8fadfd8ad4d7005a5a022fb847164200c89e2cc5de8bcb938"
+      "sha256": "c939995d006ec6e4a76e6f824e038902856e1a4af103782204df531a2c7e6c35"
     },
     {
       "path": "docs/MODEL_CONTRACT.md",
-      "sha256": "935ed4bfdbb764c3bb1df0d890f4ac76883dd047b8e6b809011ad6792e06cbd8"
+      "sha256": "7304fda4a79cee39b6f3461c784ba4d8eb280eb4b090e4608b72ce0768d0ef1c"
     },
     {
       "path": "docs/PUBLISHING.md",
@@ -64,19 +64,39 @@
     },
     {
       "path": "docs/RELATIONSHIPS.md",
-      "sha256": "c4549d3ed29f0e9ed1d8f71227d52bf2a75350847349d12654617f1b1c234c15"
+      "sha256": "771015274f9bc15748fecbe1b4d136ab3fdb4b34aa95883979019feb1c55e240"
     },
     {
       "path": "docs/ROADMAP.md",
-      "sha256": "68229467811c5e0b96b1f79c540fdfa902b1681aea120f892a52c0360632f59f"
+      "sha256": "98ee48ed9d3d31684b377f3b7d9215197c56327516d4d8203959feb9ff7d994c"
     },
     {
       "path": "docs/SCENARIO.md",
-      "sha256": "74e3931dc9925a771ce7b00089633913b3406ba0c71088cd8c64b936fe96733f"
+      "sha256": "636abd72ddfba249b4d34c39afb04c5351e6f6c6b9f210a884e28033d4c1bfc6"
+    },
+    {
+      "path": "docs/SQL_AND_DEMO.md",
+      "sha256": "cb880f3368aae817a7725c25a1389222180addcd728f40261184172cf24f1400"
     },
     {
       "path": "docs/VALIDATION.md",
-      "sha256": "9a1a21e2d6530e7584191bbb9504cbd8c048b7b066dea7dc6ee753b9599505d3"
+      "sha256": "31be308c12f99c6d66fd5741f97a9a64252a4e19f0ac3644dd3840044f1f339a"
+    },
+    {
+      "path": "docs/VALIDATION_COVERAGE.md",
+      "sha256": "ec9b0cdf20a5e12138bbe1373d74eccfed5503f3d120beb69585f13eaae23995"
+    },
+    {
+      "path": "fixtures/banking_scenarios.json",
+      "sha256": "d318014cc41074b21142b9ef5944812ded9585c1e0f16e7b3ff6874399397ceb"
+    },
+    {
+      "path": "generated/banking.duckdb.sql",
+      "sha256": "0085dc96e4bca52705490d8f758260ae7cf6d646d5f67388d206ad6ab79474d5"
+    },
+    {
+      "path": "generated/demo-report.json",
+      "sha256": "e7abc8a95e8a366f451647dcc50a2cd7266c662272021ade10d39c6272d31a60"
     },
     {
       "path": "index.html",
@@ -84,15 +104,19 @@
     },
     {
       "path": "model/banking.model.json",
-      "sha256": "c89ba2827dae0b3470cd2dc6a9f2dfb3955bcb672c9d96e3ceccbd7b028b83fe"
+      "sha256": "273f78fd44dfd3fb86d7462724c718a84536636df815b0f819e5b0edfc448a2b"
+    },
+    {
+      "path": "model/validation_checks.json",
+      "sha256": "9fc802c6446fdaf812c021b519883eb5879d3b83a07b89048ee2164ffc9e5e5a"
     },
     {
       "path": "package-lock.json",
-      "sha256": "a373451ec9be9d4c044ea879313584c39dfec04682ed30e17b714c2aed786638"
+      "sha256": "beae38f1df23f962e3a404f325feaaee7a52a8027d04edbb2b59ed31cdbc0e98"
     },
     {
       "path": "package.json",
-      "sha256": "f3d246cd85a7a6a035a05212e2733605bace9e8b77959b653eb5dc9ef82fd182"
+      "sha256": "48694c458230befc2f560850602e1544392b8345be3667a4d46ca3ee79008870"
     },
     {
       "path": "playwright.config.ts",
@@ -104,11 +128,23 @@
     },
     {
       "path": "replay.py",
-      "sha256": "e6a0fdfac17946ba7a243e1a38d13a1990e5d04091007590f644f7903bffa12b"
+      "sha256": "cad63e91a76e372fbdc5882c391f3836d3e83d4d03306e1151a4f54b8e856957"
+    },
+    {
+      "path": "requirements-demo.txt",
+      "sha256": "afa5bd1cbd0d0be1318c3e8992b31f1deae587e80425877fc7dee2fee0d1572f"
+    },
+    {
+      "path": "scripts/export_sql.py",
+      "sha256": "b9a88d868195f30b03b42584cd11a405512b2b4996b36e4b7aa12943f232f45e"
     },
     {
       "path": "scripts/render_docs.py",
       "sha256": "ba64c58bfbe24e6d625773ff5f546bb6c5cfbfa173745cf4fa264b31867b72c8"
+    },
+    {
+      "path": "scripts/run_demo.py",
+      "sha256": "fd2e035c331b38316ef80c38c44797bf6f6b4eb36256e696117f0218a874ac17"
     },
     {
       "path": "scripts/serve_browser_test.py",
@@ -116,7 +152,7 @@
     },
     {
       "path": "scripts/update_manifest.py",
-      "sha256": "3cc3d3350722cefff491b7066fa737236dd9fc7971ab61784e14f3369aa1408b"
+      "sha256": "182f1680c5ddf8ce4d2ec712a3f83ce0a0bd2408de295da2b7a8f9b41ee085a0"
     },
     {
       "path": "scripts/validate_model.py",
@@ -124,7 +160,7 @@
     },
     {
       "path": "src/App.tsx",
-      "sha256": "b984cfd2192672ff88218927207f89d5b0e934b64a5c19d676e9769cc40e9ea4"
+      "sha256": "0fd8da2047208233fd23b727bab6cd58dfefc121748e7e2df56ce07f705ef398"
     },
     {
       "path": "src/Graph.tsx",
@@ -152,11 +188,15 @@
     },
     {
       "path": "tests/browser/explorer.spec.ts",
-      "sha256": "d5a173a542f36e1f7154ee22b43c3d3045a7b2857500ac94faf0b5e59188dd07"
+      "sha256": "490e4f37fdacefd0c10deb2247d129df56d7d9c4b0322c72562a69ba957df7fa"
     },
     {
       "path": "tests/explorer.test.ts",
-      "sha256": "4808c95f3f0b6811a98c59dc8920af75699159db28d340fdfe5dd8015ff4696b"
+      "sha256": "6401a8b85194a20adb58c4fd1fd1c20357a8b418e0ffeeba96d1d33f5dbcd3fb"
+    },
+    {
+      "path": "tests/test_demo.py",
+      "sha256": "8d9773503be6593213678ae003e311a8323da5d4cfe32e412d681b82777517a9"
     },
     {
       "path": "tests/test_model.py",

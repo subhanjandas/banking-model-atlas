@@ -12,5 +12,5 @@ for directory,dirs,names in os.walk(root):
         path=Path(directory)/name
         if name=='MANIFEST.json' or name.startswith('.env') or name=='.DS_Store' or path.suffix in {'.pyc','.duckdb'}:continue
         files.append({'path':path.relative_to(root).as_posix(),'sha256':hashlib.sha256(path.read_bytes()).hexdigest()})
-(root/'MANIFEST.json').write_text(json.dumps({'version':'0.2.0','checkpoint':'Interactive explorer','files':sorted(files,key=lambda f:f['path'])},indent=2)+'\n')
+(root/'MANIFEST.json').write_text(json.dumps({'version':'0.3.0','checkpoint':'Banking scenarios and executable schema','files':sorted(files,key=lambda f:f['path'])},indent=2)+'\n')
 print(f'Manifest refreshed: {len(files)} files.')

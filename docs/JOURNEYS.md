@@ -34,3 +34,66 @@ This is a branching explanation, not a single SQL join path. Aggregate entries b
 
 Highlighted relationships: `statement__account_id`, `statement_line__statement_id`, `statement_line__account_entry_id`, `account_entry__card_transaction_id`, `account_entry__payment_id`, `account_entry__fee_type_id`.
 
+## Onboard a customer
+
+What evidence and decisions precede opening an account?
+
+1. **customer** — Start with the person, not an approved account.
+2. **onboarding_case** — Open a case for initial onboarding or refresh.
+3. **identity_check** — Record identity-check attempts without document contents.
+4. **kyc_review** — Inspect the due-diligence review outcome.
+5. **screening_review** — Separate screening results from review decisions.
+6. **product_application** — Follow the requested product to its booking.
+7. **account** — Inspect the resulting account.
+
+These are illustrative workflow records, not an automated compliance system.
+
+Highlighted relationships: `onboarding_case__customer_id`, `identity_check__onboarding_case_id`, `kyc_review__onboarding_case_id`, `screening_review__onboarding_case_id`, `product_application__onboarding_case_id`, `product_application__booked_account_id`.
+
+## Trace a deposit payment
+
+How does an instruction become a posting and an external settlement?
+
+1. **account** — Identify the source deposit account.
+2. **payment_order** — Inspect the amount and destination type.
+3. **beneficiary** — For outbound orders, identify the saved external payee.
+4. **payment_event** — Read the execution history.
+5. **payment_settlement** — Compare outbound instructions with settlement.
+6. **account_entry** — Find the customer-account movement.
+
+Internal transfers have two customer entries and no external settlement. The diagram is a branching view, not one row per joined result.
+
+Highlighted relationships: `payment_order__source_account_id`, `payment_order__beneficiary_id`, `payment_event__payment_order_id`, `payment_settlement__payment_order_id`, `account_entry__payment_order_id`.
+
+## Fund a term loan
+
+What separates a request, approval, contract and funded balance?
+
+1. **customer** — Identify the borrower.
+2. **loan_application** — Read the requested amount and term.
+3. **credit_decision** — Find the supplied credit decision.
+4. **loan_contract** — Inspect the accepted terms.
+5. **loan_disbursement** — Trace the funded amount.
+6. **account** — Identify the internal deposit destination.
+7. **loan_schedule_item** — Inspect the supplied installment schedule.
+
+This models supplied decisions and schedules. It does not underwrite borrowers or calculate interest.
+
+Highlighted relationships: `loan_application__customer_id`, `credit_decision__loan_application_id`, `loan_contract__credit_decision_id`, `loan_disbursement__loan_contract_id`, `loan_disbursement__destination_account_id`, `loan_schedule_item__loan_contract_id`.
+
+## Reconcile to the ledger
+
+Can customer-account activity be traced to balanced accounting?
+
+1. **account_entry** — Start with a booked customer-account entry.
+2. **posting_link** — Inspect its allocated accounting mappings.
+3. **journal_line** — Read the ledger debit or credit.
+4. **gl_account** — Identify the ledger classification.
+5. **journal** — Check the whole journal balances, not just one line.
+6. **reconciliation_item** — Review recorded matches or exceptions.
+7. **reconciliation_run** — Inspect the comparison scope and completion status.
+
+A balanced journal can still be economically wrong. Reconciliation and source completeness remain separate checks.
+
+Highlighted relationships: `posting_link__account_entry_id`, `posting_link__journal_line_id`, `journal_line__gl_account_id`, `journal_line__journal_id`, `reconciliation_item__account_entry_id`, `reconciliation_item__reconciliation_run_id`.
+

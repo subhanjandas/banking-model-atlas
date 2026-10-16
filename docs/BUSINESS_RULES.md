@@ -10,7 +10,7 @@ Applies to: `account`, `product_version`, `product`.
 
 ## R02 — temporal
 
-Every open account has exactly one active PRIMARY owner. JOINT roles are allowed only for deposit products; identical customer/account/role intervals must not overlap.
+Every open account has exactly one active PRIMARY owner. JOINT roles are allowed only for deposits. Credit-card and term-loan accounts have one primary owner. Identical customer/account/role intervals must not overlap.
 
 Applies to: `account_holder`, `account`, `product`.
 
@@ -58,7 +58,7 @@ Applies to: `card_transaction`, `card_authorization`, `payment`, `account_entry`
 
 ## R10 — conditional
 
-CARD entries have only card_transaction_id populated among source references; PAYMENT has only payment_id; FEE has only fee_type_id; ADJUSTMENT has none; REVERSAL has only reverses_entry_id. Non-reversals have no reversal reference.
+Exactly the source reference corresponding to kind is populated: CARD→card_transaction_id, PAYMENT→payment_id, FEE→fee_type_id, REVERSAL→reverses_entry_id, DEPOSIT_PAYMENT→payment_order_id, LOAN_DRAW→loan_disbursement_id, LOAN_REPAYMENT→loan_repayment_id. ADJUSTMENT has none. All other source references are null.
 
 Applies to: `account_entry`, `card_transaction`, `payment`, `fee_type`.
 
@@ -88,7 +88,7 @@ Applies to: `statement`, `account`, `product`.
 
 ## R15 — reconciliation
 
-Between consecutive daily snapshots, deposit balance changes by credits minus debits; credit-card amount owed changes by debits minus credits. A gap requires all intervening entries. Snapshots may be negative.
+Between daily snapshots, deposits change by credits minus debits; credit-card and term-loan amounts owed change by debits minus credits. A gap requires all intervening entries. Snapshots may be negative; loan principal interest is accounted separately.
 
 Applies to: `account_balance_snapshot`, `account_entry`, `account`, `product`.
 
@@ -127,4 +127,106 @@ Applies to: `account`, `account_status_event`.
 Consent decisions are immutable events. Current consent is the latest decision for the customer and purpose; absence means no recorded grant.
 
 Applies to: `customer_consent`.
+
+## R22 — cross_entity
+
+An APPROVED onboarding case has a latest PASS identity check, latest PASS KYC review and latest CLEAR screening for each required type (SANCTIONS and PEP); all occur no later than closure. Ties within a check stream are disallowed.
+
+Applies to: `onboarding_case`, `identity_check`, `kyc_review`, `screening_review`.
+
+## R23 — cross_entity
+
+A booked product application is APPROVED, has an APPROVED case for the same applicant, and references an account opened with the requested product version. TERM_LOAN requests use loan_application instead.
+
+Applies to: `product_application`, `onboarding_case`, `account`, `product_version`.
+
+## R24 — temporal
+
+Risk assessment and linked case refer to the same customer. Next review date is after the assessment business date; no risk score is computed.
+
+Applies to: `customer_risk_assessment`, `onboarding_case`.
+
+## R25 — conditional
+
+An INTERNAL order has a non-null destination account, a null beneficiary and different source/destination accounts. An OUTBOUND order has a beneficiary and no destination account. Both accounts are deposits and currency matches the order; the initiating authority must be checked separately.
+
+Applies to: `payment_order`, `account`, `beneficiary`.
+
+## R26 — reconciliation
+
+Each POSTED or SETTLED internal order has exactly one DEPOSIT_PAYMENT debit on the source and one equal credit on the destination. An outbound order has exactly one source debit. Entries match amount and currency. FAILED or CANCELLED orders have no unreversed posting in this simplified version.
+
+Applies to: `payment_order`, `payment_event`, `account_entry`.
+
+## R27 — reconciliation
+
+Settlement belongs only to an OUTBOUND order. There is one full settlement per order with equal amount and currency. SETTLED requires a settlement observation; internal orders finish at POSTED.
+
+Applies to: `payment_settlement`, `payment_order`, `payment_event`.
+
+## R28 — temporal
+
+A hold uses its order source account, has positive amount, expires after placement and is not released before placement. A standing-order execution matches the template account, payee and amount; duplicate scheduled executions must be prevented by the scheduler.
+
+Applies to: `account_hold`, `payment_order`, `standing_order`.
+
+## R29 — temporal
+
+Within an order, event times are unique. Allowed transitions: RECEIVED→VALIDATED/FAILED/CANCELLED; VALIDATED→POSTED/FAILED/CANCELLED; POSTED→SETTLED for outbound only. Returns after posting are a deferred process, not a FAILED rewrite.
+
+Applies to: `payment_event`.
+
+## R30 — cross_entity
+
+A contract uses a non-expired APPROVED decision for the same application borrower and TERM_LOAN product. Contract principal and term equal the approved amounts. Approval is not automatic disbursement.
+
+Applies to: `loan_application`, `credit_decision`, `loan_contract`, `account`, `account_holder`.
+
+## R31 — aggregate
+
+Installment numbers are unique and positive; principal and interest due are nonnegative. Scheduled principal totals contractual principal. Due dates do not precede acceptance or exceed maturity.
+
+Applies to: `loan_schedule_item`, `loan_contract`.
+
+## R32 — reconciliation
+
+One full disbursement equals contract principal and creates a LOAN_DRAW debit to the loan account and an equal credit to the internal deposit destination. Funding date is not before contract acceptance.
+
+Applies to: `loan_disbursement`, `loan_contract`, `account_entry`.
+
+## R33 — reconciliation
+
+A POSTED repayment has nonnegative principal and interest and a positive total. Its principal portion creates one LOAN_REPAYMENT credit to the loan account when positive, and none when zero. Interest is journaled separately. Total principal repayments cannot exceed disbursed principal.
+
+Applies to: `loan_repayment`, `loan_contract`, `account_entry`.
+
+## R34 — aggregate
+
+Each POSTED journal contains at least two strictly positive lines and equal total debits and credits, in its one declared currency and legal entity. A DRAFT journal may be incomplete.
+
+Applies to: `journal`, `journal_line`.
+
+## R35 — reconciliation
+
+Allocated amounts are positive. For entries included in an ACCOUNT_TO_GL reconciliation, allocations must total the entry amount. Linked line direction and currency match the entry; allocations to one ledger line cannot exceed that line amount. Counterpart lines may be unmapped.
+
+Applies to: `posting_link`, `account_entry`, `journal_line`, `journal`, `account`.
+
+## R36 — conditional
+
+A COMPLETE run has a completion time no earlier than start. MATCHED items have zero difference. ACCOUNT_TO_GL items use account/ledger references; PAYMENT_TO_SETTLEMENT uses payment_order; STATEMENT_TO_ENTRIES uses statement. Exceptions may legitimately have a missing side.
+
+Applies to: `reconciliation_run`, `reconciliation_item`.
+
+## R37 — conditional
+
+Only APPROVED decisions contain positive approved principal and term. DECLINED and REFER have null approved amounts. Decision expiry is not before its decision business date.
+
+Applies to: `credit_decision`.
+
+## R38 — row
+
+Normal balance is DEBIT for ASSET and EXPENSE, CREDIT for LIABILITY, EQUITY and INCOME. Individual lines may be on either side; normal balance is not a prohibition on opposite entries.
+
+Applies to: `gl_account`, `journal_line`.
 

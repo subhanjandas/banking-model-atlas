@@ -1,3 +1,11 @@
+# Application 0.3.0 / model 0.2.0
+
+- Expand from 30 to 54 entities and eight to twelve domains.
+- Add onboarding, deposit payments, term lending and accounting with four new journeys.
+- Generate executable DuckDB DDL and synthetic reconciliation examples.
+- Add 13 selected business checks, negative-data tests and rule coverage notes.
+- Keep existing model IDs, interface navigation and original journeys stable.
+
 # Changelog
 
 ## 0.2.0 — 2026-10-16
