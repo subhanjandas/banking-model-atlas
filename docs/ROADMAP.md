@@ -4,13 +4,13 @@
 
 Completed locally: fictional scenario, 30-entity model, 161 column definitions, 45 relationships, 21 rule specifications, two connected journey definitions, metadata validator, 18 tests, generated reference documents, explorer specification and CI configuration.
 
-Pending external action: creation of the new GitHub repository and upload of this checkpoint. No hosted explorer exists yet.
+Foundation published to `subhanjandas/banking-model-atlas` in commit `55e19d4`. The foundation GitHub Actions run passed.
 
-## Next — complete one vertical slice of the viewer
+## Application 0.2.0 — explorer implemented
 
-Implement the application shell, load the model, render a small connected subset, select a table and an edge, and inspect their metadata. Use customer, card_assignment, card, card_transaction, dispute and dispute_event as an initial slice. This validates the interface before expanding the canvas.
+Implemented the application shell, all 30 tables, domain overview, graph navigation, entity and relationship inspectors, search and responsive drawers.
 
-Then render all domains, add search, domain visibility, neighbour focus, the two journeys and URL state. Add downloads and accessible responsive panels. Test the actual deployed repository subpath.
+Implemented both journeys, neighbourhood focus, URL state, and JSON/dictionary/PNG downloads. Browser tests target the production repository subpath. Publication depends on GitHub Pages configuration; see VALIDATION.md for the actual verification state.
 
 ## Following — evidence and export
 

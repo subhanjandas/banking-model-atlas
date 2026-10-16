@@ -1,18 +1,22 @@
 {
-  "version": "0.1.0",
-  "checkpoint": "Hour 1 foundation",
+  "version": "0.2.0",
+  "checkpoint": "Interactive explorer",
   "files": [
+    {
+      "path": ".github/workflows/explorer.yml",
+      "sha256": "fc42eb83d79e6c60d846002882089877d59eb8df72629fecef96c93cb4c8b3e3"
+    },
     {
       "path": ".github/workflows/validate.yml",
       "sha256": "3c2e70c449853e7c5ab6ca3e41ee113653bcae800403b6d421448ef56435a4c2"
     },
     {
       "path": ".gitignore",
-      "sha256": "c1581979e0ed7ac30b88d59e03f4d867512a30c96883d3ddb40a7e8aa0647075"
+      "sha256": "ebab261a89ac14db14c5cd178b415964d52a3c06863219b984a7673e2627b890"
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "cacb55a2056d1ca51ee53aaefc489a9114b2d6dc757852ce44a5c486b384fb3a"
+      "sha256": "58130a1e0aa36f83d8402542a86f73c9e0d139eb9cbc8302ab0445d21e8a1a2c"
     },
     {
       "path": "LICENSE",
@@ -20,7 +24,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "800dc1be32fa353b1aa559d27ac87245895a87e881eb5b0005e168453f8ca9d4"
+      "sha256": "e9f80418f94e5118b4f08a040f8ec9c43216cfd580d28f36f09bcfe5681eff45"
     },
     {
       "path": "docs/BUSINESS_RULES.md",
@@ -39,12 +43,16 @@
       "sha256": "b3c8a0cacf4606046961617e7462db54774e18ca597539a42179b3fc0843e184"
     },
     {
+      "path": "docs/EXPLORER_IMPLEMENTATION.md",
+      "sha256": "0d7b62af2484a12cdc007ad946b665d4d28d624a498be32c50ef3d4aaef839f3"
+    },
+    {
       "path": "docs/EXPLORER_SPEC.md",
-      "sha256": "a3b8f04cc1262a512f2e628a2cddeb5e012311cb60cd2dfa1980a4c4fbcd03b8"
+      "sha256": "131a27967ddbd51bc3093ad8e5ad72b796536cfdd4c31e72e78df9ba16385b96"
     },
     {
       "path": "docs/JOURNEYS.md",
-      "sha256": "a82f3d0ee2b06bd97f895243f261e3449ce659143ff1f7f070356c9ea885a3ab"
+      "sha256": "a6a83a45933e18f8fadfd8ad4d7005a5a022fb847164200c89e2cc5de8bcb938"
     },
     {
       "path": "docs/MODEL_CONTRACT.md",
@@ -52,7 +60,7 @@
     },
     {
       "path": "docs/PUBLISHING.md",
-      "sha256": "e3ac3dc5ec82bc70a21494bf5cf83eba5ec87b18ab0f46610c813270c2e8d2da"
+      "sha256": "76e3d3f5554556395d6df6df1ad76c79ee2132f8a7d0b8294b98366b89827574"
     },
     {
       "path": "docs/RELATIONSHIPS.md",
@@ -60,7 +68,7 @@
     },
     {
       "path": "docs/ROADMAP.md",
-      "sha256": "01649ba4c41db1649bbf321adc993744977fac5be7c419aa9a0add4218e9ea10"
+      "sha256": "68229467811c5e0b96b1f79c540fdfa902b1681aea120f892a52c0360632f59f"
     },
     {
       "path": "docs/SCENARIO.md",
@@ -68,11 +76,31 @@
     },
     {
       "path": "docs/VALIDATION.md",
-      "sha256": "fe6baf4df4cd32e600eb3c96dc3a55905830e62a424087e90487bd6e74bae531"
+      "sha256": "066bcc6520ea6ea666fd45f5f179c77977c07c6d3fb9d00835026c9a500f7b42"
+    },
+    {
+      "path": "index.html",
+      "sha256": "cc10880e9c5f774a58458d3163bc84213d302eb7c86d4460a37c164b807ac0d1"
     },
     {
       "path": "model/banking.model.json",
       "sha256": "c89ba2827dae0b3470cd2dc6a9f2dfb3955bcb672c9d96e3ceccbd7b028b83fe"
+    },
+    {
+      "path": "package-lock.json",
+      "sha256": "a373451ec9be9d4c044ea879313584c39dfec04682ed30e17b714c2aed786638"
+    },
+    {
+      "path": "package.json",
+      "sha256": "f3d246cd85a7a6a035a05212e2733605bace9e8b77959b653eb5dc9ef82fd182"
+    },
+    {
+      "path": "playwright.config.ts",
+      "sha256": "1a22007e1dcec52910cc277f9d7588071df62c1c42e1614b04ee75804bf4f4af"
+    },
+    {
+      "path": "public/favicon.svg",
+      "sha256": "79bba7dc94339ff08b21d64dc9cc82a174ee478541a92ddae0a3a9b76110cc8c"
     },
     {
       "path": "replay.py",
@@ -80,19 +108,75 @@
     },
     {
       "path": "scripts/render_docs.py",
-      "sha256": "315abd941fd233f2c88d9528ce3c527b7ca0ae9f347059a7433980550c0995ed"
+      "sha256": "ba64c58bfbe24e6d625773ff5f546bb6c5cfbfa173745cf4fa264b31867b72c8"
+    },
+    {
+      "path": "scripts/serve_browser_test.py",
+      "sha256": "5a0030c5b2b92ef84f0f6028117b4c5f87081b005d6aadf2fee64ae43daffe9a"
+    },
+    {
+      "path": "scripts/update_manifest.py",
+      "sha256": "3cc3d3350722cefff491b7066fa737236dd9fc7971ab61784e14f3369aa1408b"
     },
     {
       "path": "scripts/validate_model.py",
       "sha256": "cb17348cefe95a7f6ebfca7bd7651966d278b61bcdbe123530720f5c509f8bbb"
     },
     {
+      "path": "src/App.tsx",
+      "sha256": "b984cfd2192672ff88218927207f89d5b0e934b64a5c19d676e9769cc40e9ea4"
+    },
+    {
+      "path": "src/Graph.tsx",
+      "sha256": "7eb5b80717fa0f5370766ededf8f38b3cd817b1a01566f7819e2b92e7324feb2"
+    },
+    {
+      "path": "src/graph.ts",
+      "sha256": "b4bb855745c7432d92ab92f939f13633e4447ad93d302de0788cfe1ea1d2fb9e"
+    },
+    {
+      "path": "src/main.tsx",
+      "sha256": "e34b50223ac942759bc00c81a3d886fa77fc39645c31a32bd14841cbaceb2300"
+    },
+    {
+      "path": "src/model.ts",
+      "sha256": "bea74ffdab12c4f0bbc8c2720c040f469d56d403d4671fd04dade2bb59ae2b86"
+    },
+    {
+      "path": "src/styles.css",
+      "sha256": "3632f335038ecff6078c4f752e9590cf4ad918589a933d0ae9691843ffefa681"
+    },
+    {
+      "path": "src/vite-env.d.ts",
+      "sha256": "65996936fbb042915f7b74a200fcdde7e410f32a669b1ab9597cfaa4b0faddb5"
+    },
+    {
+      "path": "tests/browser/explorer.spec.ts",
+      "sha256": "d5a173a542f36e1f7154ee22b43c3d3045a7b2857500ac94faf0b5e59188dd07"
+    },
+    {
+      "path": "tests/explorer.test.ts",
+      "sha256": "0f1a34782988d6318b3eed083758b0af2f2bb02b956f5f3225d6151a9fd7897e"
+    },
+    {
       "path": "tests/test_model.py",
       "sha256": "67ab1cbc40e2c7de43f80335df7350c043ff40f65dc142eed37ca31ddd4ee643"
     },
     {
+      "path": "tsconfig.json",
+      "sha256": "482ef8529ee796fa0ef61efc9acdf784a2f71678052390e0c574d57319ff11ef"
+    },
+    {
       "path": "verify_package.py",
       "sha256": "e573a8b683a7ca382b4dac81bd19004752d5b0ae24478cf77faabd20bc5c03ab"
+    },
+    {
+      "path": "vite.config.ts",
+      "sha256": "a3ff8ca0aebd5ae78754972becaa47b4a92de0d09554a8b22b692f4976334f70"
+    },
+    {
+      "path": "vitest.config.ts",
+      "sha256": "e2df989e41a5c516af921bbdad57c60d1712131d782fe0962b54e0e1195c471e"
     }
   ]
 }

@@ -1,6 +1,6 @@
 # Business journeys
 
-These presets are metadata for the future explorer; this checkpoint does not include an interactive UI.
+These presets drive the interactive explorer. Each journey selects only its listed entities and relationships.
 
 ## Investigate a disputed purchase
 

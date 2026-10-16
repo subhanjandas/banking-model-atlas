@@ -28,7 +28,7 @@ def outputs(m):
     lines=['# Business rules','','These are specifications, not implemented data-quality checks. The metadata validator verifies their references only.','']
     for r in m['rules']:lines += ['## '+r['id']+' — '+r['category'],'',r['statement'],'','Applies to: '+', '.join('`'+e+'`' for e in r['entities'])+'.','']
     files['BUSINESS_RULES.md']='\n'.join(lines)+'\n'
-    lines=['# Business journeys','','These presets are metadata for the future explorer; this checkpoint does not include an interactive UI.','']
+    lines=['# Business journeys','','These presets drive the interactive explorer. Each journey selects only its listed entities and relationships.','']
     for j in m['journeys']:
         lines+=['## '+j['title'],'',j['question'],'']
         lines += [f'{i}. **{s["entity"]}** — {s["text"]}' for i,s in enumerate(j['steps'],1)]

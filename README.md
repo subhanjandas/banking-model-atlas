@@ -4,11 +4,13 @@
 
 Imagine a customer calls about a purchase they do not recognize. The service team needs to connect a person, an account, a particular card, a merchant, a posted transaction, and a dispute case. Those are different things, often recorded by different systems. A good data model makes the connections explicit.
 
-Banking Model Atlas is being built to make those connections visible. The planned explorer will let you browse domains, search tables and columns, follow relationships, and read the business meaning behind each field. Two guided journeys will show how the model helps answer everyday questions.
+Banking Model Atlas is being built to make those connections visible. The explorer lets you browse domains, search tables and columns, follow relationships, and read the business meaning behind each field. Two guided journeys show how the model helps answer everyday questions.
 
-**Current release: `0.1.0` — Hour 1 foundation.** The model, definitions, journey specifications, structural validator, and documentation are here. The interactive website, SQL exports, synthetic records, and database execution are not built yet. This repository does not currently run a banking system or display a graph in a browser.
+**Current application release: `0.2.0` — interactive explorer.** The 30-entity model now has a browser interface with domain and table views, search, detailed inspectors, relationship focus, two guided journeys, shareable links, and JSON/dictionary/PNG downloads. The banking model remains version `0.1.0`. SQL exports, synthetic records and transaction-level validation are still future work.
 
-## What is in this checkpoint?
+**Run it:** `npm ci` then `npm run dev` (Node.js 22.12+). See [the explorer guide](docs/EXPLORER_IMPLEMENTATION.md) for commands and implementation details. GitHub Pages publication is handled by the workflow once Pages is enabled for this repository.
+
+## What is in this project?
 
 | Item | Included |
 |---|---:|
@@ -19,8 +21,10 @@ Banking Model Atlas is being built to make those connections visible. The planne
 | Specified business rules | 21 |
 | Guided journey definitions | 2 |
 | Automated metadata tests | 18 |
+| Explorer unit tests | 16 |
+| Browser interaction scenarios | 6 |
 
-The JSON model is the source of truth. The catalogue, dictionary, relationship register, business-rule reference, and journey guide are generated from it. That means a description shown in the future website can come from exactly the same place as the downloadable documentation.
+The JSON model is the source of truth. The catalogue, dictionary, relationship register, business-rule reference, and journey guide are generated from it. That means a description shown in the website comes from exactly the same place as the downloadable documentation.
 
 ## Meet the bank
 
@@ -105,13 +109,13 @@ Other attributes, including customer segment and merchant category, are current-
 
 The exact highlighted entities and edges are stored in the model and documented in [JOURNEYS.md](docs/JOURNEYS.md).
 
-## What the interactive release will feel like
+## Explore the interactive model
 
-The left panel will contain domains and search. The centre will show the graph. Selecting an entity or relationship will open a right-hand inspector with definitions, grain, columns, keys, and business rules.
+The left panel contains domains and search. The centre shows the graph. Selecting an entity or relationship opens a right-hand inspector with definitions, grain, columns, keys, and business rules.
 
 At a wide zoom, the graph will emphasize domains. At a closer view, it will emphasize tables and key fields. Full column lists belong in the inspector, so the canvas remains readable. Search will find both entity and column names. A table focus mode will show its immediate neighbours, and journey presets will highlight a meaningful subset of the model.
 
-The planned stack is React, TypeScript, Vite, and Cytoscape.js. The first viewer will run entirely in the browser from versioned model metadata. Database access and AI generation are not required to explore the model. See the [explorer specification](docs/EXPLORER_SPEC.md) for interaction and acceptance criteria.
+The stack is React, TypeScript, Vite, and Cytoscape.js. The viewer runs entirely in the browser from versioned model metadata. Database access and AI generation are not required to explore the model. See the [explorer specification](docs/EXPLORER_SPEC.md) for interaction and acceptance criteria.
 
 ## Run the foundation checks
 
@@ -151,7 +155,9 @@ The validator checks metadata: identifiers, references, key types, cardinality c
 | `docs/EXPLORER_SPEC.md` | Planned interface behavior and acceptance criteria. |
 | `docs/ROADMAP.md` | Checkpoint status and next implementation steps. |
 | `docs/PUBLISHING.md` | Repository creation and future site publication. |
-| `scripts/` | Metadata validation and documentation generation. |
+| `src/` | React interface, graph adapter and model navigation. |
+| `docs/EXPLORER_IMPLEMENTATION.md` | How to run, test and understand the viewer. |
+| `scripts/` | Metadata validation, documentation generation and CI serving. |
 | `tests/` | Mutation tests for the metadata contract. |
 | `.github/workflows/validate.yml` | The same checks for GitHub Actions. |
 

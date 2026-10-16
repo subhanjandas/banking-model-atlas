@@ -1,0 +1,2 @@
+import {defineConfig} from '@playwright/test';
+export default defineConfig({testDir:'./tests/browser',timeout:30000,use:{baseURL:'http://127.0.0.1:4173/banking-model-atlas/',viewport:{width:1440,height:1000},trace:'retain-on-failure',screenshot:'only-on-failure'},reporter:[['list'],['html',{open:'never'}]],webServer:{command:'python3 scripts/serve_browser_test.py',url:'http://127.0.0.1:4173/banking-model-atlas/',reuseExistingServer:false},projects:[{name:'chromium',use:{browserName:'chromium'}}]});

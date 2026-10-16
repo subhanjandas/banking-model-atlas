@@ -1,29 +1,22 @@
-# Publishing this checkpoint
+# Publishing the explorer
 
-Suggested repository: `subhanjandas/banking-model-atlas`.
+Repository: https://github.com/subhanjandas/banking-model-atlas
 
-The current GitHub connection can edit repositories but does not expose repository creation. No GitHub CLI authentication is available in the build environment. This package is ready to upload; no repository or website has been claimed as published.
+The foundation checkpoint is already on main. The explorer workflow runs Python metadata checks, TypeScript compilation, unit tests and Chromium interaction checks before uploading a static Pages artifact. Deployment depends on that successful build.
 
-## Smallest handoff
+## One-time GitHub Pages setting
 
-Create a public repository named `banking-model-atlas` on GitHub and initialize it with a README. If the GitHub connection only has access to selected repositories, include the new repository. Share its URL so the prepared checkpoint can be uploaded as a coherent commit.
+In the repository, open **Settings → Pages → Build and deployment → Source**, and select **GitHub Actions**. GitHub requires this setting before a custom Pages workflow can deploy. The current connector cannot modify Pages administration settings, and the workflow deliberately does not request a personal access token.
 
-Initializing the README gives the connector an existing branch and commit to build on. The prepared README will replace that initial placeholder.
+After enabling Pages, rerun the failed deployment job from the latest **Explorer checks and Pages** run, or run the workflow again from Actions. A successful deployment records the actual URL in its environment output. Do not treat an expected URL as evidence that the site is live.
 
-## Upload from your Mac instead
+The expected project path is `/banking-model-atlas/`. Vite builds relative asset paths, and browser tests serve the production bundle at that same subpath. Query-string links work without a server-side router or a 404 fallback.
 
-If uploading yourself, create an empty repository without an initial README. Unzip the package, open a terminal in `banking-model-atlas`, run the checks in the README, then run:
+## Local use
 
 ```bash
-git init -b main
-git add .
-git commit -m "docs: establish Banking Model Atlas foundation"
-git remote add origin https://github.com/subhanjandas/banking-model-atlas.git
-git push -u origin main
+npm ci
+npm run dev
 ```
 
-These commands assume a fresh extracted folder and an empty remote. Authenticate through your usual GitHub setup. Do not put tokens in repository files.
-
-## Website publication comes later
-
-The foundation does not contain a built website. A future GitHub Pages workflow should build the viewer, use the correct `/banking-model-atlas/` base path, run checks, and publish the static assets. Repository upload and website deployment are separate milestones.
+For the production bundle, run `npm run build` and `npm run preview`. No secrets or external data are required.

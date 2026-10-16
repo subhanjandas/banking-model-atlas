@@ -1,6 +1,6 @@
 # Explorer specification
 
-Status: planned, not implemented in Hour 1.
+Status: implemented in application 0.2.0, except SQL export. This is the original interaction contract; observed test results are recorded in VALIDATION.md.
 
 ## Main task
 

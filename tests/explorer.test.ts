@@ -1,0 +1,21 @@
+import {describe,it,expect} from 'vitest';
+import cytoscape from 'cytoscape';
+import {initialState,parseState,serializeState,visibleModel,searchModel,dictionary,model,neighbours} from '../src/model';
+import {graphElements} from '../src/graph';
+describe('Explorer behavior',()=>{
+ it('shows all eight domains initially',()=>expect(graphElements(initialState).filter(e=>e.data.kind==='domain')).toHaveLength(8));
+ it('loads all 30 entities and 45 relationships in table view',()=>{const v=visibleModel({...initialState,view:'tables'});expect(v.entities).toHaveLength(30);expect(v.relationships).toHaveLength(45);});
+ it('filters a domain and counts omitted cross-domain relationships',()=>{const v=visibleModel({...initialState,domain:'cards'});expect(v.entities.map(e=>e.id)).toEqual(['card','card_assignment','card_status_event']);expect(v.omitted).toBeGreaterThan(0);expect(v.relationships.every(r=>v.entities.some(e=>e.id===r.source_entity)&&v.entities.some(e=>e.id===r.target_entity))).toBe(true);});
+ it.each(model.journeys)('renders only the selected edges in $id',j=>{const v=visibleModel({...initialState,journey:j.id});expect(v.relationships.map(r=>r.id).sort()).toEqual([...j.relationship_ids].sort());expect(v.entities).toHaveLength(j.steps.length);});
+ it('searches column descriptions and names case-insensitively',()=>expect(searchModel('ORIGINAL_TRANSACTION_ID').some(r=>r.entity.id==='card_transaction'&&r.columns.some(c=>c.id==='original_transaction_id'))).toBe(true));
+ it('has an empty search state',()=>expect(searchModel('zzzz-not-an-entity')).toEqual([]));
+ it('round-trips a selected entity and column',()=>{const s={...initialState,view:'tables' as const,entity:'card_transaction',column:'amount'};expect(parseState(serializeState(s)).state).toEqual(s);});
+ it('clears a conflicting domain from a shared entity link',()=>expect(parseState('?domain=cards&entity=statement').state.domain).toBe(''));
+ it('clears a journey when a linked entity is outside it',()=>expect(parseState('?journey=investigate_disputed_purchase&entity=statement').state.journey).toBe(''));
+ it('rejects unknown bookmark IDs without crashing',()=>{const r=parseState('?entity=not_real&domain=nope&view=other');expect(r.invalid).toBe(true);expect(r.state).toEqual(initialState);});
+ it('preserves a self-reference relationship bookmark',()=>expect(parseState('?edge=card__replaces_card_id').state.edge).toBe('card__replaces_card_id'));
+ it('includes the seed and immediate neighbours in focus mode',()=>{const ids=neighbours('statement_line');expect(ids.has('statement')).toBe(true);expect(ids.has('account_entry')).toBe(true);expect(ids.has('customer')).toBe(false);});
+ it('exports every column into the dictionary',()=>{const text=dictionary();for(const e of model.entities)for(const c of e.columns)expect(text).toContain(c.id);});
+ it('constructs a valid Cytoscape graph including compound nodes and self-loops',()=>{const cy=cytoscape({headless:true,elements:graphElements({...initialState,view:'tables'})});expect(cy.nodes().filter(n=>n.data('kind')==='entity')).toHaveLength(30);expect(cy.edges()).toHaveLength(45);expect(cy.edges().filter(e=>e.source().id()===e.target().id()).length).toBe(3);cy.destroy();});
+ it('uses stable node IDs and deterministic positions',()=>expect(graphElements({...initialState,view:'tables'})).toEqual(graphElements({...initialState,view:'tables'})));
+});
