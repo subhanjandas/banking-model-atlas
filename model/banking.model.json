@@ -1,0 +1,2791 @@
+{
+  "schema_version": "1.0.0",
+  "model_version": "0.1.0",
+  "id": "banking_model_atlas",
+  "title": "Banking Model Atlas",
+  "status": "foundation_draft",
+  "scenario": "Maple Harbour Bank \u2014 a fictional Canadian retail bank",
+  "description": "An original educational reference model for retail accounts and credit-card servicing. Not an operational bank schema.",
+  "business_timezone": "America/Toronto",
+  "supported_currencies": [
+    "CAD"
+  ],
+  "domains": [
+    {
+      "id": "customers",
+      "label": "Customers",
+      "description": "Who banks with us and how we contact them.",
+      "color": "#6478d3"
+    },
+    {
+      "id": "reference",
+      "label": "Bank and reference data",
+      "description": "Shared branch, channel and currency definitions.",
+      "color": "#607d8b"
+    },
+    {
+      "id": "products",
+      "label": "Products",
+      "description": "What the bank offers and which version was agreed.",
+      "color": "#9770c7"
+    },
+    {
+      "id": "accounts",
+      "label": "Accounts and credit",
+      "description": "Ownership, account lifecycle and credit limits.",
+      "color": "#218f8b"
+    },
+    {
+      "id": "cards",
+      "label": "Cards",
+      "description": "Issued cards, their users and their lifecycle.",
+      "color": "#3a83c5"
+    },
+    {
+      "id": "activity",
+      "label": "Merchants and activity",
+      "description": "Authorization, clearing and account entries.",
+      "color": "#d58a35"
+    },
+    {
+      "id": "servicing",
+      "label": "Payments and statements",
+      "description": "Repayments, billing documents and balance snapshots.",
+      "color": "#b36586"
+    },
+    {
+      "id": "disputes",
+      "label": "Disputes",
+      "description": "Customer claims and the progress of each case.",
+      "color": "#bc665a"
+    }
+  ],
+  "entities": [
+    {
+      "id": "customer",
+      "label": "Customer",
+      "domain": "customers",
+      "description": "A person with a relationship to the fictional bank.",
+      "grain": "One natural person.",
+      "primary_key": [
+        "customer_id"
+      ],
+      "columns": [
+        {
+          "id": "customer_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for customer.",
+          "classification": "identifier"
+        },
+        {
+          "id": "display_name",
+          "type": "string",
+          "nullable": false,
+          "description": "Invented display name; never an actual customer name.",
+          "classification": "personal"
+        },
+        {
+          "id": "customer_since",
+          "type": "date",
+          "nullable": false,
+          "description": "Date this customer relationship began.",
+          "classification": "internal"
+        },
+        {
+          "id": "segment",
+          "type": "string",
+          "nullable": false,
+          "description": "Simple service grouping.",
+          "classification": "internal",
+          "allowed_values": [
+            "STANDARD",
+            "PREMIUM"
+          ]
+        },
+        {
+          "id": "status",
+          "type": "string",
+          "nullable": false,
+          "description": "Current customer relationship status.",
+          "classification": "internal",
+          "allowed_values": [
+            "ACTIVE",
+            "CLOSED"
+          ]
+        }
+      ],
+      "notes": [
+        "Organizations and beneficial ownership are outside this version."
+      ],
+      "rule_ids": [],
+      "unique_keys": []
+    },
+    {
+      "id": "customer_address",
+      "label": "Customer Address",
+      "domain": "customers",
+      "description": "An address held for a customer over a period.",
+      "grain": "One customer address assignment for one purpose and interval.",
+      "primary_key": [
+        "customer_address_id"
+      ],
+      "columns": [
+        {
+          "id": "customer_address_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for customer address.",
+          "classification": "identifier"
+        },
+        {
+          "id": "customer_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Person to whom this address belongs.",
+          "classification": "identifier"
+        },
+        {
+          "id": "purpose",
+          "type": "string",
+          "nullable": false,
+          "description": "Reason this address is held.",
+          "classification": "internal",
+          "allowed_values": [
+            "HOME",
+            "MAILING"
+          ]
+        },
+        {
+          "id": "address_text",
+          "type": "string",
+          "nullable": false,
+          "description": "Invented street and locality.",
+          "classification": "personal"
+        },
+        {
+          "id": "province_code",
+          "type": "string",
+          "nullable": false,
+          "description": "Province or territory abbreviation.",
+          "classification": "internal"
+        },
+        {
+          "id": "valid_from",
+          "type": "date",
+          "nullable": false,
+          "description": "First valid day, inclusive.",
+          "classification": "internal"
+        },
+        {
+          "id": "valid_to",
+          "type": "date",
+          "nullable": true,
+          "description": "First invalid day, exclusive; null means open-ended.",
+          "classification": "internal"
+        }
+      ],
+      "notes": [
+        "Overlapping addresses of the same purpose are disallowed in this fictional scenario."
+      ],
+      "rule_ids": [
+        "R03"
+      ],
+      "unique_keys": []
+    },
+    {
+      "id": "customer_contact",
+      "label": "Customer Contact",
+      "domain": "customers",
+      "description": "A way to reach a customer.",
+      "grain": "One contact method for a customer.",
+      "primary_key": [
+        "customer_contact_id"
+      ],
+      "columns": [
+        {
+          "id": "customer_contact_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for customer contact.",
+          "classification": "identifier"
+        },
+        {
+          "id": "customer_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Customer reached by this contact.",
+          "classification": "identifier"
+        },
+        {
+          "id": "contact_type",
+          "type": "string",
+          "nullable": false,
+          "description": "Contact medium.",
+          "classification": "internal",
+          "allowed_values": [
+            "EMAIL",
+            "PHONE"
+          ]
+        },
+        {
+          "id": "contact_value",
+          "type": "string",
+          "nullable": false,
+          "description": "Fictional contact value; example emails use example.com.",
+          "classification": "personal"
+        },
+        {
+          "id": "is_preferred",
+          "type": "boolean",
+          "nullable": false,
+          "description": "Whether this is preferred within its contact type.",
+          "classification": "internal"
+        }
+      ],
+      "notes": [
+        "Contact history and verification evidence are deferred."
+      ],
+      "rule_ids": [
+        "R19"
+      ],
+      "unique_keys": []
+    },
+    {
+      "id": "customer_consent",
+      "label": "Customer Consent",
+      "domain": "customers",
+      "description": "A recorded choice about a specific optional purpose.",
+      "grain": "One consent decision event for one customer and purpose.",
+      "primary_key": [
+        "customer_consent_id"
+      ],
+      "columns": [
+        {
+          "id": "customer_consent_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for customer consent.",
+          "classification": "identifier"
+        },
+        {
+          "id": "customer_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Person who made the choice.",
+          "classification": "identifier"
+        },
+        {
+          "id": "purpose",
+          "type": "string",
+          "nullable": false,
+          "description": "Optional use covered by the choice.",
+          "classification": "internal",
+          "allowed_values": [
+            "EMAIL_MARKETING",
+            "SMS_MARKETING"
+          ]
+        },
+        {
+          "id": "decision",
+          "type": "string",
+          "nullable": false,
+          "description": "Choice recorded.",
+          "classification": "internal",
+          "allowed_values": [
+            "GRANTED",
+            "WITHDRAWN"
+          ]
+        },
+        {
+          "id": "decided_at",
+          "type": "timestamp",
+          "nullable": false,
+          "description": "UTC time of the decision.",
+          "classification": "internal"
+        },
+        {
+          "id": "channel_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Channel that recorded the choice.",
+          "classification": "identifier"
+        }
+      ],
+      "notes": [
+        "Latest event per customer and purpose defines the current choice. This is not a legal compliance implementation."
+      ],
+      "rule_ids": [
+        "R17",
+        "R21"
+      ],
+      "unique_keys": []
+    },
+    {
+      "id": "branch",
+      "label": "Branch",
+      "domain": "reference",
+      "description": "A servicing location or virtual branch.",
+      "grain": "One servicing branch.",
+      "primary_key": [
+        "branch_id"
+      ],
+      "columns": [
+        {
+          "id": "branch_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for branch.",
+          "classification": "identifier"
+        },
+        {
+          "id": "branch_code",
+          "type": "string",
+          "nullable": false,
+          "description": "Unique fictional branch code.",
+          "classification": "internal"
+        },
+        {
+          "id": "name",
+          "type": "string",
+          "nullable": false,
+          "description": "Display name.",
+          "classification": "internal"
+        },
+        {
+          "id": "province_code",
+          "type": "string",
+          "nullable": false,
+          "description": "Servicing province or territory.",
+          "classification": "internal"
+        }
+      ],
+      "notes": [
+        "Virtual branch allows digital accounts without forcing a physical visit."
+      ],
+      "rule_ids": [],
+      "unique_keys": [
+        [
+          "branch_code"
+        ]
+      ]
+    },
+    {
+      "id": "channel",
+      "label": "Channel",
+      "domain": "reference",
+      "description": "A route through which a customer action occurs.",
+      "grain": "One interaction channel.",
+      "primary_key": [
+        "channel_id"
+      ],
+      "columns": [
+        {
+          "id": "channel_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for channel.",
+          "classification": "identifier"
+        },
+        {
+          "id": "code",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable channel code.",
+          "classification": "internal",
+          "allowed_values": [
+            "APP",
+            "WEB",
+            "BRANCH",
+            "PHONE",
+            "NETWORK"
+          ]
+        },
+        {
+          "id": "name",
+          "type": "string",
+          "nullable": false,
+          "description": "Human-readable channel name.",
+          "classification": "internal"
+        }
+      ],
+      "notes": [
+        "Channel describes origin, not a person or device."
+      ],
+      "rule_ids": [],
+      "unique_keys": [
+        [
+          "code"
+        ]
+      ]
+    },
+    {
+      "id": "currency",
+      "label": "Currency",
+      "domain": "reference",
+      "description": "A currency reference used by monetary entities.",
+      "grain": "One currency.",
+      "primary_key": [
+        "currency_id"
+      ],
+      "columns": [
+        {
+          "id": "currency_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for currency.",
+          "classification": "identifier"
+        },
+        {
+          "id": "code",
+          "type": "string",
+          "nullable": false,
+          "description": "Currency code; CAD is the only supported value.",
+          "classification": "internal",
+          "allowed_values": [
+            "CAD"
+          ]
+        },
+        {
+          "id": "minor_unit_digits",
+          "type": "integer",
+          "nullable": false,
+          "description": "Number of fractional digits; 2 for CAD.",
+          "classification": "internal"
+        }
+      ],
+      "notes": [
+        "Foreign exchange and cross-currency settlement are excluded."
+      ],
+      "rule_ids": [
+        "R18"
+      ],
+      "unique_keys": [
+        [
+          "code"
+        ]
+      ]
+    },
+    {
+      "id": "product",
+      "label": "Product",
+      "domain": "products",
+      "description": "A named deposit or credit-card offering.",
+      "grain": "One product family.",
+      "primary_key": [
+        "product_id"
+      ],
+      "columns": [
+        {
+          "id": "product_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for product.",
+          "classification": "identifier"
+        },
+        {
+          "id": "name",
+          "type": "string",
+          "nullable": false,
+          "description": "Fictional marketing name.",
+          "classification": "internal"
+        },
+        {
+          "id": "kind",
+          "type": "string",
+          "nullable": false,
+          "description": "Account family supported by this product.",
+          "classification": "internal",
+          "allowed_values": [
+            "DEPOSIT",
+            "CREDIT_CARD"
+          ]
+        }
+      ],
+      "notes": [
+        "An account refers to a version, not directly to a mutable marketing description."
+      ],
+      "rule_ids": [
+        "R01",
+        "R02",
+        "R04",
+        "R14",
+        "R15"
+      ],
+      "unique_keys": []
+    },
+    {
+      "id": "product_version",
+      "label": "Product Version",
+      "domain": "products",
+      "description": "A dated edition of product terms.",
+      "grain": "One version of one product.",
+      "primary_key": [
+        "product_version_id"
+      ],
+      "columns": [
+        {
+          "id": "product_version_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for product version.",
+          "classification": "identifier"
+        },
+        {
+          "id": "product_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Product whose terms are versioned.",
+          "classification": "identifier"
+        },
+        {
+          "id": "version_number",
+          "type": "integer",
+          "nullable": false,
+          "description": "Increasing number within the product.",
+          "classification": "internal"
+        },
+        {
+          "id": "effective_from",
+          "type": "date",
+          "nullable": false,
+          "description": "First day offered, inclusive.",
+          "classification": "internal"
+        },
+        {
+          "id": "effective_to",
+          "type": "date",
+          "nullable": true,
+          "description": "First day no longer offered, exclusive.",
+          "classification": "internal"
+        },
+        {
+          "id": "terms_summary",
+          "type": "string",
+          "nullable": false,
+          "description": "Plain-language description; not a contract.",
+          "classification": "internal"
+        }
+      ],
+      "notes": [
+        "Existing accounts retain their booked version after the offering closes. APR calculations are out of scope."
+      ],
+      "rule_ids": [
+        "R01"
+      ],
+      "unique_keys": [
+        [
+          "product_id",
+          "version_number"
+        ]
+      ]
+    },
+    {
+      "id": "fee_type",
+      "label": "Fee Type",
+      "domain": "products",
+      "description": "A category of account fee.",
+      "grain": "One fee category.",
+      "primary_key": [
+        "fee_type_id"
+      ],
+      "columns": [
+        {
+          "id": "fee_type_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for fee type.",
+          "classification": "identifier"
+        },
+        {
+          "id": "code",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable fee category.",
+          "classification": "internal",
+          "allowed_values": [
+            "ANNUAL",
+            "LATE",
+            "SERVICE"
+          ]
+        },
+        {
+          "id": "description",
+          "type": "string",
+          "nullable": false,
+          "description": "What the category means.",
+          "classification": "internal"
+        }
+      ],
+      "notes": [
+        "No fee engine or fee schedule is implemented."
+      ],
+      "rule_ids": [
+        "R10"
+      ],
+      "unique_keys": [
+        [
+          "code"
+        ]
+      ]
+    },
+    {
+      "id": "account",
+      "label": "Account",
+      "domain": "accounts",
+      "description": "A customer-facing deposit or credit-card account.",
+      "grain": "One account contract.",
+      "primary_key": [
+        "account_id"
+      ],
+      "columns": [
+        {
+          "id": "account_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for account.",
+          "classification": "identifier"
+        },
+        {
+          "id": "product_version_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Product terms booked at account opening.",
+          "classification": "identifier"
+        },
+        {
+          "id": "branch_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Branch responsible for servicing.",
+          "classification": "identifier"
+        },
+        {
+          "id": "currency_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Account denomination.",
+          "classification": "identifier"
+        },
+        {
+          "id": "opened_on",
+          "type": "date",
+          "nullable": false,
+          "description": "First day of the account.",
+          "classification": "internal"
+        },
+        {
+          "id": "closed_on",
+          "type": "date",
+          "nullable": true,
+          "description": "Closure date, if closed.",
+          "classification": "internal"
+        }
+      ],
+      "notes": [
+        "Kind is derived through product_version and product. Account numbers are not stored."
+      ],
+      "rule_ids": [
+        "R01",
+        "R02",
+        "R04",
+        "R05",
+        "R11",
+        "R14",
+        "R15",
+        "R18",
+        "R20"
+      ],
+      "unique_keys": []
+    },
+    {
+      "id": "account_holder",
+      "label": "Account Holder",
+      "domain": "accounts",
+      "description": "Ownership or signing authority over an account.",
+      "grain": "One customer role on an account for an interval.",
+      "primary_key": [
+        "account_holder_id"
+      ],
+      "columns": [
+        {
+          "id": "account_holder_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for account holder.",
+          "classification": "identifier"
+        },
+        {
+          "id": "account_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Account to which the role applies.",
+          "classification": "identifier"
+        },
+        {
+          "id": "customer_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Person assigned the role.",
+          "classification": "identifier"
+        },
+        {
+          "id": "role",
+          "type": "string",
+          "nullable": false,
+          "description": "Legal or operational role in this fictional scenario.",
+          "classification": "internal",
+          "allowed_values": [
+            "PRIMARY",
+            "JOINT"
+          ]
+        },
+        {
+          "id": "valid_from",
+          "type": "date",
+          "nullable": false,
+          "description": "First valid day, inclusive.",
+          "classification": "internal"
+        },
+        {
+          "id": "valid_to",
+          "type": "date",
+          "nullable": true,
+          "description": "First invalid day, exclusive.",
+          "classification": "internal"
+        }
+      ],
+      "notes": [
+        "Deposits can have joint owners. Credit-card accounts have one primary owner; supplementary card users are not account owners."
+      ],
+      "rule_ids": [
+        "R02",
+        "R03",
+        "R16"
+      ],
+      "unique_keys": []
+    },
+    {
+      "id": "account_status_event",
+      "label": "Account Status Event",
+      "domain": "accounts",
+      "description": "A lifecycle change for an account.",
+      "grain": "One account status event.",
+      "primary_key": [
+        "account_status_event_id"
+      ],
+      "columns": [
+        {
+          "id": "account_status_event_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for account status event.",
+          "classification": "identifier"
+        },
+        {
+          "id": "account_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Account whose status changed.",
+          "classification": "identifier"
+        },
+        {
+          "id": "status",
+          "type": "string",
+          "nullable": false,
+          "description": "New status.",
+          "classification": "internal",
+          "allowed_values": [
+            "OPEN",
+            "RESTRICTED",
+            "CLOSED"
+          ]
+        },
+        {
+          "id": "effective_at",
+          "type": "timestamp",
+          "nullable": false,
+          "description": "UTC effective time.",
+          "classification": "internal"
+        },
+        {
+          "id": "reason",
+          "type": "string",
+          "nullable": false,
+          "description": "Human-readable reason for the change.",
+          "classification": "internal"
+        }
+      ],
+      "notes": [
+        "The latest event defines current status; historical entries are not rejected using current status."
+      ],
+      "rule_ids": [
+        "R17",
+        "R20"
+      ],
+      "unique_keys": []
+    },
+    {
+      "id": "credit_facility",
+      "label": "Credit Facility",
+      "domain": "accounts",
+      "description": "The credit agreement attached to a credit-card account.",
+      "grain": "One facility per credit-card account.",
+      "primary_key": [
+        "credit_facility_id"
+      ],
+      "columns": [
+        {
+          "id": "credit_facility_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for credit facility.",
+          "classification": "identifier"
+        },
+        {
+          "id": "account_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Credit-card account supported by this facility.",
+          "classification": "identifier"
+        },
+        {
+          "id": "approved_on",
+          "type": "date",
+          "nullable": false,
+          "description": "Date credit was approved.",
+          "classification": "internal"
+        },
+        {
+          "id": "currency_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Must match the linked account currency.",
+          "classification": "identifier"
+        }
+      ],
+      "notes": [
+        "Exactly one facility for each credit-card account; none for deposit accounts. Loans and underwriting are excluded."
+      ],
+      "rule_ids": [
+        "R04"
+      ],
+      "unique_keys": [
+        [
+          "account_id"
+        ]
+      ]
+    },
+    {
+      "id": "credit_limit_event",
+      "label": "Credit Limit Event",
+      "domain": "accounts",
+      "description": "A change in the approved credit limit.",
+      "grain": "One effective limit change per facility.",
+      "primary_key": [
+        "credit_limit_event_id"
+      ],
+      "columns": [
+        {
+          "id": "credit_limit_event_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for credit limit event.",
+          "classification": "identifier"
+        },
+        {
+          "id": "credit_facility_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Facility whose limit changed.",
+          "classification": "identifier"
+        },
+        {
+          "id": "effective_at",
+          "type": "timestamp",
+          "nullable": false,
+          "description": "UTC time from which the limit applies.",
+          "classification": "internal"
+        },
+        {
+          "id": "limit_amount",
+          "type": "decimal(18,2)",
+          "nullable": false,
+          "description": "Nonnegative approved limit in facility currency.",
+          "classification": "financial"
+        },
+        {
+          "id": "reason",
+          "type": "string",
+          "nullable": false,
+          "description": "Reason for changing the limit.",
+          "classification": "internal"
+        }
+      ],
+      "notes": [
+        "Latest effective event gives current limit. Available credit also needs holds and balances, so it is not calculated here."
+      ],
+      "rule_ids": [
+        "R04",
+        "R17"
+      ],
+      "unique_keys": []
+    },
+    {
+      "id": "card",
+      "label": "Card",
+      "domain": "cards",
+      "description": "An issued credit-card instrument.",
+      "grain": "One issued card instance, including each replacement.",
+      "primary_key": [
+        "card_id"
+      ],
+      "columns": [
+        {
+          "id": "card_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for card.",
+          "classification": "identifier"
+        },
+        {
+          "id": "account_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Credit-card account billed for use.",
+          "classification": "identifier"
+        },
+        {
+          "id": "issued_on",
+          "type": "date",
+          "nullable": false,
+          "description": "Issue date.",
+          "classification": "internal"
+        },
+        {
+          "id": "expires_on",
+          "type": "date",
+          "nullable": false,
+          "description": "Last valid calendar day.",
+          "classification": "internal"
+        },
+        {
+          "id": "replaces_card_id",
+          "type": "string",
+          "nullable": true,
+          "description": "Earlier card replaced by this card, when applicable.",
+          "classification": "identifier"
+        }
+      ],
+      "notes": [
+        "No PAN, CVV, PIN or magnetic-stripe data. Debit cards and digital tokens are deferred."
+      ],
+      "rule_ids": [
+        "R05",
+        "R06",
+        "R07",
+        "R11",
+        "R16"
+      ],
+      "unique_keys": []
+    },
+    {
+      "id": "card_assignment",
+      "label": "Card Assignment",
+      "domain": "cards",
+      "description": "The person authorized to use a card.",
+      "grain": "One card-to-person assignment interval.",
+      "primary_key": [
+        "card_assignment_id"
+      ],
+      "columns": [
+        {
+          "id": "card_assignment_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for card assignment.",
+          "classification": "identifier"
+        },
+        {
+          "id": "card_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Card being assigned.",
+          "classification": "identifier"
+        },
+        {
+          "id": "customer_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Person authorized to use it.",
+          "classification": "identifier"
+        },
+        {
+          "id": "role",
+          "type": "string",
+          "nullable": false,
+          "description": "Card-user role.",
+          "classification": "internal",
+          "allowed_values": [
+            "PRIMARY",
+            "SUPPLEMENTARY"
+          ]
+        },
+        {
+          "id": "valid_from",
+          "type": "date",
+          "nullable": false,
+          "description": "First valid day, inclusive.",
+          "classification": "internal"
+        },
+        {
+          "id": "valid_to",
+          "type": "date",
+          "nullable": true,
+          "description": "First invalid day, exclusive.",
+          "classification": "internal"
+        }
+      ],
+      "notes": [
+        "A supplementary user need not own the account. A card has at most one assigned person at a time."
+      ],
+      "rule_ids": [
+        "R03",
+        "R05",
+        "R16"
+      ],
+      "unique_keys": []
+    },
+    {
+      "id": "card_status_event",
+      "label": "Card Status Event",
+      "domain": "cards",
+      "description": "A change in a card lifecycle.",
+      "grain": "One card status event.",
+      "primary_key": [
+        "card_status_event_id"
+      ],
+      "columns": [
+        {
+          "id": "card_status_event_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for card status event.",
+          "classification": "identifier"
+        },
+        {
+          "id": "card_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Card whose status changed.",
+          "classification": "identifier"
+        },
+        {
+          "id": "status",
+          "type": "string",
+          "nullable": false,
+          "description": "New lifecycle status.",
+          "classification": "internal",
+          "allowed_values": [
+            "ISSUED",
+            "ACTIVE",
+            "BLOCKED",
+            "EXPIRED",
+            "CLOSED"
+          ]
+        },
+        {
+          "id": "effective_at",
+          "type": "timestamp",
+          "nullable": false,
+          "description": "UTC effective time.",
+          "classification": "internal"
+        }
+      ],
+      "notes": [
+        "Replacement does not move old transactions onto the new card."
+      ],
+      "rule_ids": [
+        "R17"
+      ],
+      "unique_keys": []
+    },
+    {
+      "id": "merchant_category",
+      "label": "Merchant Category",
+      "domain": "activity",
+      "description": "A fictional grouping for merchant analytics.",
+      "grain": "One merchant category.",
+      "primary_key": [
+        "merchant_category_id"
+      ],
+      "columns": [
+        {
+          "id": "merchant_category_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for merchant category.",
+          "classification": "identifier"
+        },
+        {
+          "id": "code",
+          "type": "string",
+          "nullable": false,
+          "description": "Project-local category code.",
+          "classification": "internal"
+        },
+        {
+          "id": "name",
+          "type": "string",
+          "nullable": false,
+          "description": "Display category such as groceries or travel.",
+          "classification": "internal"
+        }
+      ],
+      "notes": [
+        "Codes are illustrative; no claim of a complete network MCC reference."
+      ],
+      "rule_ids": [],
+      "unique_keys": [
+        [
+          "code"
+        ]
+      ]
+    },
+    {
+      "id": "merchant",
+      "label": "Merchant",
+      "domain": "activity",
+      "description": "A merchant identity observed in card activity.",
+      "grain": "One merchant.",
+      "primary_key": [
+        "merchant_id"
+      ],
+      "columns": [
+        {
+          "id": "merchant_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for merchant.",
+          "classification": "identifier"
+        },
+        {
+          "id": "merchant_category_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Merchant analytics category.",
+          "classification": "identifier"
+        },
+        {
+          "id": "name",
+          "type": "string",
+          "nullable": false,
+          "description": "Invented merchant name.",
+          "classification": "internal"
+        },
+        {
+          "id": "country_code",
+          "type": "string",
+          "nullable": false,
+          "description": "Country code; CA in this scenario.",
+          "classification": "internal",
+          "allowed_values": [
+            "CA"
+          ]
+        }
+      ],
+      "notes": [
+        "Merchant identity resolution across acquirers is deferred."
+      ],
+      "rule_ids": [
+        "R07"
+      ],
+      "unique_keys": []
+    },
+    {
+      "id": "card_authorization",
+      "label": "Card Authorization",
+      "domain": "activity",
+      "description": "A request to approve card spending before posting.",
+      "grain": "One authorization request.",
+      "primary_key": [
+        "card_authorization_id"
+      ],
+      "columns": [
+        {
+          "id": "card_authorization_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for card authorization.",
+          "classification": "identifier"
+        },
+        {
+          "id": "card_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Card presented for authorization.",
+          "classification": "identifier"
+        },
+        {
+          "id": "merchant_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Merchant requesting authorization.",
+          "classification": "identifier"
+        },
+        {
+          "id": "currency_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Requested currency.",
+          "classification": "identifier"
+        },
+        {
+          "id": "requested_amount",
+          "type": "decimal(18,2)",
+          "nullable": false,
+          "description": "Positive requested amount.",
+          "classification": "financial"
+        },
+        {
+          "id": "requested_at",
+          "type": "timestamp",
+          "nullable": false,
+          "description": "UTC request time.",
+          "classification": "internal"
+        },
+        {
+          "id": "decision",
+          "type": "string",
+          "nullable": false,
+          "description": "Authorization result.",
+          "classification": "internal",
+          "allowed_values": [
+            "APPROVED",
+            "DECLINED"
+          ]
+        },
+        {
+          "id": "channel_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Origin of the request.",
+          "classification": "identifier"
+        }
+      ],
+      "notes": [
+        "An authorization is not a posted purchase. Hold expiry, incremental authorizations and reversals are deferred."
+      ],
+      "rule_ids": [
+        "R07",
+        "R09",
+        "R18"
+      ],
+      "unique_keys": []
+    },
+    {
+      "id": "card_transaction",
+      "label": "Card Transaction",
+      "domain": "activity",
+      "description": "A posted purchase or refund received through the card network.",
+      "grain": "One posted card purchase or refund.",
+      "primary_key": [
+        "card_transaction_id"
+      ],
+      "columns": [
+        {
+          "id": "card_transaction_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for card transaction.",
+          "classification": "identifier"
+        },
+        {
+          "id": "card_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Card used for this activity.",
+          "classification": "identifier"
+        },
+        {
+          "id": "merchant_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Merchant involved.",
+          "classification": "identifier"
+        },
+        {
+          "id": "currency_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Posted currency.",
+          "classification": "identifier"
+        },
+        {
+          "id": "authorization_id",
+          "type": "string",
+          "nullable": true,
+          "description": "Related authorization when available; may be absent for offline clearing.",
+          "classification": "identifier"
+        },
+        {
+          "id": "original_transaction_id",
+          "type": "string",
+          "nullable": true,
+          "description": "Purchase refunded by this refund.",
+          "classification": "identifier"
+        },
+        {
+          "id": "kind",
+          "type": "string",
+          "nullable": false,
+          "description": "Type of posted card activity.",
+          "classification": "internal",
+          "allowed_values": [
+            "PURCHASE",
+            "REFUND"
+          ]
+        },
+        {
+          "id": "amount",
+          "type": "decimal(18,2)",
+          "nullable": false,
+          "description": "Positive amount; kind determines economic direction.",
+          "classification": "financial"
+        },
+        {
+          "id": "occurred_at",
+          "type": "timestamp",
+          "nullable": false,
+          "description": "UTC time of merchant activity.",
+          "classification": "internal"
+        },
+        {
+          "id": "posted_on",
+          "type": "date",
+          "nullable": false,
+          "description": "Business date on which activity was posted.",
+          "classification": "internal"
+        }
+      ],
+      "notes": [
+        "One authorization may support multiple posted presentments. The relationship does not imply equal amounts."
+      ],
+      "rule_ids": [
+        "R07",
+        "R08",
+        "R09",
+        "R10",
+        "R11",
+        "R16",
+        "R18"
+      ],
+      "unique_keys": []
+    },
+    {
+      "id": "account_entry",
+      "label": "Account Entry",
+      "domain": "activity",
+      "description": "An immutable customer-account movement used for statement presentation.",
+      "grain": "One booked debit or credit on an account.",
+      "primary_key": [
+        "account_entry_id"
+      ],
+      "columns": [
+        {
+          "id": "account_entry_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for account entry.",
+          "classification": "identifier"
+        },
+        {
+          "id": "account_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Account affected.",
+          "classification": "identifier"
+        },
+        {
+          "id": "card_transaction_id",
+          "type": "string",
+          "nullable": true,
+          "description": "Card activity behind this entry, if any.",
+          "classification": "identifier"
+        },
+        {
+          "id": "payment_id",
+          "type": "string",
+          "nullable": true,
+          "description": "Repayment behind this entry, if any.",
+          "classification": "identifier"
+        },
+        {
+          "id": "fee_type_id",
+          "type": "string",
+          "nullable": true,
+          "description": "Fee category when this is a fee.",
+          "classification": "identifier"
+        },
+        {
+          "id": "reverses_entry_id",
+          "type": "string",
+          "nullable": true,
+          "description": "Earlier entry reversed by this entry.",
+          "classification": "identifier"
+        },
+        {
+          "id": "kind",
+          "type": "string",
+          "nullable": false,
+          "description": "Business source of the entry.",
+          "classification": "internal",
+          "allowed_values": [
+            "CARD",
+            "PAYMENT",
+            "FEE",
+            "ADJUSTMENT",
+            "REVERSAL"
+          ]
+        },
+        {
+          "id": "direction",
+          "type": "string",
+          "nullable": false,
+          "description": "Customer-account debit or credit.",
+          "classification": "internal",
+          "allowed_values": [
+            "DEBIT",
+            "CREDIT"
+          ]
+        },
+        {
+          "id": "amount",
+          "type": "decimal(18,2)",
+          "nullable": false,
+          "description": "Positive amount in account currency.",
+          "classification": "financial"
+        },
+        {
+          "id": "posted_on",
+          "type": "date",
+          "nullable": false,
+          "description": "Booking business date.",
+          "classification": "internal"
+        },
+        {
+          "id": "description",
+          "type": "string",
+          "nullable": false,
+          "description": "Short statement narrative.",
+          "classification": "internal"
+        }
+      ],
+      "notes": [
+        "These are account subledger-style entries, not a balanced general ledger. A separate rule defines balance signs by account kind."
+      ],
+      "rule_ids": [
+        "R09",
+        "R10",
+        "R11",
+        "R12",
+        "R13",
+        "R15"
+      ],
+      "unique_keys": []
+    },
+    {
+      "id": "payment",
+      "label": "Payment",
+      "domain": "servicing",
+      "description": "An external repayment to a credit-card account.",
+      "grain": "One received payment instruction.",
+      "primary_key": [
+        "payment_id"
+      ],
+      "columns": [
+        {
+          "id": "payment_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for payment.",
+          "classification": "identifier"
+        },
+        {
+          "id": "account_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Credit-card account receiving the repayment.",
+          "classification": "identifier"
+        },
+        {
+          "id": "channel_id",
+          "type": "string",
+          "nullable": false,
+          "description": "How the instruction arrived.",
+          "classification": "identifier"
+        },
+        {
+          "id": "currency_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Payment currency; must match the account.",
+          "classification": "identifier"
+        },
+        {
+          "id": "amount",
+          "type": "decimal(18,2)",
+          "nullable": false,
+          "description": "Positive repayment amount.",
+          "classification": "financial"
+        },
+        {
+          "id": "received_at",
+          "type": "timestamp",
+          "nullable": false,
+          "description": "UTC receipt time.",
+          "classification": "internal"
+        },
+        {
+          "id": "status",
+          "type": "string",
+          "nullable": false,
+          "description": "Current processing outcome.",
+          "classification": "internal",
+          "allowed_values": [
+            "PENDING",
+            "POSTED",
+            "FAILED"
+          ]
+        }
+      ],
+      "notes": [
+        "All funding is external in this release. No internal transfer or payment-rail implementation."
+      ],
+      "rule_ids": [
+        "R09",
+        "R10",
+        "R11",
+        "R18"
+      ],
+      "unique_keys": []
+    },
+    {
+      "id": "statement",
+      "label": "Statement",
+      "domain": "servicing",
+      "description": "An issued monthly billing snapshot for a credit-card account.",
+      "grain": "One issued statement for an account and cycle.",
+      "primary_key": [
+        "statement_id"
+      ],
+      "columns": [
+        {
+          "id": "statement_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for statement.",
+          "classification": "identifier"
+        },
+        {
+          "id": "account_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Credit-card account being billed.",
+          "classification": "identifier"
+        },
+        {
+          "id": "period_start",
+          "type": "date",
+          "nullable": false,
+          "description": "First included posting date.",
+          "classification": "internal"
+        },
+        {
+          "id": "period_end_exclusive",
+          "type": "date",
+          "nullable": false,
+          "description": "First excluded posting date.",
+          "classification": "internal"
+        },
+        {
+          "id": "issued_on",
+          "type": "date",
+          "nullable": false,
+          "description": "Issue date.",
+          "classification": "internal"
+        },
+        {
+          "id": "due_on",
+          "type": "date",
+          "nullable": false,
+          "description": "Payment due date.",
+          "classification": "internal"
+        },
+        {
+          "id": "opening_balance",
+          "type": "decimal(18,2)",
+          "nullable": false,
+          "description": "Signed amount owed at start; negative means customer credit.",
+          "classification": "financial"
+        },
+        {
+          "id": "closing_balance",
+          "type": "decimal(18,2)",
+          "nullable": false,
+          "description": "Signed amount owed at end.",
+          "classification": "financial"
+        },
+        {
+          "id": "minimum_due",
+          "type": "decimal(18,2)",
+          "nullable": false,
+          "description": "Nonnegative supplied amount; calculation is outside scope.",
+          "classification": "financial"
+        }
+      ],
+      "notes": [
+        "Issued statements are immutable. Reissues and interest calculations are deferred."
+      ],
+      "rule_ids": [
+        "R13",
+        "R14"
+      ],
+      "unique_keys": [
+        [
+          "account_id",
+          "period_start",
+          "period_end_exclusive"
+        ]
+      ]
+    },
+    {
+      "id": "statement_line",
+      "label": "Statement Line",
+      "domain": "servicing",
+      "description": "A printed item on an issued statement.",
+      "grain": "One account entry displayed on one statement.",
+      "primary_key": [
+        "statement_line_id"
+      ],
+      "columns": [
+        {
+          "id": "statement_line_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for statement line.",
+          "classification": "identifier"
+        },
+        {
+          "id": "statement_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Statement containing this line.",
+          "classification": "identifier"
+        },
+        {
+          "id": "account_entry_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Booked entry being displayed.",
+          "classification": "identifier"
+        },
+        {
+          "id": "line_number",
+          "type": "integer",
+          "nullable": false,
+          "description": "Positive order within the statement.",
+          "classification": "internal"
+        },
+        {
+          "id": "narrative",
+          "type": "string",
+          "nullable": false,
+          "description": "Narrative captured at issue time.",
+          "classification": "internal"
+        }
+      ],
+      "notes": [
+        "Amounts come from immutable entries. An entry appears on at most one issued statement in this simplified model."
+      ],
+      "rule_ids": [
+        "R13"
+      ],
+      "unique_keys": [
+        [
+          "statement_id",
+          "line_number"
+        ],
+        [
+          "account_entry_id"
+        ]
+      ]
+    },
+    {
+      "id": "account_balance_snapshot",
+      "label": "Account Balance Snapshot",
+      "domain": "servicing",
+      "description": "A supplied end-of-day account balance.",
+      "grain": "One account and business date.",
+      "primary_key": [
+        "account_balance_snapshot_id"
+      ],
+      "columns": [
+        {
+          "id": "account_balance_snapshot_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for account balance snapshot.",
+          "classification": "identifier"
+        },
+        {
+          "id": "account_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Account summarized.",
+          "classification": "identifier"
+        },
+        {
+          "id": "as_of_date",
+          "type": "date",
+          "nullable": false,
+          "description": "Business date of the snapshot.",
+          "classification": "internal"
+        },
+        {
+          "id": "balance_amount",
+          "type": "decimal(18,2)",
+          "nullable": false,
+          "description": "Signed deposit funds or signed credit-card amount owed, according to account kind.",
+          "classification": "financial"
+        }
+      ],
+      "notes": [
+        "A snapshot is a reconciliation reference, not a second source of transactions. Opening positions are required to rebuild balances."
+      ],
+      "rule_ids": [
+        "R15"
+      ],
+      "unique_keys": [
+        [
+          "account_id",
+          "as_of_date"
+        ]
+      ]
+    },
+    {
+      "id": "dispute_reason",
+      "label": "Dispute Reason",
+      "domain": "disputes",
+      "description": "A project-local category for customer claims.",
+      "grain": "One dispute reason.",
+      "primary_key": [
+        "dispute_reason_id"
+      ],
+      "columns": [
+        {
+          "id": "dispute_reason_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for dispute reason.",
+          "classification": "identifier"
+        },
+        {
+          "id": "code",
+          "type": "string",
+          "nullable": false,
+          "description": "Project-local reason code.",
+          "classification": "internal",
+          "allowed_values": [
+            "UNRECOGNIZED",
+            "DUPLICATE",
+            "GOODS_NOT_RECEIVED"
+          ]
+        },
+        {
+          "id": "description",
+          "type": "string",
+          "nullable": false,
+          "description": "Explanation of the reason.",
+          "classification": "internal"
+        }
+      ],
+      "notes": [
+        "Not a card-network reason-code catalogue."
+      ],
+      "rule_ids": [],
+      "unique_keys": [
+        [
+          "code"
+        ]
+      ]
+    },
+    {
+      "id": "dispute",
+      "label": "Dispute",
+      "domain": "disputes",
+      "description": "A customer claim about a posted purchase.",
+      "grain": "One dispute case against one purchase.",
+      "primary_key": [
+        "dispute_id"
+      ],
+      "columns": [
+        {
+          "id": "dispute_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for dispute.",
+          "classification": "identifier"
+        },
+        {
+          "id": "card_transaction_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Purchase being challenged.",
+          "classification": "identifier"
+        },
+        {
+          "id": "raised_by_customer_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Customer raising the case.",
+          "classification": "identifier"
+        },
+        {
+          "id": "dispute_reason_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Reason for the claim.",
+          "classification": "identifier"
+        },
+        {
+          "id": "claimed_amount",
+          "type": "decimal(18,2)",
+          "nullable": false,
+          "description": "Positive challenged portion of the purchase.",
+          "classification": "financial"
+        },
+        {
+          "id": "opened_at",
+          "type": "timestamp",
+          "nullable": false,
+          "description": "UTC time the case was opened.",
+          "classification": "internal"
+        }
+      ],
+      "notes": [
+        "The owner or assigned card user may raise a case. A claim does not itself create a refund or provisional credit."
+      ],
+      "rule_ids": [
+        "R09",
+        "R16"
+      ],
+      "unique_keys": []
+    },
+    {
+      "id": "dispute_event",
+      "label": "Dispute Event",
+      "domain": "disputes",
+      "description": "A lifecycle event within a dispute case.",
+      "grain": "One event in a dispute.",
+      "primary_key": [
+        "dispute_event_id"
+      ],
+      "columns": [
+        {
+          "id": "dispute_event_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for dispute event.",
+          "classification": "identifier"
+        },
+        {
+          "id": "dispute_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Case being progressed.",
+          "classification": "identifier"
+        },
+        {
+          "id": "status",
+          "type": "string",
+          "nullable": false,
+          "description": "New case status.",
+          "classification": "internal",
+          "allowed_values": [
+            "OPEN",
+            "UNDER_REVIEW",
+            "RESOLVED_CUSTOMER",
+            "RESOLVED_MERCHANT",
+            "CLOSED"
+          ]
+        },
+        {
+          "id": "occurred_at",
+          "type": "timestamp",
+          "nullable": false,
+          "description": "UTC event time.",
+          "classification": "internal"
+        },
+        {
+          "id": "summary",
+          "type": "string",
+          "nullable": false,
+          "description": "Synthetic operational note; no personal narrative.",
+          "classification": "internal"
+        }
+      ],
+      "notes": [
+        "Chargeback messages, evidence files and provisional-credit postings are deferred."
+      ],
+      "rule_ids": [
+        "R17"
+      ],
+      "unique_keys": []
+    }
+  ],
+  "relationships": [
+    {
+      "id": "customer_address__customer_id",
+      "source_entity": "customer_address",
+      "source_column": "customer_id",
+      "target_entity": "customer",
+      "target_column": "customer_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Person to whom this address belongs.",
+      "enforcement": "logical_reference; physical implementation deferred"
+    },
+    {
+      "id": "customer_contact__customer_id",
+      "source_entity": "customer_contact",
+      "source_column": "customer_id",
+      "target_entity": "customer",
+      "target_column": "customer_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Customer reached by this contact.",
+      "enforcement": "logical_reference; physical implementation deferred"
+    },
+    {
+      "id": "customer_consent__customer_id",
+      "source_entity": "customer_consent",
+      "source_column": "customer_id",
+      "target_entity": "customer",
+      "target_column": "customer_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Person who made the choice.",
+      "enforcement": "logical_reference; physical implementation deferred"
+    },
+    {
+      "id": "customer_consent__channel_id",
+      "source_entity": "customer_consent",
+      "source_column": "channel_id",
+      "target_entity": "channel",
+      "target_column": "channel_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Channel that recorded the choice.",
+      "enforcement": "logical_reference; physical implementation deferred"
+    },
+    {
+      "id": "product_version__product_id",
+      "source_entity": "product_version",
+      "source_column": "product_id",
+      "target_entity": "product",
+      "target_column": "product_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Product whose terms are versioned.",
+      "enforcement": "logical_reference; physical implementation deferred"
+    },
+    {
+      "id": "account__product_version_id",
+      "source_entity": "account",
+      "source_column": "product_version_id",
+      "target_entity": "product_version",
+      "target_column": "product_version_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Product terms booked at account opening.",
+      "enforcement": "logical_reference; physical implementation deferred"
+    },
+    {
+      "id": "account__branch_id",
+      "source_entity": "account",
+      "source_column": "branch_id",
+      "target_entity": "branch",
+      "target_column": "branch_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Branch responsible for servicing.",
+      "enforcement": "logical_reference; physical implementation deferred"
+    },
+    {
+      "id": "account__currency_id",
+      "source_entity": "account",
+      "source_column": "currency_id",
+      "target_entity": "currency",
+      "target_column": "currency_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Account denomination.",
+      "enforcement": "logical_reference; physical implementation deferred"
+    },
+    {
+      "id": "account_holder__account_id",
+      "source_entity": "account_holder",
+      "source_column": "account_id",
+      "target_entity": "account",
+      "target_column": "account_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Account to which the role applies.",
+      "enforcement": "logical_reference; physical implementation deferred"
+    },
+    {
+      "id": "account_holder__customer_id",
+      "source_entity": "account_holder",
+      "source_column": "customer_id",
+      "target_entity": "customer",
+      "target_column": "customer_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Person assigned the role.",
+      "enforcement": "logical_reference; physical implementation deferred"
+    },
+    {
+      "id": "account_status_event__account_id",
+      "source_entity": "account_status_event",
+      "source_column": "account_id",
+      "target_entity": "account",
+      "target_column": "account_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Account whose status changed.",
+      "enforcement": "logical_reference; physical implementation deferred"
+    },
+    {
+      "id": "credit_facility__account_id",
+      "source_entity": "credit_facility",
+      "source_column": "account_id",
+      "target_entity": "account",
+      "target_column": "account_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_one",
+      "description": "Credit-card account supported by this facility.",
+      "enforcement": "logical_reference; physical implementation deferred"
+    },
+    {
+      "id": "credit_facility__currency_id",
+      "source_entity": "credit_facility",
+      "source_column": "currency_id",
+      "target_entity": "currency",
+      "target_column": "currency_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Must match the linked account currency.",
+      "enforcement": "logical_reference; physical implementation deferred"
+    },
+    {
+      "id": "credit_limit_event__credit_facility_id",
+      "source_entity": "credit_limit_event",
+      "source_column": "credit_facility_id",
+      "target_entity": "credit_facility",
+      "target_column": "credit_facility_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Facility whose limit changed.",
+      "enforcement": "logical_reference; physical implementation deferred"
+    },
+    {
+      "id": "card__account_id",
+      "source_entity": "card",
+      "source_column": "account_id",
+      "target_entity": "account",
+      "target_column": "account_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Credit-card account billed for use.",
+      "enforcement": "logical_reference; physical implementation deferred"
+    },
+    {
+      "id": "card__replaces_card_id",
+      "source_entity": "card",
+      "source_column": "replaces_card_id",
+      "target_entity": "card",
+      "target_column": "card_id",
+      "source_to_target": "zero_or_one",
+      "target_to_source": "zero_or_many",
+      "description": "Earlier card replaced by this card, when applicable.",
+      "enforcement": "logical_reference; physical implementation deferred"
+    },
+    {
+      "id": "card_assignment__card_id",
+      "source_entity": "card_assignment",
+      "source_column": "card_id",
+      "target_entity": "card",
+      "target_column": "card_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Card being assigned.",
+      "enforcement": "logical_reference; physical implementation deferred"
+    },
+    {
+      "id": "card_assignment__customer_id",
+      "source_entity": "card_assignment",
+      "source_column": "customer_id",
+      "target_entity": "customer",
+      "target_column": "customer_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Person authorized to use it.",
+      "enforcement": "logical_reference; physical implementation deferred"
+    },
+    {
+      "id": "card_status_event__card_id",
+      "source_entity": "card_status_event",
+      "source_column": "card_id",
+      "target_entity": "card",
+      "target_column": "card_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Card whose status changed.",
+      "enforcement": "logical_reference; physical implementation deferred"
+    },
+    {
+      "id": "merchant__merchant_category_id",
+      "source_entity": "merchant",
+      "source_column": "merchant_category_id",
+      "target_entity": "merchant_category",
+      "target_column": "merchant_category_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Merchant analytics category.",
+      "enforcement": "logical_reference; physical implementation deferred"
+    },
+    {
+      "id": "card_authorization__card_id",
+      "source_entity": "card_authorization",
+      "source_column": "card_id",
+      "target_entity": "card",
+      "target_column": "card_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Card presented for authorization.",
+      "enforcement": "logical_reference; physical implementation deferred"
+    },
+    {
+      "id": "card_authorization__merchant_id",
+      "source_entity": "card_authorization",
+      "source_column": "merchant_id",
+      "target_entity": "merchant",
+      "target_column": "merchant_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Merchant requesting authorization.",
+      "enforcement": "logical_reference; physical implementation deferred"
+    },
+    {
+      "id": "card_authorization__currency_id",
+      "source_entity": "card_authorization",
+      "source_column": "currency_id",
+      "target_entity": "currency",
+      "target_column": "currency_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Requested currency.",
+      "enforcement": "logical_reference; physical implementation deferred"
+    },
+    {
+      "id": "card_authorization__channel_id",
+      "source_entity": "card_authorization",
+      "source_column": "channel_id",
+      "target_entity": "channel",
+      "target_column": "channel_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Origin of the request.",
+      "enforcement": "logical_reference; physical implementation deferred"
+    },
+    {
+      "id": "card_transaction__card_id",
+      "source_entity": "card_transaction",
+      "source_column": "card_id",
+      "target_entity": "card",
+      "target_column": "card_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Card used for this activity.",
+      "enforcement": "logical_reference; physical implementation deferred"
+    },
+    {
+      "id": "card_transaction__merchant_id",
+      "source_entity": "card_transaction",
+      "source_column": "merchant_id",
+      "target_entity": "merchant",
+      "target_column": "merchant_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Merchant involved.",
+      "enforcement": "logical_reference; physical implementation deferred"
+    },
+    {
+      "id": "card_transaction__currency_id",
+      "source_entity": "card_transaction",
+      "source_column": "currency_id",
+      "target_entity": "currency",
+      "target_column": "currency_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Posted currency.",
+      "enforcement": "logical_reference; physical implementation deferred"
+    },
+    {
+      "id": "card_transaction__authorization_id",
+      "source_entity": "card_transaction",
+      "source_column": "authorization_id",
+      "target_entity": "card_authorization",
+      "target_column": "card_authorization_id",
+      "source_to_target": "zero_or_one",
+      "target_to_source": "zero_or_many",
+      "description": "Related authorization when available; may be absent for offline clearing.",
+      "enforcement": "logical_reference; physical implementation deferred"
+    },
+    {
+      "id": "card_transaction__original_transaction_id",
+      "source_entity": "card_transaction",
+      "source_column": "original_transaction_id",
+      "target_entity": "card_transaction",
+      "target_column": "card_transaction_id",
+      "source_to_target": "zero_or_one",
+      "target_to_source": "zero_or_many",
+      "description": "Purchase refunded by this refund.",
+      "enforcement": "logical_reference; physical implementation deferred"
+    },
+    {
+      "id": "account_entry__account_id",
+      "source_entity": "account_entry",
+      "source_column": "account_id",
+      "target_entity": "account",
+      "target_column": "account_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Account affected.",
+      "enforcement": "logical_reference; physical implementation deferred"
+    },
+    {
+      "id": "account_entry__card_transaction_id",
+      "source_entity": "account_entry",
+      "source_column": "card_transaction_id",
+      "target_entity": "card_transaction",
+      "target_column": "card_transaction_id",
+      "source_to_target": "zero_or_one",
+      "target_to_source": "zero_or_many",
+      "description": "Card activity behind this entry, if any.",
+      "enforcement": "logical_reference; physical implementation deferred"
+    },
+    {
+      "id": "account_entry__payment_id",
+      "source_entity": "account_entry",
+      "source_column": "payment_id",
+      "target_entity": "payment",
+      "target_column": "payment_id",
+      "source_to_target": "zero_or_one",
+      "target_to_source": "zero_or_many",
+      "description": "Repayment behind this entry, if any.",
+      "enforcement": "logical_reference; physical implementation deferred"
+    },
+    {
+      "id": "account_entry__fee_type_id",
+      "source_entity": "account_entry",
+      "source_column": "fee_type_id",
+      "target_entity": "fee_type",
+      "target_column": "fee_type_id",
+      "source_to_target": "zero_or_one",
+      "target_to_source": "zero_or_many",
+      "description": "Fee category when this is a fee.",
+      "enforcement": "logical_reference; physical implementation deferred"
+    },
+    {
+      "id": "account_entry__reverses_entry_id",
+      "source_entity": "account_entry",
+      "source_column": "reverses_entry_id",
+      "target_entity": "account_entry",
+      "target_column": "account_entry_id",
+      "source_to_target": "zero_or_one",
+      "target_to_source": "zero_or_many",
+      "description": "Earlier entry reversed by this entry.",
+      "enforcement": "logical_reference; physical implementation deferred"
+    },
+    {
+      "id": "payment__account_id",
+      "source_entity": "payment",
+      "source_column": "account_id",
+      "target_entity": "account",
+      "target_column": "account_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Credit-card account receiving the repayment.",
+      "enforcement": "logical_reference; physical implementation deferred"
+    },
+    {
+      "id": "payment__channel_id",
+      "source_entity": "payment",
+      "source_column": "channel_id",
+      "target_entity": "channel",
+      "target_column": "channel_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "How the instruction arrived.",
+      "enforcement": "logical_reference; physical implementation deferred"
+    },
+    {
+      "id": "payment__currency_id",
+      "source_entity": "payment",
+      "source_column": "currency_id",
+      "target_entity": "currency",
+      "target_column": "currency_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Payment currency; must match the account.",
+      "enforcement": "logical_reference; physical implementation deferred"
+    },
+    {
+      "id": "statement__account_id",
+      "source_entity": "statement",
+      "source_column": "account_id",
+      "target_entity": "account",
+      "target_column": "account_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Credit-card account being billed.",
+      "enforcement": "logical_reference; physical implementation deferred"
+    },
+    {
+      "id": "statement_line__statement_id",
+      "source_entity": "statement_line",
+      "source_column": "statement_id",
+      "target_entity": "statement",
+      "target_column": "statement_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Statement containing this line.",
+      "enforcement": "logical_reference; physical implementation deferred"
+    },
+    {
+      "id": "statement_line__account_entry_id",
+      "source_entity": "statement_line",
+      "source_column": "account_entry_id",
+      "target_entity": "account_entry",
+      "target_column": "account_entry_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_one",
+      "description": "Booked entry being displayed.",
+      "enforcement": "logical_reference; physical implementation deferred"
+    },
+    {
+      "id": "account_balance_snapshot__account_id",
+      "source_entity": "account_balance_snapshot",
+      "source_column": "account_id",
+      "target_entity": "account",
+      "target_column": "account_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Account summarized.",
+      "enforcement": "logical_reference; physical implementation deferred"
+    },
+    {
+      "id": "dispute__card_transaction_id",
+      "source_entity": "dispute",
+      "source_column": "card_transaction_id",
+      "target_entity": "card_transaction",
+      "target_column": "card_transaction_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Purchase being challenged.",
+      "enforcement": "logical_reference; physical implementation deferred"
+    },
+    {
+      "id": "dispute__raised_by_customer_id",
+      "source_entity": "dispute",
+      "source_column": "raised_by_customer_id",
+      "target_entity": "customer",
+      "target_column": "customer_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Customer raising the case.",
+      "enforcement": "logical_reference; physical implementation deferred"
+    },
+    {
+      "id": "dispute__dispute_reason_id",
+      "source_entity": "dispute",
+      "source_column": "dispute_reason_id",
+      "target_entity": "dispute_reason",
+      "target_column": "dispute_reason_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Reason for the claim.",
+      "enforcement": "logical_reference; physical implementation deferred"
+    },
+    {
+      "id": "dispute_event__dispute_id",
+      "source_entity": "dispute_event",
+      "source_column": "dispute_id",
+      "target_entity": "dispute",
+      "target_column": "dispute_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Case being progressed.",
+      "enforcement": "logical_reference; physical implementation deferred"
+    }
+  ],
+  "rules": [
+    {
+      "id": "R01",
+      "entities": [
+        "account",
+        "product_version",
+        "product"
+      ],
+      "category": "cross_entity",
+      "statement": "An account opens within its product version offering interval and keeps that version; later product migration is deferred.",
+      "enforcement_plan": "dataset_validation",
+      "implementation_status": "specified_not_implemented"
+    },
+    {
+      "id": "R02",
+      "entities": [
+        "account_holder",
+        "account",
+        "product"
+      ],
+      "category": "temporal",
+      "statement": "Every open account has exactly one active PRIMARY owner. JOINT roles are allowed only for deposit products; identical customer/account/role intervals must not overlap.",
+      "enforcement_plan": "dataset_validation",
+      "implementation_status": "specified_not_implemented"
+    },
+    {
+      "id": "R03",
+      "entities": [
+        "customer_address",
+        "account_holder",
+        "card_assignment"
+      ],
+      "category": "temporal",
+      "statement": "All validity intervals are [valid_from, valid_to); a non-null end is after the start. Address intervals for one customer/purpose do not overlap; card assignments for one card do not overlap.",
+      "enforcement_plan": "dataset_validation",
+      "implementation_status": "specified_not_implemented"
+    },
+    {
+      "id": "R04",
+      "entities": [
+        "credit_facility",
+        "account",
+        "product",
+        "credit_limit_event"
+      ],
+      "category": "cross_entity",
+      "statement": "Each credit-card account has exactly one facility and an initial nonnegative limit event; deposits have none. Facility currency equals account currency.",
+      "enforcement_plan": "dataset_validation",
+      "implementation_status": "specified_not_implemented"
+    },
+    {
+      "id": "R05",
+      "entities": [
+        "card",
+        "card_assignment",
+        "account"
+      ],
+      "category": "cross_entity",
+      "statement": "Cards belong only to credit-card accounts. Issue precedes expiry. Assignments begin no earlier than issue; PRIMARY card users must be active primary account owners at assignment start.",
+      "enforcement_plan": "dataset_validation",
+      "implementation_status": "specified_not_implemented"
+    },
+    {
+      "id": "R06",
+      "entities": [
+        "card"
+      ],
+      "category": "graph",
+      "statement": "A replacement references an older card on the same account; no self-reference or replacement cycle is allowed.",
+      "enforcement_plan": "dataset_validation",
+      "implementation_status": "specified_not_implemented"
+    },
+    {
+      "id": "R07",
+      "entities": [
+        "card_transaction",
+        "card_authorization",
+        "card",
+        "merchant"
+      ],
+      "category": "cross_entity",
+      "statement": "Card activity occurs after issue. Linked authorizations must be approved and use the same card, merchant and currency; multiple presentments are allowed. Refunds have no authorization link in this release.",
+      "enforcement_plan": "dataset_validation",
+      "implementation_status": "specified_not_implemented"
+    },
+    {
+      "id": "R08",
+      "entities": [
+        "card_transaction"
+      ],
+      "category": "aggregate",
+      "statement": "A REFUND references a PURCHASE on the same card, merchant and currency. A PURCHASE has no original reference. Refund posting does not precede purchase posting; cumulative refunds do not exceed purchase amount.",
+      "enforcement_plan": "dataset_validation",
+      "implementation_status": "specified_not_implemented"
+    },
+    {
+      "id": "R09",
+      "entities": [
+        "card_transaction",
+        "card_authorization",
+        "payment",
+        "account_entry",
+        "dispute"
+      ],
+      "category": "row",
+      "statement": "All transaction, requested, payment, entry and claimed amounts are strictly positive. Money is represented as decimal strings in future JSON records, never binary floating-point values.",
+      "enforcement_plan": "dataset_validation",
+      "implementation_status": "specified_not_implemented"
+    },
+    {
+      "id": "R10",
+      "entities": [
+        "account_entry",
+        "card_transaction",
+        "payment",
+        "fee_type"
+      ],
+      "category": "conditional",
+      "statement": "CARD entries have only card_transaction_id populated among source references; PAYMENT has only payment_id; FEE has only fee_type_id; ADJUSTMENT has none; REVERSAL has only reverses_entry_id. Non-reversals have no reversal reference.",
+      "enforcement_plan": "dataset_validation",
+      "implementation_status": "specified_not_implemented"
+    },
+    {
+      "id": "R11",
+      "entities": [
+        "account_entry",
+        "card_transaction",
+        "payment",
+        "card",
+        "account"
+      ],
+      "category": "cross_entity",
+      "statement": "Each card transaction has exactly one original CARD entry for its card account and equal amount; PURCHASE is DEBIT and REFUND is CREDIT. Each POSTED payment has exactly one original PAYMENT CREDIT entry of equal amount for its receiving account. PENDING or FAILED payments have none.",
+      "enforcement_plan": "dataset_validation",
+      "implementation_status": "specified_not_implemented"
+    },
+    {
+      "id": "R12",
+      "entities": [
+        "account_entry"
+      ],
+      "category": "cross_entity",
+      "statement": "A reversal points to one non-reversal entry on the same account, has equal amount and opposite direction, and posts no earlier. Each original entry may be reversed at most once; partial reversals are deferred.",
+      "enforcement_plan": "dataset_validation",
+      "implementation_status": "specified_not_implemented"
+    },
+    {
+      "id": "R13",
+      "entities": [
+        "statement",
+        "statement_line",
+        "account_entry"
+      ],
+      "category": "reconciliation",
+      "statement": "Statement lines refer to entries on the statement account within its half-open period. For credit-card statements, closing_balance = opening_balance + debits - credits. Cycles on one account do not overlap; each eligible entry appears exactly once in its issued cycle.",
+      "enforcement_plan": "dataset_validation",
+      "implementation_status": "specified_not_implemented"
+    },
+    {
+      "id": "R14",
+      "entities": [
+        "statement",
+        "account",
+        "product"
+      ],
+      "category": "row",
+      "statement": "Statements exist only for credit-card accounts. Period start precedes end; issue is on or after period end; due date is after issue; minimum due is nonnegative and no greater than max(closing_balance,0).",
+      "enforcement_plan": "dataset_validation",
+      "implementation_status": "specified_not_implemented"
+    },
+    {
+      "id": "R15",
+      "entities": [
+        "account_balance_snapshot",
+        "account_entry",
+        "account",
+        "product"
+      ],
+      "category": "reconciliation",
+      "statement": "Between consecutive daily snapshots, deposit balance changes by credits minus debits; credit-card amount owed changes by debits minus credits. A gap requires all intervening entries. Snapshots may be negative.",
+      "enforcement_plan": "dataset_validation",
+      "implementation_status": "specified_not_implemented"
+    },
+    {
+      "id": "R16",
+      "entities": [
+        "dispute",
+        "card_transaction",
+        "card_assignment",
+        "account_holder",
+        "card"
+      ],
+      "category": "cross_entity",
+      "statement": "A dispute references a PURCHASE; claim does not exceed its amount. Claimant is an account owner or assigned card user at purchase occurrence. Multiple cases may exist, but only one active case per purchase is allowed.",
+      "enforcement_plan": "dataset_validation",
+      "implementation_status": "specified_not_implemented"
+    },
+    {
+      "id": "R17",
+      "entities": [
+        "account_status_event",
+        "card_status_event",
+        "dispute_event",
+        "credit_limit_event",
+        "customer_consent"
+      ],
+      "category": "temporal",
+      "statement": "Effective times are unique within each owner stream (consent also by purpose). Initial states are OPEN for accounts, ISSUED for cards and OPEN for disputes; latest event defines current state. Full allowed-transition matrices are deferred.",
+      "enforcement_plan": "dataset_validation",
+      "implementation_status": "specified_not_implemented"
+    },
+    {
+      "id": "R18",
+      "entities": [
+        "payment",
+        "card_transaction",
+        "card_authorization",
+        "account",
+        "currency"
+      ],
+      "category": "cross_entity",
+      "statement": "All currencies are CAD; payment and card activity currency must equal the associated account currency. Payment destination is a credit-card account.",
+      "enforcement_plan": "dataset_validation",
+      "implementation_status": "specified_not_implemented"
+    },
+    {
+      "id": "R19",
+      "entities": [
+        "customer_contact"
+      ],
+      "category": "aggregate",
+      "statement": "At most one preferred contact exists per customer and contact type.",
+      "enforcement_plan": "dataset_validation",
+      "implementation_status": "specified_not_implemented"
+    },
+    {
+      "id": "R20",
+      "entities": [
+        "account",
+        "account_status_event"
+      ],
+      "category": "temporal",
+      "statement": "Closure date is on or after opening and agrees with the CLOSED event business date. Reopening is deferred. UTC instants map to business dates using America/Toronto.",
+      "enforcement_plan": "dataset_validation",
+      "implementation_status": "specified_not_implemented"
+    },
+    {
+      "id": "R21",
+      "entities": [
+        "customer_consent"
+      ],
+      "category": "temporal",
+      "statement": "Consent decisions are immutable events. Current consent is the latest decision for the customer and purpose; absence means no recorded grant.",
+      "enforcement_plan": "dataset_validation",
+      "implementation_status": "specified_not_implemented"
+    }
+  ],
+  "journeys": [
+    {
+      "id": "investigate_disputed_purchase",
+      "title": "Investigate a disputed purchase",
+      "question": "Who used the card, what posted, and what happened to the complaint?",
+      "steps": [
+        {
+          "entity": "customer",
+          "text": "Find the customer raising the complaint."
+        },
+        {
+          "entity": "card_assignment",
+          "text": "Identify their card assignment at the purchase time."
+        },
+        {
+          "entity": "card",
+          "text": "Keep the original card even if it has since been replaced."
+        },
+        {
+          "entity": "card_transaction",
+          "text": "Find the posted purchase rather than an authorization hold."
+        },
+        {
+          "entity": "merchant",
+          "text": "Identify the merchant involved."
+        },
+        {
+          "entity": "dispute",
+          "text": "Read the amount and reason for the claim."
+        },
+        {
+          "entity": "dispute_event",
+          "text": "Follow the case history."
+        }
+      ],
+      "relationship_ids": [
+        "card_assignment__customer_id",
+        "card_assignment__card_id",
+        "card_transaction__card_id",
+        "card_transaction__merchant_id",
+        "dispute__card_transaction_id",
+        "dispute_event__dispute_id"
+      ],
+      "caveat": "The highlighted graph explains joins; it does not prove a claim or automatically credit an account."
+    },
+    {
+      "id": "explain_monthly_statement",
+      "title": "Explain a monthly statement",
+      "question": "How did purchases, repayments and fees affect the amount owed?",
+      "steps": [
+        {
+          "entity": "account",
+          "text": "Select the credit-card account."
+        },
+        {
+          "entity": "statement",
+          "text": "Read the billing period and opening balance."
+        },
+        {
+          "entity": "statement_line",
+          "text": "Find the items included in the issued document."
+        },
+        {
+          "entity": "account_entry",
+          "text": "Use booked debits and credits to reconcile the closing balance."
+        },
+        {
+          "entity": "card_transaction",
+          "text": "Trace card entries to purchases or refunds."
+        },
+        {
+          "entity": "payment",
+          "text": "Trace repayment entries to posted payments."
+        },
+        {
+          "entity": "fee_type",
+          "text": "Explain any fee categories."
+        }
+      ],
+      "relationship_ids": [
+        "statement__account_id",
+        "statement_line__statement_id",
+        "statement_line__account_entry_id",
+        "account_entry__card_transaction_id",
+        "account_entry__payment_id",
+        "account_entry__fee_type_id"
+      ],
+      "caveat": "This is a branching explanation, not a single SQL join path. Aggregate entries before joining optional source tables; the statement is not an interest calculator."
+    }
+  ]
+}

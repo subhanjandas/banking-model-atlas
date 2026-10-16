@@ -1,0 +1,98 @@
+{
+  "version": "0.1.0",
+  "checkpoint": "Hour 1 foundation",
+  "files": [
+    {
+      "path": ".github/workflows/validate.yml",
+      "sha256": "3c2e70c449853e7c5ab6ca3e41ee113653bcae800403b6d421448ef56435a4c2"
+    },
+    {
+      "path": ".gitignore",
+      "sha256": "c1581979e0ed7ac30b88d59e03f4d867512a30c96883d3ddb40a7e8aa0647075"
+    },
+    {
+      "path": "CHANGELOG.md",
+      "sha256": "cacb55a2056d1ca51ee53aaefc489a9114b2d6dc757852ce44a5c486b384fb3a"
+    },
+    {
+      "path": "LICENSE",
+      "sha256": "6f75bade48aa0bec246060b323e5ea7f24d4dee6108fcae0997673d0f0c58ae2"
+    },
+    {
+      "path": "README.md",
+      "sha256": "800dc1be32fa353b1aa559d27ac87245895a87e881eb5b0005e168453f8ca9d4"
+    },
+    {
+      "path": "docs/BUSINESS_RULES.md",
+      "sha256": "80fd99f11cb9cb62580bec391abb1ff1c82cf98463e3590f3d475a1db4607346"
+    },
+    {
+      "path": "docs/DATA_DICTIONARY.md",
+      "sha256": "c73c89ee4f82e4b20c0e76bbec920bdb5c3eb2af8c37635e88aadbb74673c66e"
+    },
+    {
+      "path": "docs/DECISIONS.md",
+      "sha256": "3d65e4e84a75dabf8344fcba81e375edda740788eab491300084022daafbdb78"
+    },
+    {
+      "path": "docs/ENTITY_CATALOGUE.md",
+      "sha256": "b3c8a0cacf4606046961617e7462db54774e18ca597539a42179b3fc0843e184"
+    },
+    {
+      "path": "docs/EXPLORER_SPEC.md",
+      "sha256": "a3b8f04cc1262a512f2e628a2cddeb5e012311cb60cd2dfa1980a4c4fbcd03b8"
+    },
+    {
+      "path": "docs/JOURNEYS.md",
+      "sha256": "a82f3d0ee2b06bd97f895243f261e3449ce659143ff1f7f070356c9ea885a3ab"
+    },
+    {
+      "path": "docs/MODEL_CONTRACT.md",
+      "sha256": "935ed4bfdbb764c3bb1df0d890f4ac76883dd047b8e6b809011ad6792e06cbd8"
+    },
+    {
+      "path": "docs/PUBLISHING.md",
+      "sha256": "e3ac3dc5ec82bc70a21494bf5cf83eba5ec87b18ab0f46610c813270c2e8d2da"
+    },
+    {
+      "path": "docs/RELATIONSHIPS.md",
+      "sha256": "c4549d3ed29f0e9ed1d8f71227d52bf2a75350847349d12654617f1b1c234c15"
+    },
+    {
+      "path": "docs/ROADMAP.md",
+      "sha256": "01649ba4c41db1649bbf321adc993744977fac5be7c419aa9a0add4218e9ea10"
+    },
+    {
+      "path": "docs/SCENARIO.md",
+      "sha256": "74e3931dc9925a771ce7b00089633913b3406ba0c71088cd8c64b936fe96733f"
+    },
+    {
+      "path": "docs/VALIDATION.md",
+      "sha256": "fe6baf4df4cd32e600eb3c96dc3a55905830e62a424087e90487bd6e74bae531"
+    },
+    {
+      "path": "model/banking.model.json",
+      "sha256": "c89ba2827dae0b3470cd2dc6a9f2dfb3955bcb672c9d96e3ceccbd7b028b83fe"
+    },
+    {
+      "path": "replay.py",
+      "sha256": "e6a0fdfac17946ba7a243e1a38d13a1990e5d04091007590f644f7903bffa12b"
+    },
+    {
+      "path": "scripts/render_docs.py",
+      "sha256": "315abd941fd233f2c88d9528ce3c527b7ca0ae9f347059a7433980550c0995ed"
+    },
+    {
+      "path": "scripts/validate_model.py",
+      "sha256": "cb17348cefe95a7f6ebfca7bd7651966d278b61bcdbe123530720f5c509f8bbb"
+    },
+    {
+      "path": "tests/test_model.py",
+      "sha256": "67ab1cbc40e2c7de43f80335df7350c043ff40f65dc142eed37ca31ddd4ee643"
+    },
+    {
+      "path": "verify_package.py",
+      "sha256": "e573a8b683a7ca382b4dac81bd19004752d5b0ae24478cf77faabd20bc5c03ab"
+    }
+  ]
+}
