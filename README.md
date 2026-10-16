@@ -113,7 +113,7 @@ The exact highlighted entities and edges are stored in the model and documented 
 
 The left panel contains domains and search. The centre shows the graph. Selecting an entity or relationship opens a right-hand inspector with definitions, grain, columns, keys, and business rules.
 
-At a wide zoom, the graph will emphasize domains. At a closer view, it will emphasize tables and key fields. Full column lists belong in the inspector, so the canvas remains readable. Search will find both entity and column names. A table focus mode will show its immediate neighbours, and journey presets will highlight a meaningful subset of the model.
+The Domains view emphasizes the eight business areas; the Tables view shows grouped entities and key fields. These are explicit view controls, rather than automatic zoom transitions. Full column lists live in the inspector so the canvas remains readable. Search finds entity and column names and column descriptions. Table focus shows immediate neighbours, and journey presets highlight a meaningful subset of the model.
 
 The stack is React, TypeScript, Vite, and Cytoscape.js. The viewer runs entirely in the browser from versioned model metadata. Database access and AI generation are not required to explore the model. See the [explorer specification](docs/EXPLORER_SPEC.md) for interaction and acceptance criteria.
 

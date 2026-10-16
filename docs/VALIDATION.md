@@ -14,7 +14,9 @@ Date: 2026-10-16. Application: 0.2.0. Banking model: 0.1.0.
 
 Six Chromium interaction scenarios are configured in GitHub Actions against the production build under `/banking-model-atlas/`. They cover navigation, self-reference inspection, filtered search, bookmarks, journeys, focus/reset/history, three downloads and a mobile inspector. Screenshots and failure traces are retained as the `browser-evidence` artifact.
 
-The managed local environment does not provide the required browser-control skill, so no local browser was launched. The remote run and Pages deployment must be checked before claiming success. GitHub Pages may require the one-time setting described in PUBLISHING.md.
+The managed local environment does not provide the required browser-control skill, so no local browser was launched. At commit `4a0bf35`, all six Chromium scenarios passed in run [38918446994](https://github.com/subhanjandas/banking-model-atlas/actions/runs/38918446994), along with the build, unit tests and Python checks. Desktop overview, journey and mobile-inspector screenshots were reviewed. That review led to a compact layout for journeys and neighbourhoods, preserving context when a table is selected; this refinement is covered by the next CI run.
+
+Deployment failed specifically at `actions/configure-pages`: GitHub returned “Not Found” and asked for Pages to be enabled with GitHub Actions as the source. No public site is claimed. Enable the one-time setting described in PUBLISHING.md, then rerun deployment.
 
 ## Deliberate limits
 

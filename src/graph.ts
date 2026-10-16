@@ -7,7 +7,13 @@ export function graphElements(state:ViewState):ElementDefinition[]{
   model.relationships.forEach(r=>{const a=entityById.get(r.source_entity)!.domain,b=entityById.get(r.target_entity)!.domain;if(a!==b){const [x,y]=[a,b].sort(),key=x+'__'+y;const p=pairs.get(key);if(p)p.count++;else pairs.set(key,{a:x,b:y,count:1});}});
   return [...nodes,...[...pairs].map(([id,p])=>({data:{id:'domain_edge_'+id,source:p.a,target:p.b,kind:'domain_edge',label:p.count+' links'}}))];
  }
- const {entities,relationships}=visibleModel(state);const domains=model.domains.filter(d=>entities.some(e=>e.domain===d.id));
+ const {entities,relationships}=visibleModel(state);
+ if(state.journey||state.focus){
+  const journey=model.journeys.find(j=>j.id===state.journey);
+  const ordered=journey?journey.steps.map(s=>entityById.get(s.entity)!):[...entities].sort((a,b)=>a.id===state.focus?-1:b.id===state.focus?1:0);
+  return [...ordered.map((e,i)=>{const row=Math.floor(i/3);return {data:{id:e.id,kind:'entity',color:domainById.get(e.domain)!.color,label:e.id+'\n\nPK  '+e.primary_key[0]+'\n'+e.columns.length+' columns · '+e.rule_ids.length+' rules'},position:{x:(row%2?2-i%3:i%3)*275,y:row*150}};}),...relationships.map(r=>({data:{id:r.id,source:r.source_entity,target:r.target_entity,kind:'relationship',label:r.source_column}}))];
+ }
+ const domains=model.domains.filter(d=>entities.some(e=>e.domain===d.id));
  const nodes:ElementDefinition[]=[];
  // Each domain occupies its own fixed-width tile. Three rows of entities fit the largest domain.
  domains.forEach((d,di)=>{

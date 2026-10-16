@@ -24,7 +24,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "e9f80418f94e5118b4f08a040f8ec9c43216cfd580d28f36f09bcfe5681eff45"
+      "sha256": "7b6cf98475f0ccaa30eaa72ebb5e5e53744bd86008a10c51a8fcab99ebf809c9"
     },
     {
       "path": "docs/BUSINESS_RULES.md",
@@ -76,7 +76,7 @@
     },
     {
       "path": "docs/VALIDATION.md",
-      "sha256": "066bcc6520ea6ea666fd45f5f179c77977c07c6d3fb9d00835026c9a500f7b42"
+      "sha256": "9a1a21e2d6530e7584191bbb9504cbd8c048b7b066dea7dc6ee753b9599505d3"
     },
     {
       "path": "index.html",
@@ -128,11 +128,11 @@
     },
     {
       "path": "src/Graph.tsx",
-      "sha256": "7eb5b80717fa0f5370766ededf8f38b3cd817b1a01566f7819e2b92e7324feb2"
+      "sha256": "a6cf6971cc9f6d5f3fa07cda3f15cf930a13db11fa2279c7a6bbfd48f01d973f"
     },
     {
       "path": "src/graph.ts",
-      "sha256": "b4bb855745c7432d92ab92f939f13633e4447ad93d302de0788cfe1ea1d2fb9e"
+      "sha256": "294c788d9012427b1877e2295e02fa5011d23b265b7956da3412f5fd0b3afa2d"
     },
     {
       "path": "src/main.tsx",
@@ -156,7 +156,7 @@
     },
     {
       "path": "tests/explorer.test.ts",
-      "sha256": "0f1a34782988d6318b3eed083758b0af2f2bb02b956f5f3225d6151a9fd7897e"
+      "sha256": "4808c95f3f0b6811a98c59dc8920af75699159db28d340fdfe5dd8015ff4696b"
     },
     {
       "path": "tests/test_model.py",
