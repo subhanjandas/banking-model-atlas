@@ -1,0 +1,41 @@
+{
+  "name": "daily-outbound-activity",
+  "version": 1,
+  "owner": "Atlas maintainer / Subhanjan Das",
+  "grain": [
+    "day",
+    "channel",
+    "currency"
+  ],
+  "classification": "synthetic aggregated financial data",
+  "fields": {
+    "day": {
+      "type": "ISO_DATE",
+      "required": true
+    },
+    "channel": {
+      "type": "STRING",
+      "required": true
+    },
+    "currency": {
+      "type": "ISO_CURRENCY",
+      "required": true
+    },
+    "payment_count": {
+      "type": "INTEGER",
+      "required": true
+    },
+    "payment_amount": {
+      "type": "MINOR_UNITS",
+      "required": true
+    },
+    "return_count": {
+      "type": "INTEGER",
+      "required": true
+    },
+    "return_amount": {
+      "type": "MINOR_UNITS",
+      "required": true
+    }
+  }
+}

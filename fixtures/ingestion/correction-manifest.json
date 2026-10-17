@@ -1,0 +1,14 @@
+{
+  "batch_id": "CORRECTION",
+  "contract": "payment-return-v1",
+  "expected_distinct_versions": 1,
+  "expected_revision_amount_total": "45.00",
+  "expected_versions": [
+    {
+      "key": "RET2",
+      "version": 2,
+      "sha256": "5914d2cfc699295f817aa65cfe0365dfe96a5487ad686a7e0322e262785237e8"
+    }
+  ],
+  "description": "Synthetic producer-issued control file, committed separately from deliveries. Revision total counts all distinct versions, not the latest financial balance."
+}

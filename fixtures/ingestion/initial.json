@@ -1,0 +1,34 @@
+[
+  {
+    "delivery_id": "DEL2",
+    "source": "synthetic-payments",
+    "contract": "payment-return-v1",
+    "key": "RET2",
+    "version": 1,
+    "event_at": "2026-09-28T12:00:00Z",
+    "received_at": "2026-09-28T13:00:00Z",
+    "payload": {
+      "payment_return_id": "RET2",
+      "payment_order_id": "PO_OUT",
+      "amount": "40.00",
+      "returned_on": "2026-09-28",
+      "external_reference": "SRC_RET2"
+    }
+  },
+  {
+    "delivery_id": "DEL1",
+    "source": "synthetic-payments",
+    "contract": "payment-return-v1",
+    "key": "RET1",
+    "version": 1,
+    "event_at": "2026-09-26T12:00:00Z",
+    "received_at": "2026-09-29T09:00:00Z",
+    "payload": {
+      "payment_return_id": "RET1",
+      "payment_order_id": "PO_OUT",
+      "amount": "30.00",
+      "returned_on": "2026-09-26",
+      "external_reference": "SRC_RET1"
+    }
+  }
+]

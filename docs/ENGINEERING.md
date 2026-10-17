@@ -1,5 +1,7 @@
 # Engineering checkpoint: trustworthy inputs and richer scenarios
 
+For the newer durable pipeline, daily analytics and governance examples, read [Engineering lab](ENGINEERING_LAB.md). This page documents the earlier source-ingestion checkpoint.
+
 Application 1.1.0 / model 0.5.0. This release adds synthetic records for fraud, collections, rewards and customer service; partial payment returns; and a small, executable source-ingestion boundary.
 
 ## What actually runs

@@ -1,0 +1,165 @@
+{
+  "scope": "Synthetic local SQLite pipeline; static build-time evidence",
+  "schema_version": 2,
+  "currency": "CAD",
+  "unit": "minor units (cents)",
+  "initial_batch": {
+    "status": "committed",
+    "checkpoint": 1,
+    "new_versions": 2,
+    "affected_days": [
+      "2026-09-26",
+      "2026-09-28"
+    ],
+    "deliveries": 2,
+    "late_versions": 1,
+    "completeness": "passed"
+  },
+  "before_correction": {
+    "observed_at": "2026-09-29T23:59:59Z",
+    "freshness_threshold_seconds": 86400,
+    "latest_received_at": "2026-09-29T09:00:00Z",
+    "freshness_lag_seconds": 53999.0,
+    "freshness": "healthy",
+    "latest_attempt": "committed",
+    "reconciled": true,
+    "checkpoint": 1,
+    "rejected_runs": 0,
+    "source_versions": 2,
+    "daily": [
+      {
+        "day": "2026-09-20",
+        "channel": "WEB",
+        "currency": "CAD",
+        "payment_count": 1,
+        "payment_amount": 7500,
+        "return_count": 0,
+        "return_amount": 0
+      },
+      {
+        "day": "2026-09-26",
+        "channel": "WEB",
+        "currency": "CAD",
+        "payment_count": 0,
+        "payment_amount": 0,
+        "return_count": 1,
+        "return_amount": 3000
+      },
+      {
+        "day": "2026-09-28",
+        "channel": "WEB",
+        "currency": "CAD",
+        "payment_count": 0,
+        "payment_amount": 0,
+        "return_count": 1,
+        "return_amount": 4000
+      }
+    ],
+    "daily_sha256": "eb7c58bedb295d2b2b2306d1e8a11a56e965d6e8b32b3bf9aaaab91148fe4c99"
+  },
+  "correction_batch": {
+    "status": "committed",
+    "checkpoint": 2,
+    "new_versions": 1,
+    "affected_days": [
+      "2026-09-28"
+    ],
+    "deliveries": 1,
+    "late_versions": 1,
+    "completeness": "passed"
+  },
+  "replay": {
+    "status": "replayed",
+    "affected_days": [],
+    "new_versions": 0
+  },
+  "after_rejection": {
+    "observed_at": "2026-09-30T23:59:59Z",
+    "freshness_threshold_seconds": 86400,
+    "latest_received_at": "2026-09-30T09:00:00Z",
+    "freshness_lag_seconds": 53999.0,
+    "freshness": "healthy",
+    "latest_attempt": "rejected",
+    "reconciled": true,
+    "checkpoint": 2,
+    "rejected_runs": 1,
+    "source_versions": 3,
+    "daily": [
+      {
+        "day": "2026-09-20",
+        "channel": "WEB",
+        "currency": "CAD",
+        "payment_count": 1,
+        "payment_amount": 7500,
+        "return_count": 0,
+        "return_amount": 0
+      },
+      {
+        "day": "2026-09-26",
+        "channel": "WEB",
+        "currency": "CAD",
+        "payment_count": 0,
+        "payment_amount": 0,
+        "return_count": 1,
+        "return_amount": 3000
+      },
+      {
+        "day": "2026-09-28",
+        "channel": "WEB",
+        "currency": "CAD",
+        "payment_count": 0,
+        "payment_amount": 0,
+        "return_count": 1,
+        "return_amount": 4500
+      }
+    ],
+    "daily_sha256": "6f6cd6f4197d51da8f786b1efb3adb7b155066761f835ba8c626fe5a512de8f0"
+  },
+  "final": {
+    "observed_at": "2026-09-30T23:59:59Z",
+    "freshness_threshold_seconds": 86400,
+    "latest_received_at": "2026-09-30T09:00:00Z",
+    "freshness_lag_seconds": 53999.0,
+    "freshness": "healthy",
+    "latest_attempt": "committed",
+    "reconciled": true,
+    "checkpoint": 2,
+    "rejected_runs": 1,
+    "source_versions": 3,
+    "daily": [
+      {
+        "day": "2026-09-20",
+        "channel": "WEB",
+        "currency": "CAD",
+        "payment_count": 1,
+        "payment_amount": 7500,
+        "return_count": 0,
+        "return_amount": 0
+      },
+      {
+        "day": "2026-09-26",
+        "channel": "WEB",
+        "currency": "CAD",
+        "payment_count": 0,
+        "payment_amount": 0,
+        "return_count": 1,
+        "return_amount": 3000
+      },
+      {
+        "day": "2026-09-28",
+        "channel": "WEB",
+        "currency": "CAD",
+        "payment_count": 0,
+        "payment_amount": 0,
+        "return_count": 1,
+        "return_amount": 4500
+      }
+    ],
+    "daily_sha256": "6f6cd6f4197d51da8f786b1efb3adb7b155066761f835ba8c626fe5a512de8f0"
+  },
+  "quarantine_codes": [
+    "MISSING_SOURCE_RECORDS",
+    "SOURCE_CONTROL_TOTAL"
+  ],
+  "bounded_backfill_preserved_checksum": true
+}

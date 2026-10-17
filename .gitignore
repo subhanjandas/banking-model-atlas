@@ -10,3 +10,6 @@ dist/
 playwright-report/
 test-results/
 live-evidence/
+
+*.sqlite
+*.sqlite-*

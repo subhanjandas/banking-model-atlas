@@ -18,3 +18,7 @@ The query tests include deliberate excessive returns, invalid partial states, wr
 Run python3 replay.py, npm test and npm run build. Actions runs Chromium before deployment and captures the public website afterward. Current Actions status is the authoritative evidence for the committed version. Generated reports reproduce the dataset results. README gallery captures retain their explicit 1.0.0 provenance until refreshed; the latest public-site captures are available in Actions artifacts.
 
 Not claimed: full business policy coverage, completeness beyond the synthetic producer manifest, distributed exactly-once processing, persistent streaming state, post-close accounting restatements or production bank certification.
+
+## Durable engineering lab (application 1.2.0)
+
+Adds 22 Python tests covering persistent replay, abrupt child-process death, date corrections, source rejection, bounded backfill, query denial, migration and benchmark result equality. Two additional browser tests cover the evidence page, checkpoint selector, JSON download and mobile navigation. Total: 99 Python + 24 Vitest + 12 Playwright = 135 tests. The compatibility CLI also runs in `replay.py` against the frozen daily-v1 contract.

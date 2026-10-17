@@ -1,0 +1,18 @@
+[
+  {
+    "delivery_id": "DEL3",
+    "source": "synthetic-payments",
+    "contract": "payment-return-v1",
+    "key": "RET2",
+    "version": 2,
+    "event_at": "2026-09-28T12:00:00Z",
+    "received_at": "2026-09-30T09:00:00Z",
+    "payload": {
+      "payment_return_id": "RET2",
+      "payment_order_id": "PO_OUT",
+      "amount": "45.00",
+      "returned_on": "2026-09-28",
+      "external_reference": "SRC_RET2"
+    }
+  }
+]

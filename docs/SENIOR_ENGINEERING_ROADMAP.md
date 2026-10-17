@@ -1,6 +1,6 @@
-# Senior engineering evidence: next priorities
+# Senior engineering evidence: implementation status
 
-The explorer and model are already presentable. The next work should show measurable engineering decisions rather than accumulate tools or tables.
+All five priorities below now have bounded local implementations in application 1.2.0. See [the lab, tests and explicit limitations](ENGINEERING_LAB.md). The original acceptance targets are retained below for context; peak-memory measurements, hosted alert delivery, SCD2 dimensions and production authentication remain outside this release.
 
 | Priority | Deliverable | Evidence of completion |
 |---|---|---|
@@ -10,9 +10,9 @@ The explorer and model are already presentable. The next work should show measur
 | 4. Performance and cost | Seeded 100K/1M-row workloads, query plans and one measured optimization | Reproducible hardware/runtime notes, repeated timings, memory/scan sizes and unchanged result checksums; no invented savings |
 | 5. Evolution and governance | A breaking-change check, migration example, source ownership and implemented access/masking policy in a chosen target | A deliberately incompatible schema fails CI; a versioned consumer survives the approved migration; restricted fields cannot be read by the test role |
 
-## Recommended next checkpoint
+## Original planning rationale
 
-Build priorities 1 and 2 around **daily payment and return reconciliation**. Keep the current no-server DuckDB demo as the fast reference. Use a separate implementation path for persistent state rather than claiming the existing in-memory replay is incremental.
+The implementation builds priorities 1 and 2 around **daily payment and return reconciliation**. Keep the current no-server DuckDB demo as the fast reference. Use a separate implementation path for persistent state rather than claiming the existing in-memory replay is incremental.
 
 A small dbt project could provide model contracts, dependency-aware transformations and data tests for the analytical product. It is optional; choose it for those specific needs. A contract checks output shape, while business-data tests check row-level or aggregate assertions. They are complementary.
 

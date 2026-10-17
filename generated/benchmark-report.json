@@ -1,0 +1,90 @@
+{
+  "environment": {
+    "python": "3.12.14",
+    "sqlite": "3.53.1",
+    "system": "Linux",
+    "machine": "x86_64"
+  },
+  "method": "Seed 42, uniform 365-day distribution, 3 channels, integer cents; 1 warm-up and 5 measured executions per plan. Index is built between experiments. Shared-host wall-clock timings; no concurrency or cold-cache claim.",
+  "query": "SELECT channel,SUM(amount),COUNT(*) FROM activity WHERE day=? GROUP BY channel ORDER BY channel",
+  "runs": [
+    {
+      "rows": 100000,
+      "seed": 42,
+      "repetitions": 5,
+      "load_seconds": 0.143,
+      "index_build_seconds": 0.059,
+      "table_bytes": 1941504,
+      "indexed_bytes": 3858432,
+      "before": {
+        "median_ms": 3.3132,
+        "samples_ms": [
+          3.3132,
+          3.297,
+          3.2775,
+          3.6596,
+          3.6851
+        ],
+        "plan": [
+          "SCAN activity",
+          "USE TEMP B-TREE FOR GROUP BY"
+        ],
+        "result_sha256": "63be311d4738ac58ecfc6ee4dadd7b63ae3d8520973f933cbcde7f96a9520125"
+      },
+      "after": {
+        "median_ms": 0.0227,
+        "samples_ms": [
+          0.0255,
+          0.0237,
+          0.0227,
+          0.0227,
+          0.0225
+        ],
+        "plan": [
+          "SEARCH activity USING COVERING INDEX activity_cover (day=?)"
+        ],
+        "result_sha256": "63be311d4738ac58ecfc6ee4dadd7b63ae3d8520973f933cbcde7f96a9520125"
+      },
+      "result_match": true
+    },
+    {
+      "rows": 1000000,
+      "seed": 42,
+      "repetitions": 5,
+      "load_seconds": 1.593,
+      "index_build_seconds": 0.797,
+      "table_bytes": 19439616,
+      "indexed_bytes": 38825984,
+      "before": {
+        "median_ms": 41.7448,
+        "samples_ms": [
+          39.6578,
+          42.783,
+          41.7448,
+          42.4294,
+          39.0125
+        ],
+        "plan": [
+          "SCAN activity",
+          "USE TEMP B-TREE FOR GROUP BY"
+        ],
+        "result_sha256": "4ff3c11ca705b42ac9777297105e95fb45f5694bf43d1185dc29365688d46be2"
+      },
+      "after": {
+        "median_ms": 0.1627,
+        "samples_ms": [
+          0.1675,
+          0.1641,
+          0.1627,
+          0.1617,
+          0.1624
+        ],
+        "plan": [
+          "SEARCH activity USING COVERING INDEX activity_cover (day=?)"
+        ],
+        "result_sha256": "4ff3c11ca705b42ac9777297105e95fb45f5694bf43d1185dc29365688d46be2"
+      },
+      "result_match": true
+    }
+  ]
+}

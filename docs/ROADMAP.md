@@ -4,4 +4,4 @@ Application 1.1.0 / model 0.5.0 adds fixtures across all 16 domains, partial ret
 
 The engineering examples cover selected domain checks, producer-manifest completeness, source revisions, duplicate suppression and failed-batch publication safety. These are local reference implementations, not distributed production guarantees.
 
-Next: persistent incremental state and a daily payment/return analytical product. Then operational monitoring, benchmark evidence and versioned schema evolution. See SENIOR_ENGINEERING_ROADMAP.md for concrete acceptance criteria and ENGINEERING.md for the executable checkpoint.
+Application 1.2.0 implements a local persistent pipeline, daily activity mart, operational signals, measured 100K/1M benchmarks, migration and access tests. See ENGINEERING_LAB.md. The next application is intentionally a separate repository; see PLATFORM_HANDOFF.md.

@@ -10,7 +10,7 @@
 [![Model validation](https://github.com/subhanjandas/banking-model-atlas/actions/workflows/validate.yml/badge.svg)](https://github.com/subhanjandas/banking-model-atlas/actions/workflows/validate.yml)
 [![MIT license](https://img.shields.io/badge/license-MIT-8aad94)](LICENSE)
 
-Built by **[Subhanjan Das](https://github.com/subhanjandas)** · Application **1.1.0** · Model **0.5.0**
+Built by **[Subhanjan Das](https://github.com/subhanjandas)** · Application **1.2.0** · Model **0.5.0**
 
 </div>
 
@@ -42,7 +42,15 @@ It is useful for learning, design discussions and demonstrating data-modeling de
 
 **Coverage matters:** all 16 domains now contain synthetic examples, with selected checks for fraud, collections, rewards and service. Seven tables remain schema-only. Examples do not implement every rule or automate whole business workflows. [Exact coverage →](docs/VALIDATION_COVERAGE.md)
 
-**New engineering checkpoint:** source contracts, duplicate suppression, late corrections, producer-manifest completeness and atomic local publication. [Run the engineering walkthrough →](docs/ENGINEERING.md)
+**New in 1.2:** [interactive engineering evidence](https://subhanjandas.github.io/banking-model-atlas/?page=engineering)—durable incremental processing, daily activity analytics, crash recovery, operational signals, measured benchmarks and tested governance. [Run the lab →](docs/ENGINEERING_LAB.md)
+
+| Engineering question | Evidence you can inspect |
+|---|---|
+| What if a worker dies? | Real child-process termination, rollback and successful retry |
+| What if yesterday changes? | CAD 70 → CAD 75 return correction; affected partition rebuilt |
+| What if input is missing? | Producer controls reject publication; last good totals survive |
+| Is the optimization worth it? | 100K / 1M-row timings, query plans, matching checksums and storage cost |
+| Can changes and access be controlled? | Versioned migration, compatibility gate and denied raw-data queries |
 
 ## A closer look
 
@@ -149,11 +157,12 @@ A balanced journal can still use the wrong accounts or amounts. That is why the 
 | Metadata | 18 | Broken foreign keys, nullable primary keys, wrong cardinality, disconnected journeys |
 | SQL and reconciliation | 43 | Excess refunds, incorrect reversals, invalid transitions, missing mappings, balanced-but-wrong closing balances |
 | Source ingestion | 16 | Duplicate/out-of-order replay, version conflicts, changed fingerprints, missing records, failed publication preserving the last good file |
+| Durable engineering lab | 22 | Restart/crash recovery, targeted corrections, backfill, governance denial, migrations and benchmark correctness |
 | Explorer logic | 24 | Search, filters, URL state, neighbour focus, all ten journey subgraphs |
-| Browser | 10 | Navigation, downloads, mobile overflow, theme persistence, system preference, coverage labels |
+| Browser | 12 | Navigation, downloads, mobile overflow, theme persistence, system preference, coverage labels |
 | Post-deploy evidence | Separate capture | Opens the public site and saves screenshots with timestamp and commit |
 
-**111 automated tests**, plus post-deploy capture. The workflow badges above show the current run status. [Validation details](docs/VALIDATION.md) · [Reproducible demo report](generated/demo-report.json)
+**135 automated tests**, plus post-deploy capture. The workflow badges above show the current run status. [Validation details](docs/VALIDATION.md) · [Reproducible demo report](generated/demo-report.json)
 
 ## Decisions worth discussing in an interview
 
@@ -187,15 +196,16 @@ A balanced journal can still use the wrong accounts or amounts. That is why the 
 
 ## What can improve next?
 
-The portfolio reference release is complete. The highest-value next work is deeper evidence:
+The five engineering priorities now have runnable local examples. The next application belongs in a separate repository:
 
-- Add persistent incremental state and a bounded backfill command.
-- Extend the tested local return-ingestion boundary to durable orchestration and concurrent-writer control.
-- Extend supplied-manifest completeness to an authenticated external-source contract and post-close correction policy.
-- Add model migrations and a deliberately designed analytical layer.
-- Expand accessibility testing and measure larger-graph performance.
+- Build a persistent API with real session and ownership controls.
+- Connect simulated customer actions to an outbox, pipeline and reconciled dashboards.
+- Add loan servicing and business approvals as tested vertical slices.
+- Measure a hosted workload and run a backup/restore drill.
 
-[Senior engineering roadmap →](docs/SENIOR_ENGINEERING_ROADMAP.md). Multicurrency banking, real fraud scoring, regulatory reporting and production bank operations remain outside scope.
+[Full platform handoff](docs/PLATFORM_HANDOFF.md) · [Prompt for a new chat](docs/NEW_CHAT_PROMPT.md)
+
+Atlas remains the model and engineering reference. The public evidence page is static; the lab is local. It is not a hosted banking backend.
 
 ## Contribute or share
 
