@@ -6,10 +6,12 @@ Application 0.3.0 / model 0.2.0 adds 24 entities to the original 30. Twelve doma
 
 ## Next meaningful extensions
 
-1. Strengthen lifecycle checks: valid event transitions, ownership overlaps, replacement cycles and correction events.
-2. Add a bank opening trial balance and reconcile ledger account balances end to end. Current checks cover transaction journals and selected customer-entry mappings.
-3. Model payment returns and reversals with idempotent ingestion and late-arriving settlement observations.
+1. Extend the implemented lifecycle checks to ownership overlaps, replacement cycles and late-arriving correction events.
+2. Opening and closing trial balances and control-account reconciliation are implemented for the supplied period. Next: external-source completeness and close exception handling.
+3. Full payment returns and reversals are implemented. Next: partial returns and idempotent ingestion with late-arriving settlement observations.
 4. Introduce a clearly scoped analytical layer, such as daily card balances and payment reconciliation exceptions, with grain-safe queries.
 5. Add migration/version comparison before changing stable identifiers or column semantics.
 
 More entities should answer a new business question. The project is an original fictional reference model, not an entire core-banking system or a claim of industry-standard compliance.
+
+Application 0.4.0 adds the Dusk theme, 56 entities, 19 SQL checks and complete sample-period ledger reconciliation.

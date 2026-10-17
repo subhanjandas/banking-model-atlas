@@ -1,6 +1,6 @@
-# Executable check coverage
+# Executable coverage
 
-The 38 business rules are specifications. These 13 queries implement selected checks only. Each query returns violating records; an empty result passes for the loaded fixture. Every check has a negative-data regression test.
+Nineteen SQL checks cover selected portions of 42 rule specifications. Every query has a bad-data regression test. Eight additional ledger tests cover complete-period reconciliation, missing snapshots, balanced-but-wrong positions, opening trial imbalance, subledger differences, period boundaries duplicate event timestamps and offsetting customer-account errors.
 
 ## C01 — R34
 
@@ -42,13 +42,13 @@ Refund references are valid and cumulative refunds do not exceed purchases.
 
 Posted deposit orders have exactly the expected customer-account entries.
 
-**Limit:** Only final POSTED/SETTLED orders are checked; transition matrices, account product eligibility and failed-order reversals need additional checks.
+**Limit:** Checks booked entry shape, including subsequently corrected payments. Does not validate product eligibility.
 
 ## C08 — R27
 
 Outbound settlement agrees with instructions and SETTLED status has evidence.
 
-**Limit:** Partial settlement, returns and settlement-date calendars are excluded.
+**Limit:** Full outbound settlement and return only; partial settlement and rail calendars are excluded.
 
 ## C09 — R31
 
@@ -80,6 +80,40 @@ Posted transaction and journal amounts are strictly positive.
 
 **Limit:** Applies to these four tables only; signed balances and nonnegative schedule amounts follow separate conventions.
 
-## Still outside the executable coverage
+## C14 — R39
 
-Full ownership interval validation, status transition matrices, card replacement cycles, real screening, credit scoring, payment-network behavior, accrual engines, accounting period close and regulatory reporting are not implemented. The fixture uses one currency and one fictional legal entity.
+Reversals preserve the original and negate its exact account movement.
+
+**Limit:** Full reversals only; persistence-level immutability is not enforced by this analytical database.
+
+## C15 — R39
+
+Terminal corrected payments have exactly one reversal per original entry and correct payment kind.
+
+**Limit:** Does not model partial returns, fees, network messages or reversal-of-reversal.
+
+## C16 — R40
+
+payment_event history follows its explicit transition matrix.
+
+**Limit:** Requires complete effective-time histories. Corrections, late arrivals and same-time sequencing are not supported.
+
+## C17 — R40
+
+account_status_event history follows its explicit transition matrix.
+
+**Limit:** Requires complete effective-time histories. Corrections, late arrivals and same-time sequencing are not supported.
+
+## C18 — R40
+
+card_status_event history follows its explicit transition matrix.
+
+**Limit:** Requires complete effective-time histories. Corrections, late arrivals and same-time sequencing are not supported.
+
+## C19 — R42
+
+Every account and entry has complete, correctly targeted ledger mappings.
+
+**Limit:** Completeness is relative to supplied source rows, not an external bank feed.
+
+Full rule enforcement remains incomplete. See OPERATIONS.md for the reconciliation scope and lifecycle assumptions.

@@ -6,7 +6,7 @@ Imagine a customer calls about a purchase they do not recognize. The service tea
 
 Banking Model Atlas is being built to make those connections visible. The explorer lets you browse domains, search tables and columns, follow relationships, and read the business meaning behind each field. Six guided journeys show how the model helps answer everyday questions.
 
-**Application 0.3.0 · model 0.2.0.** Explore 54 entities across 12 domains, with six guided journeys and JSON, dictionary, PNG and executable DuckDB schema downloads. The repository includes synthetic banking records and checks that reconcile selected account activity and journals.
+**Application 0.4.0 · model 0.3.0.** Explore 56 entities across 12 domains, with six guided journeys and JSON, dictionary, PNG and executable DuckDB schema downloads. The repository includes synthetic banking records and checks that reconcile selected account activity and journals.
 
 **[Open the live explorer](https://subhanjandas.github.io/banking-model-atlas/)** · [Run the banking demo](docs/SQL_AND_DEMO.md) · [Read the coverage boundaries](docs/VALIDATION_COVERAGE.md)
 
@@ -17,16 +17,16 @@ Run the viewer with `npm ci` and `npm run dev` (Node.js 22.12+). GitHub Actions 
 | Item | Included |
 |---|---:|
 | Business domains | 12 |
-| Entities | 54 |
-| Documented columns | 317 |
-| Explicit relationships | 92 |
-| Specified business rules | 38 |
+| Entities | 56 |
+| Documented columns | 324 |
+| Explicit relationships | 95 |
+| Specified business rules | 42 |
 | Guided journey definitions | 6 |
 | Automated metadata tests | 18 |
-| Executable SQL tests | 16 |
-| Synthetic records | 137 |
+| Executable SQL tests | 30 |
+| Synthetic records | 175 |
 | Explorer unit tests | 20 |
-| Browser interaction scenarios | 7 |
+| Browser interaction scenarios | 9 |
 
 The JSON model is the source of truth. The catalogue, dictionary, relationship register, business-rule reference, and journey guide are generated from it. That means a description shown in the website comes from exactly the same place as the downloadable documentation.
 
@@ -62,7 +62,7 @@ A foreign-key arrow cannot express every rule. It can say that a refund points t
 | Onboarding | onboarding_case, identity_check, kyc_review, screening_review, customer_risk_assessment, product_application | Preserve decisions and evidence references without pretending to implement a compliance engine. |
 | Deposit payments | beneficiary, standing_order, payment_order, payment_event, payment_settlement, account_hold | Separate a request to move money from its lifecycle and settlement observation. |
 | Lending | loan_application, credit_decision, loan_contract, loan_schedule_item, loan_disbursement, loan_repayment | Keep an application, approved contract, funding and principal repayment distinct. |
-| Accounting and reconciliation | gl_account, journal, journal_line, posting_link, reconciliation_run, reconciliation_item | Explain balanced journals and trace selected customer entries to the ledger. |
+| Accounting and reconciliation | gl_account, journal, journal_line, posting_link, reconciliation_run, reconciliation_item, gl_balance_snapshot, account_gl_mapping | Explain balanced journals and trace selected customer entries to the ledger. |
 
 Read the [entity catalogue](docs/ENTITY_CATALOGUE.md) for every entity's definition and grain, or the [data dictionary](docs/DATA_DICTIONARY.md) for every column.
 
@@ -100,7 +100,7 @@ For a credit-card account, the statement closes at opening balance plus debits m
 
 ### Account entries are not a complete general ledger
 
-`account_entry` explains a debit or credit visible on a customer's account. It is useful for statements and reconciliation. A separate accounting domain supplies a small chart of accounts, balanced journal legs and explicit posting links. Customer activity and accounting keep separate grains; the demo checks their selected mappings. Opening trial balances, period closing and a complete general-ledger platform are outside scope.
+`account_entry` explains a debit or credit visible on a customer's account. It is useful for statements and reconciliation. A separate accounting domain supplies a small chart of accounts, balanced journal legs and explicit posting links. Customer activity and accounting keep separate grains; the demo checks their selected mappings. Independent opening and closing trial balances now reconcile every supplied ledger account. Customer-account balances reconcile to deposit, card and loan control accounts. A production period-close platform remains outside scope.
 
 For deposit accounts, credits increase funds and debits reduce them. For credit-card and term-loan accounts, debits increase the amount owed and credits reduce it. Keeping the account kind explicit avoids presenting one sign convention as correct for every balance.
 
@@ -108,7 +108,7 @@ For deposit accounts, credits increase funds and debits reduce them. For credit-
 
 Account and card status changes are events. Ownership and card assignments have validity intervals. Product terms have versions. These choices support the questions the explorer needs to explain.
 
-Other attributes, including customer segment and merchant category, are current-state values in this release. We do not claim that every attribute can be reconstructed at every historical moment. Event transition matrices and corrections to late-arriving events need more work before a production implementation.
+Other attributes, including customer segment and merchant category, are current-state values in this release. We do not claim that every attribute can be reconstructed at every historical moment. Explicit transition matrices now validate complete payment, account and card histories. Late-arriving corrections and production event ingestion remain outside scope.
 
 ## Six journeys through the graph
 
@@ -127,6 +127,8 @@ Other attributes, including customer segment and merchant category, are current-
 The exact highlighted entities and edges are stored in the model and documented in [JOURNEYS.md](docs/JOURNEYS.md).
 
 ## Explore the interactive model
+
+Use the moon/sun button in the header to switch between the original light theme and Dusk: slate surfaces, warm text and muted sage accents. Your choice is saved locally; a first visit follows your device preference. Graphs and PNG exports follow the selected theme.
 
 The left panel contains domains and search. The centre shows the graph. Selecting an entity or relationship opens a right-hand inspector with definitions, grain, columns, keys, and business rules.
 
@@ -155,9 +157,11 @@ python3 scripts/run_demo.py --write-report
 
 The validator checks metadata: identifiers, references, key types, cardinality consistency, rule links, and connected journey subgraphs. The tests deliberately break the model to verify that common errors are rejected.
 
-The full replay also executes all 54 tables, loads 137 synthetic records across 47 tables, checks all 92 relationships and runs 13 business-data checks. Negative tests deliberately introduce financial errors. See [the exact coverage and limits](docs/VALIDATION_COVERAGE.md).
+The operational examples preserve original payment entries and append full internal reversals or settled outbound returns. Payment, card and account histories follow documented transition matrices. See [the operational guide](docs/OPERATIONS.md) for exact semantics and limitations.
 
-All 38 rules retain `specified_not_implemented` because their complete enforcement plans are not implemented. Selected executable checks cover parts of those specifications; they do not establish compliance or production readiness. The browser labels this distinction explicitly.
+The full replay also executes all 56 tables, loads 175 synthetic records across 49 tables, checks all 95 relationships and runs 19 business-data checks. Negative tests deliberately introduce financial errors. See [the exact coverage and limits](docs/VALIDATION_COVERAGE.md).
+
+All 42 rules retain `specified_not_implemented` because their complete enforcement plans are not implemented. Selected executable checks cover parts of those specifications; they do not establish compliance or production readiness. The browser labels this distinction explicitly.
 
 ## Where to find things
 

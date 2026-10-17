@@ -10,10 +10,10 @@ class DemoTests(unittest.TestCase):
     def test_balances_and_schema(self):
         with database() as db:
             result=report(db)
-            self.assertEqual(result['closing_balances'],{'D1':'1750.00','D2':'175.00','CC1':'50.00','LN1':'900.00'})
-            self.assertEqual(len(db.execute('SHOW TABLES').fetchall()),54)
+            self.assertEqual(result['closing_balances'],{'D1':'2000.00','D2':'0.00','CC1':'50.00','LN1':'900.00'})
+            self.assertEqual(len(db.execute('SHOW TABLES').fetchall()),56)
     def test_check_metadata(self):
-        self.assertEqual(len({c['id'] for c in CHECKS}),13)
+        self.assertEqual(len({c['id'] for c in CHECKS}),19)
         rules={r['id'] for r in MODEL['rules']}
         for c in CHECKS:
             self.assertTrue(c['coverage_limit'])
@@ -24,6 +24,12 @@ class DemoTests(unittest.TestCase):
                 db.execute("UPDATE posting_link SET account_entry_id='missing'")
 
 MUTATIONS={
+'C14':"UPDATE account_entry SET amount=74 WHERE account_entry_id='REV_E_OUT'",
+'C15':"UPDATE payment_event SET status='REVERSED' WHERE payment_event_id='PO_OUT_END'",
+'C16':"UPDATE payment_event SET status='FAILED' WHERE payment_event_id='PO_OUT1'",
+'C17':"UPDATE account_status_event SET status='CLOSED' WHERE account_status_event_id='D2_RESTRICTED'",
+'C18':"UPDATE card_status_event SET status='CLOSED' WHERE card_status_event_id='CARD_BLOCKED'",
+'C19':"DELETE FROM posting_link WHERE posting_link_id='MAP_E_PUR'",
 'C01':"UPDATE journal_line SET amount=119 WHERE journal_line_id='J_PUR_1'",
 'C02':"UPDATE journal_line SET direction='CREDIT' WHERE journal_line_id='J_PUR_1'",
 'C03':"UPDATE posting_link SET allocated_amount=121 WHERE posting_link_id='MAP_E_PUR'",

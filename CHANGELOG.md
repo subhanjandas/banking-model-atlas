@@ -1,3 +1,11 @@
+# Application 0.4.0 / model 0.3.0
+
+- Add full internal reversals and outbound returns while preserving original postings.
+- Validate explicit payment, account and card lifecycle transitions.
+- Add ledger snapshots and account control mappings; reconcile opening, movements and closing across the complete sample chart.
+- Correct the loan repayment explanation: its funding is external cash, not a D1 debit.
+- Add a persistent Dusk theme, system preference support and themed graph exports.
+
 # Application 0.3.0 / model 0.2.0
 
 - Expand from 30 to 54 entities and eight to twelve domains.

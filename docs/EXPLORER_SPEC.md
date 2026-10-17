@@ -42,7 +42,7 @@ The first layout should be deterministic and grouped by domain. Avoid constantly
 
 ## Definition of done for the first interactive release
 
-1. All 54 entities and 92 relationships derive from the JSON, with no duplicate hard-coded model.
+1. All 56 entities and 95 relationships derive from the JSON, with no duplicate hard-coded model.
 2. Search, domain filtering, neighbour focus and reset work together.
 3. Both journey presets select connected, meaningful subgraphs.
 4. Every entity and edge has a readable inspector; self-references work.

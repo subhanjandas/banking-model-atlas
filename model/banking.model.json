@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "model_version": "0.2.0",
+  "model_version": "0.3.0",
   "id": "banking_model_atlas",
   "title": "Banking Model Atlas",
   "status": "educational_reference",
@@ -852,9 +852,15 @@
       ],
       "rule_ids": [
         "R17",
-        "R20"
+        "R20",
+        "R40"
       ],
-      "unique_keys": []
+      "unique_keys": [
+        [
+          "account_id",
+          "effective_at"
+        ]
+      ]
     },
     {
       "id": "credit_facility",
@@ -1137,9 +1143,15 @@
         "Replacement does not move old transactions onto the new card."
       ],
       "rule_ids": [
-        "R17"
+        "R17",
+        "R40"
       ],
-      "unique_keys": []
+      "unique_keys": [
+        [
+          "card_id",
+          "effective_at"
+        ]
+      ]
     },
     {
       "id": "merchant_category",
@@ -1549,7 +1561,9 @@
         "R26",
         "R32",
         "R33",
-        "R35"
+        "R35",
+        "R39",
+        "R42"
       ],
       "unique_keys": []
     },
@@ -1823,7 +1837,8 @@
         "A snapshot is a reconciliation reference, not a second source of transactions. Opening positions are required to rebuild balances."
       ],
       "rule_ids": [
-        "R15"
+        "R15",
+        "R42"
       ],
       "unique_keys": [
         [
@@ -2572,7 +2587,8 @@
         "R25",
         "R26",
         "R27",
-        "R28"
+        "R28",
+        "R39"
       ],
       "columns": [
         {
@@ -2686,7 +2702,9 @@
       "rule_ids": [
         "R26",
         "R27",
-        "R29"
+        "R29",
+        "R39",
+        "R40"
       ],
       "columns": [
         {
@@ -2715,7 +2733,9 @@
             "POSTED",
             "SETTLED",
             "FAILED",
-            "CANCELLED"
+            "CANCELLED",
+            "REVERSED",
+            "RETURNED"
           ]
         },
         {
@@ -3295,7 +3315,8 @@
         "This is a small illustrative chart, not a regulatory chart of accounts."
       ],
       "rule_ids": [
-        "R38"
+        "R38",
+        "R41"
       ],
       "columns": [
         {
@@ -3365,7 +3386,8 @@
       ],
       "rule_ids": [
         "R34",
-        "R35"
+        "R35",
+        "R41"
       ],
       "columns": [
         {
@@ -3447,7 +3469,8 @@
       "rule_ids": [
         "R34",
         "R35",
-        "R38"
+        "R38",
+        "R41"
       ],
       "columns": [
         {
@@ -3517,7 +3540,8 @@
         "The mapped line uses the same debit/credit direction and currency as the account entry. Counterpart ledger lines need not have customer-account entries."
       ],
       "rule_ids": [
-        "R35"
+        "R35",
+        "R42"
       ],
       "columns": [
         {
@@ -3706,6 +3730,103 @@
           "description": "Synthetic explanation of the match or exception.",
           "classification": "internal"
         }
+      ]
+    },
+    {
+      "id": "gl_balance_snapshot",
+      "label": "Ledger Balance Snapshot",
+      "domain": "accounting",
+      "description": "One independently supplied ledger account balance at a business-date close.",
+      "grain": "One independently supplied ledger account balance at a business-date close.",
+      "primary_key": [
+        "gl_balance_snapshot_id"
+      ],
+      "unique_keys": [
+        [
+          "gl_account_id",
+          "as_of_date"
+        ]
+      ],
+      "columns": [
+        {
+          "id": "gl_balance_snapshot_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier.",
+          "classification": "identifier"
+        },
+        {
+          "id": "gl_account_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Ledger account being reconciled.",
+          "classification": "identifier"
+        },
+        {
+          "id": "as_of_date",
+          "type": "date",
+          "nullable": false,
+          "description": "Inclusive business-date close.",
+          "classification": "internal"
+        },
+        {
+          "id": "signed_balance",
+          "type": "decimal(18,2)",
+          "nullable": false,
+          "description": "Debit-positive, credit-negative closing position.",
+          "classification": "financial"
+        }
+      ],
+      "notes": [
+        "Single CAD legal entity; balances use debit-positive signed amounts."
+      ],
+      "rule_ids": [
+        "R41",
+        "R42"
+      ]
+    },
+    {
+      "id": "account_gl_mapping",
+      "label": "Account Ledger Mapping",
+      "domain": "accounting",
+      "description": "One customer account mapped to its ledger control account.",
+      "grain": "One customer account mapped to its ledger control account.",
+      "primary_key": [
+        "account_gl_mapping_id"
+      ],
+      "unique_keys": [
+        [
+          "account_id"
+        ]
+      ],
+      "columns": [
+        {
+          "id": "account_gl_mapping_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier.",
+          "classification": "identifier"
+        },
+        {
+          "id": "account_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Customer account represented.",
+          "classification": "identifier"
+        },
+        {
+          "id": "gl_account_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Control ledger account.",
+          "classification": "identifier"
+        }
+      ],
+      "notes": [
+        "Single CAD legal entity; balances use debit-positive signed amounts."
+      ],
+      "rule_ids": [
+        "R42"
       ]
     }
   ],
@@ -4721,6 +4842,39 @@
       "target_to_source": "zero_or_many",
       "description": "Loan repayment behind a principal reduction, if any.",
       "enforcement": "logical_reference; DuckDB export enforces non-self references"
+    },
+    {
+      "id": "gl_balance_snapshot__gl_account_id",
+      "source_entity": "gl_balance_snapshot",
+      "source_column": "gl_account_id",
+      "target_entity": "gl_account",
+      "target_column": "gl_account_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Connect the reconciliation record to its represented account.",
+      "enforcement": "DuckDB foreign key"
+    },
+    {
+      "id": "account_gl_mapping__account_id",
+      "source_entity": "account_gl_mapping",
+      "source_column": "account_id",
+      "target_entity": "account",
+      "target_column": "account_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_one",
+      "description": "Connect the reconciliation record to its represented account.",
+      "enforcement": "DuckDB foreign key"
+    },
+    {
+      "id": "account_gl_mapping__gl_account_id",
+      "source_entity": "account_gl_mapping",
+      "source_column": "gl_account_id",
+      "target_entity": "gl_account",
+      "target_column": "gl_account_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Connect the reconciliation record to its represented account.",
+      "enforcement": "DuckDB foreign key"
     }
   ],
   "rules": [
@@ -5177,6 +5331,57 @@
       ],
       "category": "row",
       "statement": "Normal balance is DEBIT for ASSET and EXPENSE, CREDIT for LIABILITY, EQUITY and INCOME. Individual lines may be on either side; normal balance is not a prohibition on opposite entries.",
+      "enforcement_plan": "dataset_validation",
+      "implementation_status": "specified_not_implemented"
+    },
+    {
+      "id": "R39",
+      "entities": [
+        "payment_order",
+        "payment_event",
+        "account_entry"
+      ],
+      "category": "cross_row",
+      "statement": "Full internal reversals follow POSTED; full outbound returns follow SETTLED. Preserve original entries and append one equal opposite entry per original entry, on the same account and a later or equal business date. Partial and repeated reversals are excluded.",
+      "enforcement_plan": "dataset_validation",
+      "implementation_status": "specified_not_implemented"
+    },
+    {
+      "id": "R40",
+      "entities": [
+        "payment_event",
+        "account_status_event",
+        "card_status_event"
+      ],
+      "category": "cross_row",
+      "statement": "Complete event histories begin in the declared initial state and follow the explicit transition matrix in lifecycle_transitions.json. Effective timestamps are unique per subject; closed and terminal payment states cannot reopen.",
+      "enforcement_plan": "dataset_validation",
+      "implementation_status": "specified_not_implemented"
+    },
+    {
+      "id": "R41",
+      "entities": [
+        "gl_account",
+        "gl_balance_snapshot",
+        "journal",
+        "journal_line"
+      ],
+      "category": "cross_row",
+      "statement": "For every chart account, closing debit-positive balance equals opening balance plus posted debits minus credits strictly after the opening date and through the closing date. Both trial balances sum to zero.",
+      "enforcement_plan": "dataset_validation",
+      "implementation_status": "specified_not_implemented"
+    },
+    {
+      "id": "R42",
+      "entities": [
+        "account_gl_mapping",
+        "account_balance_snapshot",
+        "account_entry",
+        "posting_link",
+        "gl_balance_snapshot"
+      ],
+      "category": "cross_row",
+      "statement": "Every customer account maps to one control account and every booked entry has complete allocations to that control account. Signed account balances reconcile to control balances at opening and closing. Deposit balances are negated for debit-positive accounting.",
       "enforcement_plan": "dataset_validation",
       "implementation_status": "specified_not_implemented"
     }

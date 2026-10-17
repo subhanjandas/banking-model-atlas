@@ -1,16 +1,68 @@
 {
-  "model_version": "0.2.0",
+  "ledger_reconciliation": {
+    "period": {
+      "opening": "2026-08-31",
+      "closing": "2026-09-30"
+    },
+    "ledger_accounts": {
+      "G_CARD": {
+        "opening": "0.00",
+        "movement": "50.00",
+        "closing": "50.00"
+      },
+      "G_CASH": {
+        "opening": "1000.00",
+        "movement": "160.00",
+        "closing": "1160.00"
+      },
+      "G_CLEAR": {
+        "opening": "0.00",
+        "movement": "-100.00",
+        "closing": "-100.00"
+      },
+      "G_DEP": {
+        "opening": "-1000.00",
+        "movement": "-1000.00",
+        "closing": "-2000.00"
+      },
+      "G_INT": {
+        "opening": "0.00",
+        "movement": "-10.00",
+        "closing": "-10.00"
+      },
+      "G_LOAN": {
+        "opening": "0.00",
+        "movement": "900.00",
+        "closing": "900.00"
+      }
+    },
+    "subledger_controls": {
+      "2026-08-31": {
+        "G_CARD": "0.00",
+        "G_DEP": "-1000.00",
+        "G_LOAN": "0.00"
+      },
+      "2026-09-30": {
+        "G_CARD": "50.00",
+        "G_DEP": "-2000.00",
+        "G_LOAN": "900.00"
+      }
+    },
+    "trial_balance_difference": "0.00",
+    "scope": "All supplied CAD accounts and posted journals in this period; no external-feed completeness claim."
+  },
+  "model_version": "0.3.0",
   "duckdb_version": "1.5.6",
-  "schema_tables": 54,
-  "populated_tables": 47,
-  "synthetic_records": 137,
-  "relationship_integrity_checks": 92,
-  "business_checks": 13,
+  "schema_tables": 56,
+  "populated_tables": 49,
+  "synthetic_records": 175,
+  "relationship_integrity_checks": 95,
+  "business_checks": 19,
   "business_check_failures": 0,
-  "posted_journals": 8,
+  "posted_journals": 10,
   "closing_balances": {
-    "D1": "1750.00",
-    "D2": "175.00",
+    "D1": "2000.00",
+    "D2": "0.00",
     "CC1": "50.00",
     "LN1": "900.00"
   },

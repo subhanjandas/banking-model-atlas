@@ -1,5 +1,5 @@
 {
-  "description": "All records are synthetic. Opening deposit balance D1=1000.00 is assumed, not a journal generated here.",
+  "description": "Synthetic CAD banking activity, full internal reversal and outbound return, complete period trial balances; loan repayment is externally funded.",
   "opening_balances": {
     "D1": "1000.00",
     "D2": "0.00",
@@ -7,8 +7,8 @@
     "LN1": "0.00"
   },
   "expected_closing_balances": {
-    "D1": "1750.00",
-    "D2": "175.00",
+    "D1": "2000.00",
+    "D2": "0.00",
     "CC1": "50.00",
     "LN1": "900.00"
   },
@@ -179,6 +179,20 @@
         "status": "OPEN",
         "effective_at": "2026-09-01T10:00:00",
         "reason": "Synthetic account opening"
+      },
+      {
+        "account_status_event_id": "D2_RESTRICTED",
+        "account_id": "D2",
+        "status": "RESTRICTED",
+        "effective_at": "2026-09-29T10:00:00",
+        "reason": "Synthetic lifecycle demonstration"
+      },
+      {
+        "account_status_event_id": "D2_OPEN",
+        "account_id": "D2",
+        "status": "OPEN",
+        "effective_at": "2026-09-30T10:00:00",
+        "reason": "Synthetic lifecycle demonstration"
       }
     ],
     "credit_facility": [
@@ -227,6 +241,18 @@
         "card_id": "CARD1",
         "status": "ACTIVE",
         "effective_at": "2026-09-02T10:00:00"
+      },
+      {
+        "card_status_event_id": "CARD_BLOCKED",
+        "card_id": "CARD1",
+        "status": "BLOCKED",
+        "effective_at": "2026-09-29T10:00:00"
+      },
+      {
+        "card_status_event_id": "CARD_ACTIVE",
+        "card_id": "CARD1",
+        "status": "ACTIVE",
+        "effective_at": "2026-09-30T10:00:00"
       }
     ],
     "merchant_category": [
@@ -453,6 +479,20 @@
         "status": "SETTLED",
         "occurred_at": "2026-09-20T15:00:00",
         "reason_code": "DEMO_SETTLED"
+      },
+      {
+        "payment_event_id": "PO_INT_END",
+        "payment_order_id": "PO_INT",
+        "status": "REVERSED",
+        "occurred_at": "2026-09-28T12:00:00",
+        "reason_code": "DEMO_REVERSED"
+      },
+      {
+        "payment_event_id": "PO_OUT_END",
+        "payment_order_id": "PO_OUT",
+        "status": "RETURNED",
+        "occurred_at": "2026-09-28T12:00:00",
+        "reason_code": "DEMO_RETURNED"
       }
     ],
     "payment_settlement": [
@@ -700,6 +740,36 @@
         "posted_on": "2026-09-25",
         "description": "Synthetic loan repayment",
         "loan_repayment_id": "LR1"
+      },
+      {
+        "account_entry_id": "REV_E_TD",
+        "account_id": "D1",
+        "kind": "REVERSAL",
+        "direction": "CREDIT",
+        "amount": "250.00",
+        "posted_on": "2026-09-28",
+        "description": "Full correction of E_TD",
+        "reverses_entry_id": "E_TD"
+      },
+      {
+        "account_entry_id": "REV_E_TC",
+        "account_id": "D2",
+        "kind": "REVERSAL",
+        "direction": "DEBIT",
+        "amount": "250.00",
+        "posted_on": "2026-09-28",
+        "description": "Full correction of E_TC",
+        "reverses_entry_id": "E_TC"
+      },
+      {
+        "account_entry_id": "REV_E_OUT",
+        "account_id": "D2",
+        "kind": "REVERSAL",
+        "direction": "CREDIT",
+        "amount": "75.00",
+        "posted_on": "2026-09-28",
+        "description": "Full correction of E_OUT",
+        "reverses_entry_id": "E_OUT"
       }
     ],
     "statement": [
@@ -749,19 +819,43 @@
         "account_balance_snapshot_id": "BAL_D1",
         "account_id": "D1",
         "as_of_date": "2026-09-30",
-        "balance_amount": "1750.00"
+        "balance_amount": "2000.00"
       },
       {
         "account_balance_snapshot_id": "BAL_D2",
         "account_id": "D2",
         "as_of_date": "2026-09-30",
-        "balance_amount": "175.00"
+        "balance_amount": "0.00"
       },
       {
         "account_balance_snapshot_id": "BAL_LN1",
         "account_id": "LN1",
         "as_of_date": "2026-09-30",
         "balance_amount": "900.00"
+      },
+      {
+        "account_balance_snapshot_id": "OPEN_D1",
+        "account_id": "D1",
+        "as_of_date": "2026-08-31",
+        "balance_amount": "1000.00"
+      },
+      {
+        "account_balance_snapshot_id": "OPEN_D2",
+        "account_id": "D2",
+        "as_of_date": "2026-08-31",
+        "balance_amount": "0.00"
+      },
+      {
+        "account_balance_snapshot_id": "OPEN_CC1",
+        "account_id": "CC1",
+        "as_of_date": "2026-08-31",
+        "balance_amount": "0.00"
+      },
+      {
+        "account_balance_snapshot_id": "OPEN_LN1",
+        "account_id": "LN1",
+        "as_of_date": "2026-08-31",
+        "balance_amount": "0.00"
       }
     ],
     "gl_account": [
@@ -880,6 +974,24 @@
         "status": "POSTED",
         "description": "Synthetic J_REPAY",
         "source_reference": "SRC_J_REPAY"
+      },
+      {
+        "journal_id": "J_REV_INT",
+        "currency_id": "CAD",
+        "legal_entity_code": "MHB_BANK",
+        "booked_on": "2026-09-28",
+        "status": "POSTED",
+        "description": "Append-only full payment correction",
+        "source_reference": "SRC_J_REV_INT"
+      },
+      {
+        "journal_id": "J_RETURN",
+        "currency_id": "CAD",
+        "legal_entity_code": "MHB_BANK",
+        "booked_on": "2026-09-28",
+        "status": "POSTED",
+        "description": "Append-only full payment correction",
+        "source_reference": "SRC_J_RETURN"
       }
     ],
     "journal_line": [
@@ -1018,6 +1130,38 @@
         "line_number": 3,
         "direction": "CREDIT",
         "amount": "10.00"
+      },
+      {
+        "journal_line_id": "J_REV_INT_1",
+        "journal_id": "J_REV_INT",
+        "gl_account_id": "G_DEP",
+        "line_number": 1,
+        "direction": "CREDIT",
+        "amount": "250.00"
+      },
+      {
+        "journal_line_id": "J_REV_INT_2",
+        "journal_id": "J_REV_INT",
+        "gl_account_id": "G_DEP",
+        "line_number": 2,
+        "direction": "DEBIT",
+        "amount": "250.00"
+      },
+      {
+        "journal_line_id": "J_RETURN_1",
+        "journal_id": "J_RETURN",
+        "gl_account_id": "G_CASH",
+        "line_number": 1,
+        "direction": "DEBIT",
+        "amount": "75.00"
+      },
+      {
+        "journal_line_id": "J_RETURN_2",
+        "journal_id": "J_RETURN",
+        "gl_account_id": "G_DEP",
+        "line_number": 2,
+        "direction": "CREDIT",
+        "amount": "75.00"
       }
     ],
     "posting_link": [
@@ -1074,6 +1218,24 @@
         "account_entry_id": "E_LR",
         "journal_line_id": "J_REPAY_2",
         "allocated_amount": "100.00"
+      },
+      {
+        "posting_link_id": "MAP_REV_E_TD",
+        "account_entry_id": "REV_E_TD",
+        "journal_line_id": "J_REV_INT_1",
+        "allocated_amount": "250.00"
+      },
+      {
+        "posting_link_id": "MAP_REV_E_TC",
+        "account_entry_id": "REV_E_TC",
+        "journal_line_id": "J_REV_INT_2",
+        "allocated_amount": "250.00"
+      },
+      {
+        "posting_link_id": "MAP_REV_E_OUT",
+        "account_entry_id": "REV_E_OUT",
+        "journal_line_id": "J_RETURN_2",
+        "allocated_amount": "75.00"
       }
     ],
     "reconciliation_run": [
@@ -1168,6 +1330,106 @@
         "difference_amount": "0.00",
         "explanation": "Synthetic equal-amount mapping"
       }
+    ],
+    "account_gl_mapping": [
+      {
+        "account_gl_mapping_id": "CTRL_D1",
+        "account_id": "D1",
+        "gl_account_id": "G_DEP"
+      },
+      {
+        "account_gl_mapping_id": "CTRL_D2",
+        "account_id": "D2",
+        "gl_account_id": "G_DEP"
+      },
+      {
+        "account_gl_mapping_id": "CTRL_CC1",
+        "account_id": "CC1",
+        "gl_account_id": "G_CARD"
+      },
+      {
+        "account_gl_mapping_id": "CTRL_LN1",
+        "account_id": "LN1",
+        "gl_account_id": "G_LOAN"
+      }
+    ],
+    "gl_balance_snapshot": [
+      {
+        "gl_balance_snapshot_id": "G_CASH_2026-08-31",
+        "gl_account_id": "G_CASH",
+        "as_of_date": "2026-08-31",
+        "signed_balance": "1000.00"
+      },
+      {
+        "gl_balance_snapshot_id": "G_CARD_2026-08-31",
+        "gl_account_id": "G_CARD",
+        "as_of_date": "2026-08-31",
+        "signed_balance": "0.00"
+      },
+      {
+        "gl_balance_snapshot_id": "G_LOAN_2026-08-31",
+        "gl_account_id": "G_LOAN",
+        "as_of_date": "2026-08-31",
+        "signed_balance": "0.00"
+      },
+      {
+        "gl_balance_snapshot_id": "G_DEP_2026-08-31",
+        "gl_account_id": "G_DEP",
+        "as_of_date": "2026-08-31",
+        "signed_balance": "-1000.00"
+      },
+      {
+        "gl_balance_snapshot_id": "G_CLEAR_2026-08-31",
+        "gl_account_id": "G_CLEAR",
+        "as_of_date": "2026-08-31",
+        "signed_balance": "0.00"
+      },
+      {
+        "gl_balance_snapshot_id": "G_INT_2026-08-31",
+        "gl_account_id": "G_INT",
+        "as_of_date": "2026-08-31",
+        "signed_balance": "0.00"
+      },
+      {
+        "gl_balance_snapshot_id": "G_CASH_2026-09-30",
+        "gl_account_id": "G_CASH",
+        "as_of_date": "2026-09-30",
+        "signed_balance": "1160.00"
+      },
+      {
+        "gl_balance_snapshot_id": "G_CARD_2026-09-30",
+        "gl_account_id": "G_CARD",
+        "as_of_date": "2026-09-30",
+        "signed_balance": "50.00"
+      },
+      {
+        "gl_balance_snapshot_id": "G_LOAN_2026-09-30",
+        "gl_account_id": "G_LOAN",
+        "as_of_date": "2026-09-30",
+        "signed_balance": "900.00"
+      },
+      {
+        "gl_balance_snapshot_id": "G_DEP_2026-09-30",
+        "gl_account_id": "G_DEP",
+        "as_of_date": "2026-09-30",
+        "signed_balance": "-2000.00"
+      },
+      {
+        "gl_balance_snapshot_id": "G_CLEAR_2026-09-30",
+        "gl_account_id": "G_CLEAR",
+        "as_of_date": "2026-09-30",
+        "signed_balance": "-100.00"
+      },
+      {
+        "gl_balance_snapshot_id": "G_INT_2026-09-30",
+        "gl_account_id": "G_INT",
+        "as_of_date": "2026-09-30",
+        "signed_balance": "-10.00"
+      }
     ]
+  },
+  "period": {
+    "opening": "2026-08-31",
+    "closing": "2026-09-30"
   }
 }

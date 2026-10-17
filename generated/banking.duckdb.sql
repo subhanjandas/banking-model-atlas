@@ -1,4 +1,4 @@
--- Banking Model Atlas | model 0.2.0
+-- Banking Model Atlas | model 0.3.0
 -- Dialect: DuckDB. Run in a fresh database. No DROP or destructive reset.
 -- PK, non-self FK, UNIQUE, NOT NULL and enumerations are enforced.
 -- Self-reference integrity and selected business rules are checked by scripts/run_demo.py.
@@ -222,6 +222,22 @@ COMMENT ON COLUMN "customer_contact"."customer_id" IS 'Customer reached by this 
 COMMENT ON COLUMN "customer_contact"."contact_type" IS 'Contact medium.';
 COMMENT ON COLUMN "customer_contact"."contact_value" IS 'Fictional contact value; example emails use example.com.';
 COMMENT ON COLUMN "customer_contact"."is_preferred" IS 'Whether this is preferred within its contact type.';
+
+-- One independently supplied ledger account balance at a business-date close.
+CREATE TABLE "gl_balance_snapshot" (
+  "gl_balance_snapshot_id" VARCHAR NOT NULL,
+  "gl_account_id" VARCHAR NOT NULL,
+  "as_of_date" DATE NOT NULL,
+  "signed_balance" DECIMAL(18,2) NOT NULL,
+  PRIMARY KEY ("gl_balance_snapshot_id"),
+  UNIQUE ("gl_account_id", "as_of_date"),
+  FOREIGN KEY ("gl_account_id") REFERENCES "gl_account" ("gl_account_id")
+);
+COMMENT ON TABLE "gl_balance_snapshot" IS 'One independently supplied ledger account balance at a business-date close. Grain: One independently supplied ledger account balance at a business-date close.';
+COMMENT ON COLUMN "gl_balance_snapshot"."gl_balance_snapshot_id" IS 'Stable synthetic identifier.';
+COMMENT ON COLUMN "gl_balance_snapshot"."gl_account_id" IS 'Ledger account being reconciled.';
+COMMENT ON COLUMN "gl_balance_snapshot"."as_of_date" IS 'Inclusive business-date close.';
+COMMENT ON COLUMN "gl_balance_snapshot"."signed_balance" IS 'Debit-positive, credit-negative closing position.';
 
 -- One single-currency journal for one legal entity.
 CREATE TABLE "journal" (
@@ -453,6 +469,21 @@ COMMENT ON COLUMN "account_balance_snapshot"."account_id" IS 'Account summarized
 COMMENT ON COLUMN "account_balance_snapshot"."as_of_date" IS 'Business date of the snapshot.';
 COMMENT ON COLUMN "account_balance_snapshot"."balance_amount" IS 'Signed deposit funds or credit-card/term-loan amount owed, according to product kind.';
 
+-- One customer account mapped to its ledger control account.
+CREATE TABLE "account_gl_mapping" (
+  "account_gl_mapping_id" VARCHAR NOT NULL,
+  "account_id" VARCHAR NOT NULL,
+  "gl_account_id" VARCHAR NOT NULL,
+  PRIMARY KEY ("account_gl_mapping_id"),
+  UNIQUE ("account_id"),
+  FOREIGN KEY ("account_id") REFERENCES "account" ("account_id"),
+  FOREIGN KEY ("gl_account_id") REFERENCES "gl_account" ("gl_account_id")
+);
+COMMENT ON TABLE "account_gl_mapping" IS 'One customer account mapped to its ledger control account. Grain: One customer account mapped to its ledger control account.';
+COMMENT ON COLUMN "account_gl_mapping"."account_gl_mapping_id" IS 'Stable synthetic identifier.';
+COMMENT ON COLUMN "account_gl_mapping"."account_id" IS 'Customer account represented.';
+COMMENT ON COLUMN "account_gl_mapping"."gl_account_id" IS 'Control ledger account.';
+
 -- One customer role on an account for an interval.
 CREATE TABLE "account_holder" (
   "account_holder_id" VARCHAR NOT NULL,
@@ -481,6 +512,7 @@ CREATE TABLE "account_status_event" (
   "effective_at" TIMESTAMP NOT NULL,
   "reason" VARCHAR NOT NULL,
   PRIMARY KEY ("account_status_event_id"),
+  UNIQUE ("account_id", "effective_at"),
   FOREIGN KEY ("account_id") REFERENCES "account" ("account_id")
 );
 COMMENT ON TABLE "account_status_event" IS 'A lifecycle change for an account. Grain: One account status event.';
@@ -696,6 +728,7 @@ CREATE TABLE "card_status_event" (
   "status" VARCHAR NOT NULL CHECK ("status" IN ('ISSUED', 'ACTIVE', 'BLOCKED', 'EXPIRED', 'CLOSED')),
   "effective_at" TIMESTAMP NOT NULL,
   PRIMARY KEY ("card_status_event_id"),
+  UNIQUE ("card_id", "effective_at"),
   FOREIGN KEY ("card_id") REFERENCES "card" ("card_id")
 );
 COMMENT ON TABLE "card_status_event" IS 'A change in a card lifecycle. Grain: One card status event.';
@@ -896,7 +929,7 @@ COMMENT ON COLUMN "loan_schedule_item"."interest_due" IS 'Nonnegative supplied i
 CREATE TABLE "payment_event" (
   "payment_event_id" VARCHAR NOT NULL,
   "payment_order_id" VARCHAR NOT NULL,
-  "status" VARCHAR NOT NULL CHECK ("status" IN ('RECEIVED', 'VALIDATED', 'POSTED', 'SETTLED', 'FAILED', 'CANCELLED')),
+  "status" VARCHAR NOT NULL CHECK ("status" IN ('RECEIVED', 'VALIDATED', 'POSTED', 'SETTLED', 'FAILED', 'CANCELLED', 'REVERSED', 'RETURNED')),
   "occurred_at" TIMESTAMP NOT NULL,
   "reason_code" VARCHAR NOT NULL,
   PRIMARY KEY ("payment_event_id"),

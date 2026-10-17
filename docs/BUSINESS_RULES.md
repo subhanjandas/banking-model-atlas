@@ -230,3 +230,27 @@ Normal balance is DEBIT for ASSET and EXPENSE, CREDIT for LIABILITY, EQUITY and 
 
 Applies to: `gl_account`, `journal_line`.
 
+## R39 — cross_row
+
+Full internal reversals follow POSTED; full outbound returns follow SETTLED. Preserve original entries and append one equal opposite entry per original entry, on the same account and a later or equal business date. Partial and repeated reversals are excluded.
+
+Applies to: `payment_order`, `payment_event`, `account_entry`.
+
+## R40 — cross_row
+
+Complete event histories begin in the declared initial state and follow the explicit transition matrix in lifecycle_transitions.json. Effective timestamps are unique per subject; closed and terminal payment states cannot reopen.
+
+Applies to: `payment_event`, `account_status_event`, `card_status_event`.
+
+## R41 — cross_row
+
+For every chart account, closing debit-positive balance equals opening balance plus posted debits minus credits strictly after the opening date and through the closing date. Both trial balances sum to zero.
+
+Applies to: `gl_account`, `gl_balance_snapshot`, `journal`, `journal_line`.
+
+## R42 — cross_row
+
+Every customer account maps to one control account and every booked entry has complete allocations to that control account. Signed account balances reconcile to control balances at opening and closing. Deposit balances are negated for debit-positive accounting.
+
+Applies to: `account_gl_mapping`, `account_balance_snapshot`, `account_entry`, `posting_link`, `gl_balance_snapshot`.
+

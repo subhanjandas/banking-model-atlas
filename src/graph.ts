@@ -15,9 +15,9 @@ export function graphElements(state:ViewState):ElementDefinition[]{
  }
  const domains=model.domains.filter(d=>entities.some(e=>e.domain===d.id));
  const nodes:ElementDefinition[]=[];
- // Each domain occupies its own fixed-width tile. Three rows of entities fit the largest domain.
+ // Each domain occupies its own fixed-width tile. Four rows accommodate the accounting domain.
  domains.forEach((d,di)=>{
-  const members=entities.filter(e=>e.domain===d.id),cx=(di%3)*570,cy=Math.floor(di/3)*435;
+  const members=entities.filter(e=>e.domain===d.id),cx=(di%3)*570,cy=Math.floor(di/3)*545;
   nodes.push({data:{id:'group_'+d.id,label:d.label.toUpperCase(),kind:'group',color:d.color}});
   members.forEach((e,i)=>nodes.push({data:{id:e.id,parent:'group_'+d.id,kind:'entity',color:d.color,label:e.id+'\n\nPK  '+e.primary_key[0]+'\n'+e.columns.length+' columns · '+e.rule_ids.length+' rules'},position:{x:cx+(i%2)*252,y:cy+Math.floor(i/2)*115}}));
  });

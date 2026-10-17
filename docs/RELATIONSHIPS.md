@@ -96,3 +96,6 @@ Read each row from the referencing table to the referenced table. Reverse cardin
 | `account_entry__payment_order_id` | `account_entry.payment_order_id` | `payment_order.payment_order_id` | zero_or_one | zero_or_many | Deposit payment instruction behind this entry, if any. |
 | `account_entry__loan_disbursement_id` | `account_entry.loan_disbursement_id` | `loan_disbursement.loan_disbursement_id` | zero_or_one | zero_or_many | Loan draw behind this principal or deposit entry, if any. |
 | `account_entry__loan_repayment_id` | `account_entry.loan_repayment_id` | `loan_repayment.loan_repayment_id` | zero_or_one | zero_or_many | Loan repayment behind a principal reduction, if any. |
+| `gl_balance_snapshot__gl_account_id` | `gl_balance_snapshot.gl_account_id` | `gl_account.gl_account_id` | exactly_one | zero_or_many | Connect the reconciliation record to its represented account. |
+| `account_gl_mapping__account_id` | `account_gl_mapping.account_id` | `account.account_id` | exactly_one | zero_or_one | Connect the reconciliation record to its represented account. |
+| `account_gl_mapping__gl_account_id` | `account_gl_mapping.gl_account_id` | `gl_account.gl_account_id` | exactly_one | zero_or_many | Connect the reconciliation record to its represented account. |

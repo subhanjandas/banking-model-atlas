@@ -279,11 +279,11 @@ A lifecycle change for an account.
 | `effective_at` | `timestamp` | false | internal | UTC effective time. |
 | `reason` | `string` | false | internal | Human-readable reason for the change. |
 
-**Unique keys:** Primary key only.
+**Unique keys:** account_id, effective_at
 
 **Notes:** The latest event defines current status; historical entries are not rejected using current status.
 
-**Rules:** R17, R20
+**Rules:** R17, R20, R40
 
 ## credit_facility
 
@@ -388,11 +388,11 @@ A change in a card lifecycle.
 | `status` | `string` | false | internal | New lifecycle status. Allowed: ISSUED, ACTIVE, BLOCKED, EXPIRED, CLOSED. |
 | `effective_at` | `timestamp` | false | internal | UTC effective time. |
 
-**Unique keys:** Primary key only.
+**Unique keys:** card_id, effective_at
 
 **Notes:** Replacement does not move old transactions onto the new card.
 
-**Rules:** R17
+**Rules:** R17, R40
 
 ## merchant_category
 
@@ -516,7 +516,7 @@ An immutable customer-account movement used for statement presentation.
 
 **Notes:** Customer-facing account entries form a subledger view. The separate journal and posting_link entities support accounting and reconciliation; the model is not a complete bank ledger platform.
 
-**Rules:** R09, R10, R11, R12, R13, R15, R26, R32, R33, R35
+**Rules:** R09, R10, R11, R12, R13, R15, R26, R32, R33, R35, R39, R42
 
 ## payment
 
@@ -609,7 +609,7 @@ A supplied end-of-day account balance.
 
 **Notes:** A snapshot is a reconciliation reference, not a second source of transactions. Opening positions are required to rebuild balances.
 
-**Rules:** R15
+**Rules:** R15, R42
 
 ## dispute_reason
 
@@ -887,7 +887,7 @@ An instruction to move funds from a deposit account.
 
 **Notes:** Status comes from payment_event. Internal movements have two customer-account entries; external ones have one.
 
-**Rules:** R25, R26, R27, R28
+**Rules:** R25, R26, R27, R28, R39
 
 ## payment_event
 
@@ -901,7 +901,7 @@ A lifecycle event for a deposit payment instruction.
 |---|---|---|---|---|
 | `payment_event_id` | `string` | false | identifier | Stable synthetic identifier for payment event. |
 | `payment_order_id` | `string` | false | identifier | Instruction being progressed. |
-| `status` | `string` | false | internal | New execution state. Allowed: RECEIVED, VALIDATED, POSTED, SETTLED, FAILED, CANCELLED. |
+| `status` | `string` | false | internal | New execution state. Allowed: RECEIVED, VALIDATED, POSTED, SETTLED, FAILED, CANCELLED, REVERSED, RETURNED. |
 | `occurred_at` | `timestamp` | false | internal | UTC event time. |
 | `reason_code` | `string` | false | internal | Project-local processing reason. |
 
@@ -909,7 +909,7 @@ A lifecycle event for a deposit payment instruction.
 
 **Notes:** Latest event gives status. Posting and external settlement are separate milestones.
 
-**Rules:** R26, R27, R29
+**Rules:** R26, R27, R29, R39, R40
 
 ## payment_settlement
 
@@ -1118,7 +1118,7 @@ An account in the fictional bank chart of accounts.
 
 **Notes:** This is a small illustrative chart, not a regulatory chart of accounts.
 
-**Rules:** R38
+**Rules:** R38, R41
 
 ## journal
 
@@ -1142,7 +1142,7 @@ A set of accounting lines posted together.
 
 **Notes:** Every POSTED journal must balance independently. Journals are immutable after posting; corrections use new journals.
 
-**Rules:** R34, R35
+**Rules:** R34, R35, R41
 
 ## journal_line
 
@@ -1165,7 +1165,7 @@ One debit or credit within an accounting journal.
 
 **Notes:** A journal has at least two lines when posted. Bank general-ledger balances and customer-account balances have different meanings.
 
-**Rules:** R34, R35, R38
+**Rules:** R34, R35, R38, R41
 
 ## posting_link
 
@@ -1186,7 +1186,7 @@ A reconciliation mapping from customer-account activity to a ledger line.
 
 **Notes:** The mapped line uses the same debit/credit direction and currency as the account entry. Counterpart ledger lines need not have customer-account entries.
 
-**Rules:** R35
+**Rules:** R35, R42
 
 ## reconciliation_run
 
@@ -1236,4 +1236,45 @@ A match or exception recorded by a reconciliation run.
 **Notes:** References are conditional on run scope. A reconciliation result is evidence, not a financial posting.
 
 **Rules:** R36
+
+## gl_balance_snapshot
+
+One independently supplied ledger account balance at a business-date close.
+
+**Grain:** One independently supplied ledger account balance at a business-date close.
+
+**Primary key:** gl_balance_snapshot_id
+
+| Column | Type | Nullable | Classification | Definition |
+|---|---|---|---|---|
+| `gl_balance_snapshot_id` | `string` | false | identifier | Stable synthetic identifier. |
+| `gl_account_id` | `string` | false | identifier | Ledger account being reconciled. |
+| `as_of_date` | `date` | false | internal | Inclusive business-date close. |
+| `signed_balance` | `decimal(18,2)` | false | financial | Debit-positive, credit-negative closing position. |
+
+**Unique keys:** gl_account_id, as_of_date
+
+**Notes:** Single CAD legal entity; balances use debit-positive signed amounts.
+
+**Rules:** R41, R42
+
+## account_gl_mapping
+
+One customer account mapped to its ledger control account.
+
+**Grain:** One customer account mapped to its ledger control account.
+
+**Primary key:** account_gl_mapping_id
+
+| Column | Type | Nullable | Classification | Definition |
+|---|---|---|---|---|
+| `account_gl_mapping_id` | `string` | false | identifier | Stable synthetic identifier. |
+| `account_id` | `string` | false | identifier | Customer account represented. |
+| `gl_account_id` | `string` | false | identifier | Control ledger account. |
+
+**Unique keys:** account_id
+
+**Notes:** Single CAD legal entity; balances use debit-positive signed amounts.
+
+**Rules:** R42
 

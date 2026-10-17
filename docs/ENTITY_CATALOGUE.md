@@ -139,4 +139,6 @@ Double-entry journals, account-entry mappings and reconciliation exceptions.
 | `posting_link` | A reconciliation mapping from customer-account activity to a ledger line. | One allocation of an account entry to a journal line. |
 | `reconciliation_run` | A recorded comparison between two financial record sets. | One reconciliation execution for one business date and scope. |
 | `reconciliation_item` | A match or exception recorded by a reconciliation run. | One comparison outcome within one run. |
+| `gl_balance_snapshot` | One independently supplied ledger account balance at a business-date close. | One independently supplied ledger account balance at a business-date close. |
+| `account_gl_mapping` | One customer account mapped to its ledger control account. | One customer account mapped to its ledger control account. |
 

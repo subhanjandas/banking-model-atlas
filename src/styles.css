@@ -14,3 +14,30 @@
 
 /* Keep small instructional text readable against the quiet canvas. */
 .canvas-heading p,.welcome-panel>p,.how-to p,.column-card>p,.rule-card p,.relationship-detail>p,.panel-help{color:#65745e}.breadcrumb,.eyebrow,.section-label,.sidebar-heading,.inspector-top,.column-meta,.canvas-note,.view-summary,.statusbar,.journey-strip>p{color:#6d7a64}.classification{color:#637455}.column-result>span,.reference-link,.read-guide,.sidebar-footer small,.welcome-stats span{color:#65785d}.entity-sublist>button{color:#607457}.graph-controls>span,.reset-button,.omitted-note{color:#687a5b}
+
+/* Dusk: slate surfaces, warm text and muted sage accents. */
+.theme-toggle{padding:8px!important;min-width:34px;flex-shrink:0}
+:root[data-theme=dark]{color-scheme:dark;--ink:#e0e8e3;--muted:#abbcb4;--line:#3a4849;--green:#a7cbb5;--soft:#34473f;color:#dce6df;background:#202a2c}
+[data-theme=dark] body,[data-theme=dark] .app,[data-theme=dark] .main{background:#202a2c;color:#dce6df}
+[data-theme=dark] .topbar,[data-theme=dark] .sidebar,[data-theme=dark] .inspector,[data-theme=dark] .bottom-guide,[data-theme=dark] .journey-strip,[data-theme=dark] .menu-popover{background:#263234;border-color:#3a4849}
+[data-theme=dark] .graph-stage{background-color:#202a2c;background-image:radial-gradient(#455451 1px,transparent 1px)}
+[data-theme=dark] h1,[data-theme=dark] h2,[data-theme=dark] .brand,[data-theme=dark] .welcome-panel h2,[data-theme=dark] .welcome-stats b,[data-theme=dark] .how-to b,[data-theme=dark] .column-heading code,[data-theme=dark] .entity-intro h2{color:#e1e9df}
+[data-theme=dark] p,[data-theme=dark] small,[data-theme=dark] code,[data-theme=dark] .column-card>p,[data-theme=dark] .rule-card p,[data-theme=dark] .panel-help,[data-theme=dark] .welcome-panel>p,[data-theme=dark] .how-to p,[data-theme=dark] .relationship-detail>p,[data-theme=dark] .entity-intro>p{color:#b5c3ba}
+[data-theme=dark] .eyebrow,[data-theme=dark] .breadcrumb,[data-theme=dark] .section-label,[data-theme=dark] .sidebar-heading,[data-theme=dark] .inspector-top,[data-theme=dark] .column-meta,[data-theme=dark] .view-summary,[data-theme=dark] .statusbar,[data-theme=dark] .welcome-stats span,[data-theme=dark] .domain-button,[data-theme=dark] .journey-link,[data-theme=dark] .entity-sublist>button,[data-theme=dark] .read-guide,[data-theme=dark] .reference-link,[data-theme=dark] .journey-steps>button,[data-theme=dark] .strip-title{color:#b2c5b8}
+[data-theme=dark] button:hover,[data-theme=dark] a:hover{color:#d6eacb}
+[data-theme=dark] .button,[data-theme=dark] .search-box,[data-theme=dark] .view-switch,[data-theme=dark] .graph-controls,[data-theme=dark] .canvas-note,[data-theme=dark] .omitted-note,[data-theme=dark] .endpoint,[data-theme=dark] .relationship-card,[data-theme=dark] .focus-button{background:#2d3b3d;border-color:#465653;color:#c3d5c7}
+[data-theme=dark] .search-box input{color:#e0e8e3}
+[data-theme=dark] .primary,[data-theme=dark] .brand-mark{background:#476c5d;color:#f1f5e9}
+[data-theme=dark] .view-switch button.active,[data-theme=dark] .nav-all.active,[data-theme=dark] .domain-button.active,[data-theme=dark] .journey-link.active,[data-theme=dark] .journey-steps>button.active,[data-theme=dark] .entity-sublist>button.active{background:#354d43;color:#d3e5c9}
+[data-theme=dark] .grain,[data-theme=dark] .scope-note,[data-theme=dark] .inspector-note,[data-theme=dark] .illustration-core,[data-theme=dark] .count,[data-theme=dark] .classification,[data-theme=dark] .enum-values span{background:#303f3b;border-color:#4b6052;color:#c0d1b7}
+[data-theme=dark] .rule-status,[data-theme=dark] .key{background:#484334;color:#e4d49e}
+[data-theme=dark] .key.fk,[data-theme=dark] .classification.financial{background:#3c4055;color:#c7c2e4}
+[data-theme=dark] .classification.personal{background:#4d3e39;color:#e1bba9}
+[data-theme=dark] .highlight-column{background:#494634;box-shadow:inset 0 0 0 1px #8d8057}
+[data-theme=dark] .inspector-tabs button{color:#b3c2b5}
+[data-theme=dark] .inspector-tabs button.active{color:#d2e2be;border-bottom-color:#b0c89a}
+[data-theme=dark] .column-card,[data-theme=dark] .rule-card{border-color:#3a4849}
+[data-theme=dark] .scope-note b,[data-theme=dark] .grain p,[data-theme=dark] .inspector-note b,[data-theme=dark] .relationship-card b,[data-theme=dark] .rule-card>span{color:#c7dabf}
+[data-theme=dark] .menu-note,[data-theme=dark] .sidebar-footer,[data-theme=dark] .statusbar{background:#263234;color:#aabdb1}
+[data-theme=dark] .orbit{border-color:#536452}[data-theme=dark] .orbit-point{border-color:#263234}
+[data-theme=dark] ::-webkit-scrollbar-thumb{background:#52635b}

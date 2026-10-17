@@ -62,8 +62,8 @@
         "R26"
       ],
       "description": "Posted deposit orders have exactly the expected customer-account entries.",
-      "sql": "WITH latest AS (SELECT payment_order_id,status FROM payment_event QUALIFY row_number() OVER(PARTITION BY payment_order_id ORDER BY occurred_at DESC)=1),\ncounts AS (SELECT o.payment_order_id,o.kind,o.amount,o.source_account_id,o.destination_account_id,o.beneficiary_id,o.currency_id,\ncount(e.account_entry_id) AS n,\ncount(e.account_entry_id) FILTER(WHERE e.account_id=o.source_account_id AND e.direction='DEBIT' AND e.amount=o.amount AND a.currency_id=o.currency_id) AS debits,\ncount(e.account_entry_id) FILTER(WHERE e.account_id=o.destination_account_id AND e.direction='CREDIT' AND e.amount=o.amount AND a.currency_id=o.currency_id) AS credits\nFROM payment_order o JOIN latest s USING(payment_order_id) LEFT JOIN account_entry e ON e.payment_order_id=o.payment_order_id AND e.kind='DEPOSIT_PAYMENT'\nLEFT JOIN account a ON a.account_id=e.account_id WHERE s.status IN ('POSTED','SETTLED') GROUP BY ALL)\nSELECT payment_order_id FROM counts WHERE debits<>1 OR (kind='INTERNAL' AND (n<>2 OR credits<>1 OR destination_account_id IS NULL OR source_account_id=destination_account_id OR beneficiary_id IS NOT NULL)) OR (kind='OUTBOUND' AND (n<>1 OR beneficiary_id IS NULL OR destination_account_id IS NOT NULL))",
-      "coverage_limit": "Only final POSTED/SETTLED orders are checked; transition matrices, account product eligibility and failed-order reversals need additional checks."
+      "sql": "WITH latest AS (SELECT payment_order_id,status FROM payment_event QUALIFY row_number() OVER(PARTITION BY payment_order_id ORDER BY occurred_at DESC)=1),\ncounts AS (SELECT o.payment_order_id,o.kind,o.amount,o.source_account_id,o.destination_account_id,o.beneficiary_id,o.currency_id,\ncount(e.account_entry_id) AS n,\ncount(e.account_entry_id) FILTER(WHERE e.account_id=o.source_account_id AND e.direction='DEBIT' AND e.amount=o.amount AND a.currency_id=o.currency_id) AS debits,\ncount(e.account_entry_id) FILTER(WHERE e.account_id=o.destination_account_id AND e.direction='CREDIT' AND e.amount=o.amount AND a.currency_id=o.currency_id) AS credits\nFROM payment_order o JOIN latest s USING(payment_order_id) LEFT JOIN account_entry e ON e.payment_order_id=o.payment_order_id AND e.kind='DEPOSIT_PAYMENT'\nLEFT JOIN account a ON a.account_id=e.account_id WHERE s.status IN ('POSTED','SETTLED','REVERSED','RETURNED') GROUP BY ALL)\nSELECT payment_order_id FROM counts WHERE debits<>1 OR (kind='INTERNAL' AND (n<>2 OR credits<>1 OR destination_account_id IS NULL OR source_account_id=destination_account_id OR beneficiary_id IS NOT NULL)) OR (kind='OUTBOUND' AND (n<>1 OR beneficiary_id IS NULL OR destination_account_id IS NOT NULL))",
+      "coverage_limit": "Checks booked entry shape, including subsequently corrected payments. Does not validate product eligibility."
     },
     {
       "id": "C08",
@@ -71,8 +71,8 @@
         "R27"
       ],
       "description": "Outbound settlement agrees with instructions and SETTLED status has evidence.",
-      "sql": "SELECT s.payment_settlement_id AS item FROM payment_settlement s JOIN payment_order o USING(payment_order_id)\nWHERE o.kind<>'OUTBOUND' OR s.settled_amount<>o.amount OR s.currency_id<>o.currency_id\nUNION ALL SELECT o.payment_order_id FROM payment_order o JOIN (SELECT payment_order_id,status FROM payment_event QUALIFY row_number() OVER(PARTITION BY payment_order_id ORDER BY occurred_at DESC)=1) e USING(payment_order_id)\nLEFT JOIN payment_settlement s USING(payment_order_id) WHERE e.status='SETTLED' AND (s.payment_settlement_id IS NULL OR o.kind<>'OUTBOUND')",
-      "coverage_limit": "Partial settlement, returns and settlement-date calendars are excluded."
+      "sql": "SELECT s.payment_settlement_id AS item FROM payment_settlement s JOIN payment_order o USING(payment_order_id)\nWHERE o.kind<>'OUTBOUND' OR s.settled_amount<>o.amount OR s.currency_id<>o.currency_id\nUNION ALL SELECT o.payment_order_id FROM payment_order o JOIN (SELECT payment_order_id,status FROM payment_event QUALIFY row_number() OVER(PARTITION BY payment_order_id ORDER BY occurred_at DESC)=1) e USING(payment_order_id)\nLEFT JOIN payment_settlement s USING(payment_order_id) WHERE e.status IN ('SETTLED','RETURNED') AND (s.payment_settlement_id IS NULL OR o.kind<>'OUTBOUND')",
+      "coverage_limit": "Full outbound settlement and return only; partial settlement and rail calendars are excluded."
     },
     {
       "id": "C09",
@@ -119,6 +119,60 @@
       "description": "Posted transaction and journal amounts are strictly positive.",
       "sql": "SELECT 'entry:'||account_entry_id AS item FROM account_entry WHERE amount<=0\nUNION ALL SELECT 'card:'||card_transaction_id FROM card_transaction WHERE amount<=0\nUNION ALL SELECT 'line:'||journal_line_id FROM journal_line WHERE amount<=0\nUNION ALL SELECT 'order:'||payment_order_id FROM payment_order WHERE amount<=0",
       "coverage_limit": "Applies to these four tables only; signed balances and nonnegative schedule amounts follow separate conventions."
+    },
+    {
+      "id": "C14",
+      "rule_ids": [
+        "R39"
+      ],
+      "description": "Reversals preserve the original and negate its exact account movement.",
+      "sql": "SELECT r.account_entry_id FROM account_entry r LEFT JOIN account_entry o ON o.account_entry_id=r.reverses_entry_id WHERE r.kind='REVERSAL' AND (o.account_entry_id IS NULL OR o.kind='REVERSAL' OR o.account_id<>r.account_id OR o.amount<>r.amount OR o.direction=r.direction OR r.posted_on<o.posted_on)\nUNION ALL SELECT reverses_entry_id FROM account_entry WHERE kind='REVERSAL' GROUP BY reverses_entry_id HAVING count(*)<>1",
+      "coverage_limit": "Full reversals only; persistence-level immutability is not enforced by this analytical database."
+    },
+    {
+      "id": "C15",
+      "rule_ids": [
+        "R39"
+      ],
+      "description": "Terminal corrected payments have exactly one reversal per original entry and correct payment kind.",
+      "sql": "WITH latest AS (SELECT payment_order_id,status FROM payment_event QUALIFY row_number() OVER(PARTITION BY payment_order_id ORDER BY occurred_at DESC)=1)\nSELECT o.payment_order_id FROM payment_order o JOIN latest s USING(payment_order_id) WHERE (s.status='REVERSED' AND o.kind<>'INTERNAL') OR (s.status='RETURNED' AND o.kind<>'OUTBOUND')\nUNION ALL SELECT e.account_entry_id FROM account_entry e JOIN latest s USING(payment_order_id) LEFT JOIN account_entry r ON r.reverses_entry_id=e.account_entry_id WHERE e.kind='DEPOSIT_PAYMENT' GROUP BY e.account_entry_id,s.status HAVING count(r.account_entry_id)<>CASE WHEN s.status IN ('REVERSED','RETURNED') THEN 1 ELSE 0 END",
+      "coverage_limit": "Does not model partial returns, fees, network messages or reversal-of-reversal."
+    },
+    {
+      "id": "C16",
+      "rule_ids": [
+        "R40"
+      ],
+      "description": "payment_event history follows its explicit transition matrix.",
+      "sql": "WITH history AS (SELECT *,lag(status) OVER(PARTITION BY payment_order_id ORDER BY occurred_at) previous FROM payment_event) SELECT payment_event_id FROM history WHERE (previous IS NULL AND status<>'RECEIVED') OR (previous IS NOT NULL AND NOT ((previous='RECEIVED' AND status IN ('VALIDATED','FAILED','CANCELLED')) OR (previous='VALIDATED' AND status IN ('POSTED','FAILED','CANCELLED')) OR (previous='POSTED' AND status IN ('SETTLED','REVERSED')) OR (previous='SETTLED' AND status IN ('RETURNED'))))",
+      "coverage_limit": "Requires complete effective-time histories. Corrections, late arrivals and same-time sequencing are not supported."
+    },
+    {
+      "id": "C17",
+      "rule_ids": [
+        "R40"
+      ],
+      "description": "account_status_event history follows its explicit transition matrix.",
+      "sql": "WITH history AS (SELECT *,lag(status) OVER(PARTITION BY account_id ORDER BY effective_at) previous FROM account_status_event) SELECT account_status_event_id FROM history WHERE (previous IS NULL AND status<>'OPEN') OR (previous IS NOT NULL AND NOT ((previous='OPEN' AND status IN ('RESTRICTED','CLOSED')) OR (previous='RESTRICTED' AND status IN ('OPEN','CLOSED'))))",
+      "coverage_limit": "Requires complete effective-time histories. Corrections, late arrivals and same-time sequencing are not supported."
+    },
+    {
+      "id": "C18",
+      "rule_ids": [
+        "R40"
+      ],
+      "description": "card_status_event history follows its explicit transition matrix.",
+      "sql": "WITH history AS (SELECT *,lag(status) OVER(PARTITION BY card_id ORDER BY effective_at) previous FROM card_status_event) SELECT card_status_event_id FROM history WHERE (previous IS NULL AND status<>'ISSUED') OR (previous IS NOT NULL AND NOT ((previous='ISSUED' AND status IN ('ACTIVE','CLOSED')) OR (previous='ACTIVE' AND status IN ('BLOCKED','EXPIRED','CLOSED')) OR (previous='BLOCKED' AND status IN ('ACTIVE','EXPIRED','CLOSED')) OR (previous='EXPIRED' AND status IN ('CLOSED'))))",
+      "coverage_limit": "Requires complete effective-time histories. Corrections, late arrivals and same-time sequencing are not supported."
+    },
+    {
+      "id": "C19",
+      "rule_ids": [
+        "R42"
+      ],
+      "description": "Every account and entry has complete, correctly targeted ledger mappings.",
+      "sql": "SELECT a.account_id AS item FROM account a LEFT JOIN account_gl_mapping m USING(account_id) WHERE m.account_id IS NULL\nUNION ALL SELECT e.account_entry_id FROM account_entry e LEFT JOIN posting_link p USING(account_entry_id) GROUP BY e.account_entry_id,e.amount HAVING coalesce(sum(p.allocated_amount),0)<>e.amount\nUNION ALL SELECT p.posting_link_id FROM posting_link p JOIN account_entry e USING(account_entry_id) JOIN account_gl_mapping m USING(account_id) JOIN journal_line l USING(journal_line_id) WHERE l.gl_account_id<>m.gl_account_id",
+      "coverage_limit": "Completeness is relative to supplied source rows, not an external bank feed."
     }
   ]
 }

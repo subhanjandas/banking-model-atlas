@@ -37,7 +37,7 @@ test('both journeys, focus mode, reset, and history work',async({page})=>{
 test('downloads contain model and dictionary data',async({page})=>{
  await page.goto('./');await page.getByText('Download',{exact:true}).click();
  const pending=page.waitForEvent('download');await page.getByRole('button',{name:/Model JSON/}).click();const dl=await pending;
- const data=JSON.parse(await readFile((await dl.path())!,'utf8'));expect(data.entities).toHaveLength(54);expect(data.relationships).toHaveLength(92);
+ const data=JSON.parse(await readFile((await dl.path())!,'utf8'));expect(data.entities).toHaveLength(56);expect(data.relationships).toHaveLength(95);
  await page.getByText('Download',{exact:true}).click();const pending2=page.waitForEvent('download');await page.getByRole('button',{name:/Data dictionary/}).click();const dl2=await pending2;expect(await readFile((await dl2.path())!,'utf8')).toContain('minimum_due');
  await page.getByText('Download',{exact:true}).click();const pending3=page.waitForEvent('download');await page.getByRole('button',{name:/Current graph/}).click();const dl3=await pending3;expect((await readFile((await dl3.path())!)).subarray(1,4).toString()).toBe('PNG');
 });
@@ -64,4 +64,27 @@ test('expanded journeys and executable schema download',async({page})=>{
  const pending=page.waitForEvent('download');await page.getByRole('button',{name:/DuckDB schema/}).click();
  const file=await pending;const sql=await readFile((await file.path())!,'utf8');
  expect(sql).toContain('CREATE TABLE "journal"');expect(sql).toContain('CREATE TABLE "loan_contract"');
+});
+
+test('dusk theme persists, preserves navigation and exports its canvas',async({page})=>{
+ await page.emulateMedia({colorScheme:'light'});await page.goto('./');
+ await page.getByRole('button',{name:'Switch to dark theme'}).click();
+ await expect(page.locator('html')).toHaveAttribute('data-theme','dark');
+ await page.screenshot({path:'test-results/dark-overview.png',fullPage:true});
+ await page.goto('./?view=tables&entity=gl_balance_snapshot');
+ await expect(page.locator('.entity-intro h2')).toHaveText('Ledger Balance Snapshot');
+ await expect(page.locator('html')).toHaveAttribute('data-theme','dark');
+ await page.screenshot({path:'test-results/dark-inspector.png',fullPage:true});
+ await page.getByText('Download',{exact:true}).click();const pending=page.waitForEvent('download');
+ await page.getByRole('button',{name:/Current graph/}).click();const file=await pending;
+ expect((await readFile((await file.path())!)).subarray(1,4).toString()).toBe('PNG');
+ await page.setViewportSize({width:390,height:844});
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+ await page.getByRole('button',{name:'Switch to light theme'}).click();await page.reload();
+ await expect(page.locator('html')).toHaveAttribute('data-theme','light');
+});
+test('first visit honors the system dark preference',async({page})=>{
+ await page.emulateMedia({colorScheme:'dark'});await page.goto('./');
+ await expect(page.locator('html')).toHaveAttribute('data-theme','dark');
+ await expect(page.getByRole('button',{name:'Switch to light theme'})).toBeVisible();
 });
