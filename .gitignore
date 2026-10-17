@@ -9,3 +9,4 @@ dist/
 *.duckdb
 playwright-report/
 test-results/
+live-evidence/

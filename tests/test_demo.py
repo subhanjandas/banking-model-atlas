@@ -4,7 +4,7 @@ import unittest
 from pathlib import Path
 import duckdb
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
-from run_demo import database, report, violations, CHECKS, MODEL
+from run_demo import database, report, violations, CHECKS, MODEL, FIXTURE
 
 class DemoTests(unittest.TestCase):
     def test_balances_and_schema(self):
@@ -14,6 +14,8 @@ class DemoTests(unittest.TestCase):
             self.assertEqual(len(db.execute('SHOW TABLES').fetchall()),80)
     def test_check_metadata(self):
         self.assertEqual(len({c['id'] for c in CHECKS}),19)
+        for e in MODEL['entities']:
+            self.assertEqual(e['example_coverage']=='sample_records',bool(FIXTURE['tables'].get(e['id'])))
         rules={r['id'] for r in MODEL['rules']}
         for c in CHECKS:
             self.assertTrue(c['coverage_limit'])

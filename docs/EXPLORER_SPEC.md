@@ -1,6 +1,6 @@
 # Explorer specification
 
-Status: implemented in application 0.3.0. This is the original interaction contract; observed test results are recorded in VALIDATION.md.
+Status: implemented in application 1.0.0. This is the original interaction contract; observed test results are recorded in VALIDATION.md.
 
 ## Main task
 
@@ -42,7 +42,7 @@ The first layout should be deterministic and grouped by domain. Avoid constantly
 
 ## Definition of done for the first interactive release
 
-1. All 56 entities and 95 relationships derive from the JSON, with no duplicate hard-coded model.
+1. All 80 entities and 128 relationships derive from the JSON, with no duplicate hard-coded model.
 2. Search, domain filtering, neighbour focus and reset work together.
 3. Both journey presets select connected, meaningful subgraphs.
 4. Every entity and edge has a readable inspector; self-references work.

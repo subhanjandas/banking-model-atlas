@@ -1,6 +1,6 @@
 # Executable coverage
 
-Nineteen SQL checks cover selected portions of 42 rule specifications. Every query has a bad-data regression test. Eight additional ledger tests cover complete-period reconciliation, missing snapshots, balanced-but-wrong positions, opening trial imbalance, subledger differences, period boundaries duplicate event timestamps and offsetting customer-account errors.
+Nineteen SQL checks cover selected portions of 46 rule specifications. Every query has a bad-data regression test. Eight additional ledger tests cover complete-period reconciliation, missing snapshots, balanced-but-wrong positions, opening trial imbalance, subledger differences, period boundaries duplicate event timestamps and offsetting customer-account errors.
 
 ## C01 — R34
 

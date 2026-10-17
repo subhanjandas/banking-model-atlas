@@ -20,7 +20,7 @@
     },
     {
       "path": ".gitignore",
-      "sha256": "ebab261a89ac14db14c5cd178b415964d52a3c06863219b984a7673e2627b890"
+      "sha256": "ae536acb342ef2513471f4c5b22abd51bff3e6cf943ddd5ce7e9a8888e7654ca"
     },
     {
       "path": "CHANGELOG.md",
@@ -36,7 +36,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "5e772038243c2f52d179992c425b5c4f64cf4c88f29e41079062abf9a3735103"
+      "sha256": "f92e67825b3fcf1bc8e72bb7d0f92201ad7944f1e0ff88591f60d6b66d6b9cc2"
     },
     {
       "path": "docs/BUSINESS_RULES.md",
@@ -56,11 +56,11 @@
     },
     {
       "path": "docs/EXPLORER_IMPLEMENTATION.md",
-      "sha256": "1670d5897b627cbbc5acc7b7549d054d585c3771288cc5c6aa37814887b9d0cc"
+      "sha256": "3bbae79ef3060896eb83e0f814596d9d775cb22204d7c62a9040cffa61206be5"
     },
     {
       "path": "docs/EXPLORER_SPEC.md",
-      "sha256": "57b3fb1d8869afd9862b4bf98cd146881ee9e36bce4b9f24c27ecffb6216e1cc"
+      "sha256": "818b6f0c49fd38f82853bbd3f1096498d525b62bb83def0f10372ba8263ff69d"
     },
     {
       "path": "docs/INTERVIEW_GUIDE.md",
@@ -108,7 +108,7 @@
     },
     {
       "path": "docs/SQL_AND_DEMO.md",
-      "sha256": "2a61c9d5609f8773e26f08952001932a3bce23d5d1586d5f4c837119a04c1627"
+      "sha256": "285fab15692fe1a3cb0d40962f7f9492d3df91be194563d84e2399899ed3f65a"
     },
     {
       "path": "docs/VALIDATION.md",
@@ -116,7 +116,43 @@
     },
     {
       "path": "docs/VALIDATION_COVERAGE.md",
-      "sha256": "dfeffad65b1c884b2a288fddd941d89b5195cf1bd5b2bced7b103dc25adcf2a4"
+      "sha256": "94ad9ae179c25b0e550b24b89d7eb8e8967a29b0010d292a71d1ed47018a8ac4"
+    },
+    {
+      "path": "docs/assets/dark-overview.png",
+      "sha256": "e03491e03854b692d2ba03c8db99d50f7f92784cc9ef422886e72ab9f8cbe057"
+    },
+    {
+      "path": "docs/assets/explorer-tour.gif",
+      "sha256": "588f24ee9661d0cdc0c4e105774de70ce0944459b3e5809c650355ade4f093eb"
+    },
+    {
+      "path": "docs/assets/fraud-journey.png",
+      "sha256": "d0ac8f479b5242b9f9cfeab4ece545bb079a0bd78343c001d1df36380c11a9b4"
+    },
+    {
+      "path": "docs/assets/hero.svg",
+      "sha256": "3b6e43e453c3a4c9c0c52330e556519bfe65ec2a6a68396c940131fda5475ba8"
+    },
+    {
+      "path": "docs/assets/journey-detail.png",
+      "sha256": "0e8948a04e1e572d077c7261b8b941d0a10834e7ac1c7cf385fb2f50346c8e08"
+    },
+    {
+      "path": "docs/assets/light-overview.png",
+      "sha256": "25799395d02e65bb8f8d3879aa67a679d844edefdc153541ef9980487cbae847"
+    },
+    {
+      "path": "docs/assets/mobile-detail.png",
+      "sha256": "e8378003369a2065d3a9d424c726b32db412479cb4e9252f4249d984319902fe"
+    },
+    {
+      "path": "docs/assets/provenance.json",
+      "sha256": "6d9933c693f7d628e08dbd95cc98a63942f421d43a80086d5d518a2b9eb1ade7"
+    },
+    {
+      "path": "docs/assets/social-preview.png",
+      "sha256": "9da7754b2ceba2d3625b9e3fcae6b430fc13655d3aa32997c7e6527ebe8b719b"
     },
     {
       "path": "examples/reconciliation.sql",
@@ -248,7 +284,7 @@
     },
     {
       "path": "tests/test_demo.py",
-      "sha256": "705022ed80fbc015362a6718bb106215cfa465b1266c96aba9ddb6b613b3800a"
+      "sha256": "e4c4fea806a406de6f148bb63c7a4633d0dfb602a080af5a6c98061abff7003f"
     },
     {
       "path": "tests/test_ledger.py",

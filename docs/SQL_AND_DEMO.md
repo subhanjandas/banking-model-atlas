@@ -7,7 +7,7 @@ python3 -m pip install -r requirements-demo.txt
 python3 replay.py
 ```
 
-`generated/banking.duckdb.sql` creates 56 tables in dependency order. It includes primary keys, unique keys, required columns, enumerated-value checks and non-self foreign keys. Self-referencing links are omitted from the physical constraints and checked by the demo's relationship queries. Run it against a fresh database: it intentionally contains no DROP statements or migration logic.
+`generated/banking.duckdb.sql` creates 80 tables in dependency order. It includes primary keys, unique keys, required columns, enumerated-value checks and non-self foreign keys. Self-referencing links are omitted from the physical constraints and checked by the demo's relationship queries. Run it against a fresh database: it intentionally contains no DROP statements or migration logic.
 
 Money uses DECIMAL(18,2). Fixture amounts are decimal strings. The schema does not magically enforce every rule in the business-rule catalogue. Conditional rules, aggregate balancing and history require separate checks.
 
@@ -28,7 +28,7 @@ The ten supplied loan installments each contain 100 principal and 10 interest. T
 
 ## Repeatability and bad data
 
-`fixtures/banking_scenarios.json` supplies 175 records across 49 tables. Seven tables remain unpopulated: having a table definition does not imply its lifecycle was exercised. `scripts/run_demo.py` builds the database, loads the records, checks 95 relationships, executes 19 financial queries, computes balances from entries and compares them with independently declared expected balances and supplied snapshots.
+`fixtures/banking_scenarios.json` supplies 175 records across 49 tables. Thirty-one tables remain unpopulated: having a table definition does not imply its lifecycle was exercised. `scripts/run_demo.py` builds the database, loads the records, checks 128 relationships, executes 19 financial queries, computes balances from entries and compares them with independently declared expected balances and supplied snapshots.
 
 `tests/test_demo.py` includes a separate bad-data mutation for every check. For example, an excessive refund, an unbalanced journal and an incorrect repayment principal must each be detected. These tests establish specific behavior, not exhaustive banking coverage.
 
