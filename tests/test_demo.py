@@ -11,7 +11,7 @@ class DemoTests(unittest.TestCase):
         with database() as db:
             result=report(db)
             self.assertEqual(result['closing_balances'],{'D1':'2000.00','D2':'0.00','CC1':'50.00','LN1':'900.00'})
-            self.assertEqual(len(db.execute('SHOW TABLES').fetchall()),56)
+            self.assertEqual(len(db.execute('SHOW TABLES').fetchall()),80)
     def test_check_metadata(self):
         self.assertEqual(len({c['id'] for c in CHECKS}),19)
         rules={r['id'] for r in MODEL['rules']}

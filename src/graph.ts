@@ -2,7 +2,7 @@ import type {ElementDefinition} from 'cytoscape';
 import {model,entityById,domainById,visibleModel,type ViewState} from './model';
 export function graphElements(state:ViewState):ElementDefinition[]{
  if(state.view==='domains'){
-  const nodes=model.domains.map((d,i)=>({data:{id:d.id,kind:'domain',color:d.color,label:d.label.toUpperCase()+'\n\n'+model.entities.filter(e=>e.domain===d.id).length+' entities',description:d.description},position:{x:(i%3)*300,y:Math.floor(i/3)*190}}));
+  const nodes=model.domains.map((d,i)=>({data:{id:d.id,kind:'domain',color:d.color,label:d.label.toUpperCase()+'\n\n'+model.entities.filter(e=>e.domain===d.id).length+' entities',description:d.description},position:{x:(i%4)*300,y:Math.floor(i/4)*190}}));
   const pairs=new Map<string,{a:string;b:string;count:number}>();
   model.relationships.forEach(r=>{const a=entityById.get(r.source_entity)!.domain,b=entityById.get(r.target_entity)!.domain;if(a!==b){const [x,y]=[a,b].sort(),key=x+'__'+y;const p=pairs.get(key);if(p)p.count++;else pairs.set(key,{a:x,b:y,count:1});}});
   return [...nodes,...[...pairs].map(([id,p])=>({data:{id:'domain_edge_'+id,source:p.a,target:p.b,kind:'domain_edge',label:p.count+' links'}}))];

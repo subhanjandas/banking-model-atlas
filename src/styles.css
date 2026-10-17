@@ -45,3 +45,5 @@
 [data-theme=dark] .share-button{background:#2d3b3d;border-color:#465653;color:#c3d5c7}
 [data-theme=dark] .graph-controls button,[data-theme=dark] .graph-controls>span,[data-theme=dark] .bottom-guide>button,[data-theme=dark] .version,[data-theme=dark] .grain>span{color:#b7cbb9}
 [data-theme=dark] .graph-stage{background-image:radial-gradient(#394744 0.8px,transparent 0.8px)}
+
+.coverage-badge{font-size:10px;line-height:1.5;color:#566e52;background:#edf3e6;border:1px solid #d6dfcf;border-radius:5px;padding:7px 9px;margin-top:12px}.explorer-help{font-size:10px;line-height:1.7;margin:14px 6px;color:var(--muted)}.explorer-help summary{cursor:pointer;font-weight:600;color:var(--ink)}.explorer-help p{margin-top:9px}.explorer-help a{display:block;margin-top:9px}.journey-strip>p span{display:block;margin-top:4px}[data-theme=dark] .coverage-badge{color:#c4d8bc;background:#32473d;border-color:#4b6052}

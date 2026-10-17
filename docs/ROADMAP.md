@@ -1,17 +1,19 @@
-# Roadmap
+# Release scope and next work
 
-## Delivered
+Application 1.0.0 is the portfolio reference release: 80 entities, 16 domains, ten journeys, light/Dusk themes, typed metadata panels, downloads and a repeatable tested financial scenario.
 
-Application 0.3.0 / model 0.2.0 adds 24 entities to the original 30. Twelve domains and six connected journeys cover cards, onboarding, deposit payments, term lending and selected accounting. The graph retains filters, search, metadata panels, links and downloads. The DuckDB schema and synthetic demonstration are executable.
+## Complete in this release
 
-## Next meaningful extensions
+All 80 tables are validated and created by the DuckDB replay. The original 49 populated tables carry 175 synthetic records. Nineteen SQL checks and independent ledger reconciliation exercise the supplied financial scenario. Fraud, collections, rewards and customer-service additions are schema-only and clearly labeled. Ten journeys explain the relationships; they do not imply ten fully executed operational workflows.
 
-1. Extend the implemented lifecycle checks to ownership overlaps, replacement cycles and late-arriving correction events.
-2. Opening and closing trial balances and control-account reconciliation are implemented for the supplied period. Next: external-source completeness and close exception handling.
-3. Full payment returns and reversals are implemented. Next: partial returns and idempotent ingestion with late-arriving settlement observations.
-4. Introduce a clearly scoped analytical layer, such as daily card balances and payment reconciliation exceptions, with grain-safe queries.
-5. Add migration/version comparison before changing stable identifiers or column semantics.
+## Highest-value next work
 
-More entities should answer a new business question. The project is an original fictional reference model, not an entire core-banking system or a claim of industry-standard compliance.
+1. Add independently specified fixtures and negative tests for the four schema-only domains.
+2. Handle partial payment returns, late-arriving corrections and idempotent source ingestion.
+3. Add effective-time ownership checks, source completeness and model migration/version comparisons.
+4. Add an analytical layer with declared fact-table grain and measured join correctness.
+5. Review accessibility with screen-reader users and optimize large graphs if coverage grows beyond readable domain views.
 
-Application 0.4.0 adds the Dusk theme, 56 entities, 19 SQL checks and complete sample-period ledger reconciliation.
+## Not part of the portfolio finish
+
+A production bank platform, regulatory certification, real customer integrations, multicurrency consolidation, production credit decisions and complete accounting close orchestration. These require separate engineering and domain review.

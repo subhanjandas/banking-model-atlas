@@ -142,3 +142,55 @@ Double-entry journals, account-entry mappings and reconciliation exceptions.
 | `gl_balance_snapshot` | One independently supplied ledger account balance at a business-date close. | One independently supplied ledger account balance at a business-date close. |
 | `account_gl_mapping` | One customer account mapped to its ledger control account. | One customer account mapped to its ledger control account. |
 
+## Fraud operations
+
+Signals, investigations and recorded decisions; an alert is not proof of fraud.
+
+| Entity | Meaning | Grain |
+|---|---|---|
+| `fraud_rule` | A versioned project-local detection rule definition. | One immutable rule version. |
+| `fraud_alert` | A signal requiring review, not a confirmed loss. | One rule-triggered alert about a posted card transaction. |
+| `fraud_case` | An investigation for one customer, potentially grouping several alerts. | One customer fraud investigation. |
+| `fraud_case_alert` | An explicit association between an investigation and a signal. | One alert associated with one case. |
+| `fraud_decision` | A recorded assessment of an investigation. | One dated decision for a fraud case. |
+| `fraud_action` | A recorded requested response to a case decision. | One requested action following a fraud decision. |
+
+## Collections and hardship
+
+Overdue obligations, outreach and agreed support; a promise is not a payment.
+
+| Entity | Meaning | Grain |
+|---|---|---|
+| `delinquency_snapshot` | A supplied point-in-time view of overdue obligations. | One account delinquency assessment for a business date. |
+| `collection_case` | A work item for follow-up on a credit obligation. | One collections case for an account. |
+| `collection_contact` | A recorded outreach attempt. | One contact attempt for a collections case. |
+| `promise_to_pay` | A customer commitment that may or may not be fulfilled. | One recorded payment promise. |
+| `hardship_plan` | An agreed temporary support arrangement. | One version of a hardship arrangement for a collections case. |
+| `collection_case_event` | A historical observation in a collections workflow. | One dated case event. |
+
+## Rewards and loyalty
+
+Enrollment, earning, redemption and points accounting; points are not cash.
+
+| Entity | Meaning | Grain |
+|---|---|---|
+| `reward_program` | A versioned definition of a points offering. | One program version. |
+| `reward_membership` | An account enrollment in a rewards program. | One account enrollment interval. |
+| `reward_earn` | A points earning observation linked to a purchase. | One earning award for a card transaction and membership. |
+| `reward_redemption` | A request to spend points on a benefit. | One redemption request. |
+| `reward_adjustment` | A manual or correction-related change in points. | One signed points adjustment. |
+| `reward_balance_snapshot` | A supplied points position for reconciliation. | One membership points balance at business-date close. |
+
+## Customer service
+
+Requests, complaints, evidence and communication across the customer relationship.
+
+| Entity | Meaning | Grain |
+|---|---|---|
+| `service_request` | A customer request for assistance. | One service request opened by a customer. |
+| `service_request_event` | A dated change or update on a service request. | One service request event. |
+| `complaint` | An expression of dissatisfaction tracked separately from routine assistance. | One complaint linked to a service request. |
+| `complaint_resolution` | A recorded response and outcome for a complaint. | One resolution observation for a complaint. |
+| `communication` | A recorded communication envelope without message content. | One outbound message attempt for a request. |
+| `document_reference` | Metadata describing evidence held outside the model. | One external document reference attached to a request. |
+

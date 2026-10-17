@@ -254,3 +254,27 @@ Every customer account maps to one control account and every booked entry has co
 
 Applies to: `account_gl_mapping`, `account_balance_snapshot`, `account_entry`, `posting_link`, `gl_balance_snapshot`.
 
+## R43 — cross_row
+
+An alert is a signal, not a verdict. Case-alert associations must concern the case customer; a confirmed decision does not automatically book a loss or refund.
+
+Applies to: `fraud_rule`, `fraud_alert`, `fraud_case`, `fraud_case_alert`, `fraud_decision`, `fraud_action`.
+
+## R44 — cross_row
+
+Overdue amounts and days past due are nonnegative. Promises have positive amounts and due dates no earlier than their recorded dates; kept promises require independent payment evidence.
+
+Applies to: `delinquency_snapshot`, `collection_case`, `collection_contact`, `promise_to_pay`, `hardship_plan`, `collection_case_event`.
+
+## R45 — cross_row
+
+Earning and redemption amounts are positive integer points. Membership, purchase and account ownership must agree. Closing points equal opening plus earnings and adjustments minus fulfilled redemptions.
+
+Applies to: `reward_program`, `reward_membership`, `reward_earn`, `reward_redemption`, `reward_adjustment`, `reward_balance_snapshot`.
+
+## R46 — cross_row
+
+Request events and complaint resolutions cannot precede intake. Account-specific requests require a valid customer relationship. Documents are references only and contain no credentials.
+
+Applies to: `service_request`, `service_request_event`, `complaint`, `complaint_resolution`, `communication`, `document_reference`.
+

@@ -99,3 +99,36 @@ Read each row from the referencing table to the referenced table. Reverse cardin
 | `gl_balance_snapshot__gl_account_id` | `gl_balance_snapshot.gl_account_id` | `gl_account.gl_account_id` | exactly_one | zero_or_many | Connect the reconciliation record to its represented account. |
 | `account_gl_mapping__account_id` | `account_gl_mapping.account_id` | `account.account_id` | exactly_one | zero_or_one | Connect the reconciliation record to its represented account. |
 | `account_gl_mapping__gl_account_id` | `account_gl_mapping.gl_account_id` | `gl_account.gl_account_id` | exactly_one | zero_or_many | Connect the reconciliation record to its represented account. |
+| `fraud_alert__card_transaction_id` | `fraud_alert.card_transaction_id` | `card_transaction.card_transaction_id` | exactly_one | zero_or_many | Transaction that raised the signal. |
+| `fraud_alert__fraud_rule_id` | `fraud_alert.fraud_rule_id` | `fraud_rule.fraud_rule_id` | exactly_one | zero_or_many | Version of the detection rule. |
+| `fraud_case__customer_id` | `fraud_case.customer_id` | `customer.customer_id` | exactly_one | zero_or_many | Customer whose activity is under review. |
+| `fraud_case_alert__fraud_case_id` | `fraud_case_alert.fraud_case_id` | `fraud_case.fraud_case_id` | exactly_one | zero_or_many | Investigation reviewing this alert. |
+| `fraud_case_alert__fraud_alert_id` | `fraud_case_alert.fraud_alert_id` | `fraud_alert.fraud_alert_id` | exactly_one | zero_or_many | Signal included in the investigation. |
+| `fraud_decision__fraud_case_id` | `fraud_decision.fraud_case_id` | `fraud_case.fraud_case_id` | exactly_one | zero_or_many | Case being assessed. |
+| `fraud_action__fraud_decision_id` | `fraud_action.fraud_decision_id` | `fraud_decision.fraud_decision_id` | exactly_one | zero_or_many | Decision authorizing the request. |
+| `fraud_action__card_id` | `fraud_action.card_id` | `card.card_id` | zero_or_one | zero_or_many | Affected instrument, when relevant. |
+| `delinquency_snapshot__account_id` | `delinquency_snapshot.account_id` | `account.account_id` | exactly_one | zero_or_many | Account with assessed obligations. |
+| `collection_case__account_id` | `collection_case.account_id` | `account.account_id` | exactly_one | zero_or_many | Credit account being serviced. |
+| `collection_case__customer_id` | `collection_case.customer_id` | `customer.customer_id` | exactly_one | zero_or_many | Customer contacted about the obligation. |
+| `collection_contact__collection_case_id` | `collection_contact.collection_case_id` | `collection_case.collection_case_id` | exactly_one | zero_or_many | Case prompting contact. |
+| `collection_contact__channel_id` | `collection_contact.channel_id` | `channel.channel_id` | exactly_one | zero_or_many | Communication channel. |
+| `promise_to_pay__collection_case_id` | `promise_to_pay.collection_case_id` | `collection_case.collection_case_id` | exactly_one | zero_or_many | Case receiving the promise. |
+| `hardship_plan__collection_case_id` | `hardship_plan.collection_case_id` | `collection_case.collection_case_id` | exactly_one | zero_or_many | Case receiving support. |
+| `collection_case_event__collection_case_id` | `collection_case_event.collection_case_id` | `collection_case.collection_case_id` | exactly_one | zero_or_many | Case being progressed. |
+| `reward_membership__account_id` | `reward_membership.account_id` | `account.account_id` | exactly_one | zero_or_many | Eligible account. |
+| `reward_membership__reward_program_id` | `reward_membership.reward_program_id` | `reward_program.reward_program_id` | exactly_one | zero_or_many | Program version accepted. |
+| `reward_earn__reward_membership_id` | `reward_earn.reward_membership_id` | `reward_membership.reward_membership_id` | exactly_one | zero_or_many | Membership receiving points. |
+| `reward_earn__card_transaction_id` | `reward_earn.card_transaction_id` | `card_transaction.card_transaction_id` | exactly_one | zero_or_many | Purchase generating the award. |
+| `reward_redemption__reward_membership_id` | `reward_redemption.reward_membership_id` | `reward_membership.reward_membership_id` | exactly_one | zero_or_many | Membership spending points. |
+| `reward_adjustment__reward_membership_id` | `reward_adjustment.reward_membership_id` | `reward_membership.reward_membership_id` | exactly_one | zero_or_many | Membership being corrected. |
+| `reward_adjustment__reward_earn_id` | `reward_adjustment.reward_earn_id` | `reward_earn.reward_earn_id` | zero_or_one | zero_or_many | Original award when reversing earned points. |
+| `reward_balance_snapshot__reward_membership_id` | `reward_balance_snapshot.reward_membership_id` | `reward_membership.reward_membership_id` | exactly_one | zero_or_many | Membership whose points are counted. |
+| `service_request__customer_id` | `service_request.customer_id` | `customer.customer_id` | exactly_one | zero_or_many | Customer requesting assistance. |
+| `service_request__account_id` | `service_request.account_id` | `account.account_id` | zero_or_one | zero_or_many | Relevant account, if account-specific. |
+| `service_request__channel_id` | `service_request.channel_id` | `channel.channel_id` | exactly_one | zero_or_many | Intake channel. |
+| `service_request_event__service_request_id` | `service_request_event.service_request_id` | `service_request.service_request_id` | exactly_one | zero_or_many | Request being progressed. |
+| `complaint__service_request_id` | `complaint.service_request_id` | `service_request.service_request_id` | exactly_one | zero_or_many | Intake request. |
+| `complaint_resolution__complaint_id` | `complaint_resolution.complaint_id` | `complaint.complaint_id` | exactly_one | zero_or_many | Complaint being resolved. |
+| `communication__service_request_id` | `communication.service_request_id` | `service_request.service_request_id` | exactly_one | zero_or_many | Request prompting communication. |
+| `communication__channel_id` | `communication.channel_id` | `channel.channel_id` | exactly_one | zero_or_many | Delivery channel. |
+| `document_reference__service_request_id` | `document_reference.service_request_id` | `service_request.service_request_id` | exactly_one | zero_or_many | Request requiring evidence. |

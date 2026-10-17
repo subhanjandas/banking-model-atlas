@@ -1,11 +1,15 @@
 # Validation evidence
 
-Application 0.4.0 / model 0.3.0. The repository includes 18 metadata tests, 30 executable SQL tests, 20 explorer unit tests and nine browser scenarios.
+Portfolio application 1.0.0 / model 0.4.0.
 
-The SQL replay creates 56 tables, loads 175 synthetic records across 49 tables, checks 95 relationships and executes 19 selected business queries. Ten posted journals balance. Expected closing account balances are checked independently. See generated/demo-report.json and VALIDATION_COVERAGE.md for exact scope.
+- 18 metadata regression tests: keys, types, references, cardinalities and connected journeys.
+- 30 executable SQL/demo tests: valid records, 19 bad-data mutations, referential integrity and ledger checks.
+- 24 explorer unit tests: filtering, search, links, journey subgraphs and graph construction.
+- 10 browser scenarios: navigation, downloads, mobile layout, theme persistence, system theme and schema-only extension journeys.
+- A separate post-deploy capture opens the public GitHub Pages URL and saves real screenshots with commit/time provenance.
 
-Run `python3 -m pip install -r requirements-demo.txt`, then `python3 replay.py`, `npm ci`, `npm test` and `npm run build`. GitHub Actions runs these commands and the Chromium browser suite before deploying. Browser artifacts include overview, mobile and accounting-journey screenshots.
+The demo creates 80 tables and loads 175 synthetic records in 49 tables. Nineteen SQL business checks and opening-to-closing reconciliation pass for the supplied CAD scenario. The new four domains have no data fixtures; their DDL and metadata are checked, not their operational behavior.
 
-The previous explorer release deployed successfully in Actions run 38963395559. For the current commit's observed result, open the repository Actions tab: a configured workflow is not itself proof that a run passed. The deployment job runs only after the build and browser checks succeed.
+Run python3 replay.py, npm test and npm run build. Actions runs the Chromium suite before deployment. The Actions result for a commit is the authoritative evidence of its execution. See generated/demo-report.json for reproducible data results and docs/assets/provenance.json for published screenshot provenance.
 
-These examples do not establish complete banking correctness, regulatory compliance or production readiness. Rules with partial query coverage still retain their specification status.
+Remaining limits: complete rule enforcement, external source completeness, production concurrency, legal compliance and operational bank certification are not claimed.

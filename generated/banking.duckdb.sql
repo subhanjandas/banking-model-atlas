@@ -1,4 +1,4 @@
--- Banking Model Atlas | model 0.3.0
+-- Banking Model Atlas | model 0.4.0
 -- Dialect: DuckDB. Run in a fresh database. No DROP or destructive reset.
 -- PK, non-self FK, UNIQUE, NOT NULL and enumerations are enforced.
 -- Self-reference integrity and selected business rules are checked by scripts/run_demo.py.
@@ -88,6 +88,25 @@ COMMENT ON COLUMN "fee_type"."fee_type_id" IS 'Stable synthetic identifier for f
 COMMENT ON COLUMN "fee_type"."code" IS 'Stable fee category.';
 COMMENT ON COLUMN "fee_type"."description" IS 'What the category means.';
 
+-- One immutable rule version.
+CREATE TABLE "fraud_rule" (
+  "fraud_rule_id" VARCHAR NOT NULL,
+  "rule_code" VARCHAR NOT NULL,
+  "version_number" INTEGER NOT NULL,
+  "description" VARCHAR NOT NULL,
+  "effective_from" DATE NOT NULL,
+  "status" VARCHAR NOT NULL CHECK ("status" IN ('DRAFT', 'ACTIVE', 'RETIRED')),
+  PRIMARY KEY ("fraud_rule_id"),
+  UNIQUE ("rule_code", "version_number")
+);
+COMMENT ON TABLE "fraud_rule" IS 'A versioned project-local detection rule definition. Grain: One immutable rule version.';
+COMMENT ON COLUMN "fraud_rule"."fraud_rule_id" IS 'Stable synthetic identifier for this record.';
+COMMENT ON COLUMN "fraud_rule"."rule_code" IS 'Stable family code across versions.';
+COMMENT ON COLUMN "fraud_rule"."version_number" IS 'Positive rule version number.';
+COMMENT ON COLUMN "fraud_rule"."description" IS 'Human-readable detection intent.';
+COMMENT ON COLUMN "fraud_rule"."effective_from" IS 'First applicable business date.';
+COMMENT ON COLUMN "fraud_rule"."status" IS 'Publication state.';
+
 -- One general-ledger account.
 CREATE TABLE "gl_account" (
   "gl_account_id" VARCHAR NOT NULL,
@@ -147,6 +166,23 @@ COMMENT ON COLUMN "reconciliation_run"."scope" IS 'Comparison being performed.';
 COMMENT ON COLUMN "reconciliation_run"."started_at" IS 'UTC start time.';
 COMMENT ON COLUMN "reconciliation_run"."completed_at" IS 'UTC completion time.';
 COMMENT ON COLUMN "reconciliation_run"."status" IS 'Execution outcome.';
+
+-- One program version.
+CREATE TABLE "reward_program" (
+  "reward_program_id" VARCHAR NOT NULL,
+  "program_code" VARCHAR NOT NULL,
+  "version_number" INTEGER NOT NULL,
+  "name" VARCHAR NOT NULL,
+  "effective_from" DATE NOT NULL,
+  PRIMARY KEY ("reward_program_id"),
+  UNIQUE ("program_code", "version_number")
+);
+COMMENT ON TABLE "reward_program" IS 'A versioned definition of a points offering. Grain: One program version.';
+COMMENT ON COLUMN "reward_program"."reward_program_id" IS 'Stable synthetic identifier for this record.';
+COMMENT ON COLUMN "reward_program"."program_code" IS 'Stable program family.';
+COMMENT ON COLUMN "reward_program"."version_number" IS 'Positive terms version.';
+COMMENT ON COLUMN "reward_program"."name" IS 'Display name.';
+COMMENT ON COLUMN "reward_program"."effective_from" IS 'First applicable date.';
 
 -- One customer-owned beneficiary record.
 CREATE TABLE "beneficiary" (
@@ -222,6 +258,23 @@ COMMENT ON COLUMN "customer_contact"."customer_id" IS 'Customer reached by this 
 COMMENT ON COLUMN "customer_contact"."contact_type" IS 'Contact medium.';
 COMMENT ON COLUMN "customer_contact"."contact_value" IS 'Fictional contact value; example emails use example.com.';
 COMMENT ON COLUMN "customer_contact"."is_preferred" IS 'Whether this is preferred within its contact type.';
+
+-- One customer fraud investigation.
+CREATE TABLE "fraud_case" (
+  "fraud_case_id" VARCHAR NOT NULL,
+  "customer_id" VARCHAR NOT NULL,
+  "opened_at" TIMESTAMP NOT NULL,
+  "status" VARCHAR NOT NULL CHECK ("status" IN ('OPEN', 'REVIEWING', 'CLOSED')),
+  "summary" VARCHAR NOT NULL,
+  PRIMARY KEY ("fraud_case_id"),
+  FOREIGN KEY ("customer_id") REFERENCES "customer" ("customer_id")
+);
+COMMENT ON TABLE "fraud_case" IS 'An investigation for one customer, potentially grouping several alerts. Grain: One customer fraud investigation.';
+COMMENT ON COLUMN "fraud_case"."fraud_case_id" IS 'Stable synthetic identifier for this record.';
+COMMENT ON COLUMN "fraud_case"."customer_id" IS 'Customer whose activity is under review.';
+COMMENT ON COLUMN "fraud_case"."opened_at" IS 'UTC case opening time.';
+COMMENT ON COLUMN "fraud_case"."status" IS 'Supplied current case state.';
+COMMENT ON COLUMN "fraud_case"."summary" IS 'Synthetic investigation context.';
 
 -- One independently supplied ledger account balance at a business-date close.
 CREATE TABLE "gl_balance_snapshot" (
@@ -355,6 +408,23 @@ COMMENT ON COLUMN "customer_risk_assessment"."onboarding_case_id" IS 'Related on
 COMMENT ON COLUMN "customer_risk_assessment"."risk_band" IS 'Illustrative internal classification.';
 COMMENT ON COLUMN "customer_risk_assessment"."assessed_at" IS 'UTC assessment time.';
 COMMENT ON COLUMN "customer_risk_assessment"."next_review_on" IS 'Planned review date.';
+
+-- One dated decision for a fraud case.
+CREATE TABLE "fraud_decision" (
+  "fraud_decision_id" VARCHAR NOT NULL,
+  "fraud_case_id" VARCHAR NOT NULL,
+  "decided_at" TIMESTAMP NOT NULL,
+  "outcome" VARCHAR NOT NULL CHECK ("outcome" IN ('CONFIRMED', 'NOT_FRAUD', 'INCONCLUSIVE')),
+  "rationale" VARCHAR NOT NULL,
+  PRIMARY KEY ("fraud_decision_id"),
+  FOREIGN KEY ("fraud_case_id") REFERENCES "fraud_case" ("fraud_case_id")
+);
+COMMENT ON TABLE "fraud_decision" IS 'A recorded assessment of an investigation. Grain: One dated decision for a fraud case.';
+COMMENT ON COLUMN "fraud_decision"."fraud_decision_id" IS 'Stable synthetic identifier for this record.';
+COMMENT ON COLUMN "fraud_decision"."fraud_case_id" IS 'Case being assessed.';
+COMMENT ON COLUMN "fraud_decision"."decided_at" IS 'UTC decision time.';
+COMMENT ON COLUMN "fraud_decision"."outcome" IS 'Investigator conclusion.';
+COMMENT ON COLUMN "fraud_decision"."rationale" IS 'Synthetic explanation for the assessment.';
 
 -- One identity check attempt within an onboarding case.
 CREATE TABLE "identity_check" (
@@ -539,6 +609,24 @@ COMMENT ON COLUMN "card"."issued_on" IS 'Issue date.';
 COMMENT ON COLUMN "card"."expires_on" IS 'Last valid calendar day.';
 COMMENT ON COLUMN "card"."replaces_card_id" IS 'Earlier card replaced by this card, when applicable.';
 
+-- One collections case for an account.
+CREATE TABLE "collection_case" (
+  "collection_case_id" VARCHAR NOT NULL,
+  "account_id" VARCHAR NOT NULL,
+  "customer_id" VARCHAR NOT NULL,
+  "opened_on" DATE NOT NULL,
+  "status" VARCHAR NOT NULL CHECK ("status" IN ('OPEN', 'PAUSED', 'CLOSED')),
+  PRIMARY KEY ("collection_case_id"),
+  FOREIGN KEY ("account_id") REFERENCES "account" ("account_id"),
+  FOREIGN KEY ("customer_id") REFERENCES "customer" ("customer_id")
+);
+COMMENT ON TABLE "collection_case" IS 'A work item for follow-up on a credit obligation. Grain: One collections case for an account.';
+COMMENT ON COLUMN "collection_case"."collection_case_id" IS 'Stable synthetic identifier for this record.';
+COMMENT ON COLUMN "collection_case"."account_id" IS 'Credit account being serviced.';
+COMMENT ON COLUMN "collection_case"."customer_id" IS 'Customer contacted about the obligation.';
+COMMENT ON COLUMN "collection_case"."opened_on" IS 'Business date opened.';
+COMMENT ON COLUMN "collection_case"."status" IS 'Supplied workflow state.';
+
 -- One dated decision on an application.
 CREATE TABLE "credit_decision" (
   "credit_decision_id" VARCHAR NOT NULL,
@@ -576,6 +664,24 @@ COMMENT ON COLUMN "credit_facility"."credit_facility_id" IS 'Stable synthetic id
 COMMENT ON COLUMN "credit_facility"."account_id" IS 'Credit-card account supported by this facility.';
 COMMENT ON COLUMN "credit_facility"."approved_on" IS 'Date credit was approved.';
 COMMENT ON COLUMN "credit_facility"."currency_id" IS 'Must match the linked account currency.';
+
+-- One account delinquency assessment for a business date.
+CREATE TABLE "delinquency_snapshot" (
+  "delinquency_snapshot_id" VARCHAR NOT NULL,
+  "account_id" VARCHAR NOT NULL,
+  "as_of_date" DATE NOT NULL,
+  "days_past_due" INTEGER NOT NULL,
+  "overdue_amount" DECIMAL(18,2) NOT NULL,
+  PRIMARY KEY ("delinquency_snapshot_id"),
+  UNIQUE ("account_id", "as_of_date"),
+  FOREIGN KEY ("account_id") REFERENCES "account" ("account_id")
+);
+COMMENT ON TABLE "delinquency_snapshot" IS 'A supplied point-in-time view of overdue obligations. Grain: One account delinquency assessment for a business date.';
+COMMENT ON COLUMN "delinquency_snapshot"."delinquency_snapshot_id" IS 'Stable synthetic identifier for this record.';
+COMMENT ON COLUMN "delinquency_snapshot"."account_id" IS 'Account with assessed obligations.';
+COMMENT ON COLUMN "delinquency_snapshot"."as_of_date" IS 'Business date of assessment.';
+COMMENT ON COLUMN "delinquency_snapshot"."days_past_due" IS 'Nonnegative days since the oldest unpaid due date.';
+COMMENT ON COLUMN "delinquency_snapshot"."overdue_amount" IS 'Nonnegative overdue amount in account currency.';
 
 -- One received payment instruction.
 CREATE TABLE "payment" (
@@ -624,6 +730,47 @@ COMMENT ON COLUMN "product_application"."onboarding_case_id" IS 'Onboarding case
 COMMENT ON COLUMN "product_application"."submitted_at" IS 'UTC submission time.';
 COMMENT ON COLUMN "product_application"."status" IS 'Application outcome.';
 COMMENT ON COLUMN "product_application"."booked_account_id" IS 'Account opened after approval, if booked.';
+
+-- One account enrollment interval.
+CREATE TABLE "reward_membership" (
+  "reward_membership_id" VARCHAR NOT NULL,
+  "account_id" VARCHAR NOT NULL,
+  "reward_program_id" VARCHAR NOT NULL,
+  "enrolled_on" DATE NOT NULL,
+  "status" VARCHAR NOT NULL CHECK ("status" IN ('ACTIVE', 'SUSPENDED', 'CLOSED')),
+  PRIMARY KEY ("reward_membership_id"),
+  FOREIGN KEY ("account_id") REFERENCES "account" ("account_id"),
+  FOREIGN KEY ("reward_program_id") REFERENCES "reward_program" ("reward_program_id")
+);
+COMMENT ON TABLE "reward_membership" IS 'An account enrollment in a rewards program. Grain: One account enrollment interval.';
+COMMENT ON COLUMN "reward_membership"."reward_membership_id" IS 'Stable synthetic identifier for this record.';
+COMMENT ON COLUMN "reward_membership"."account_id" IS 'Eligible account.';
+COMMENT ON COLUMN "reward_membership"."reward_program_id" IS 'Program version accepted.';
+COMMENT ON COLUMN "reward_membership"."enrolled_on" IS 'Enrollment business date.';
+COMMENT ON COLUMN "reward_membership"."status" IS 'Supplied membership state.';
+
+-- One service request opened by a customer.
+CREATE TABLE "service_request" (
+  "service_request_id" VARCHAR NOT NULL,
+  "customer_id" VARCHAR NOT NULL,
+  "account_id" VARCHAR,
+  "channel_id" VARCHAR NOT NULL,
+  "opened_at" TIMESTAMP NOT NULL,
+  "status" VARCHAR NOT NULL CHECK ("status" IN ('OPEN', 'IN_PROGRESS', 'RESOLVED')),
+  "category" VARCHAR NOT NULL,
+  PRIMARY KEY ("service_request_id"),
+  FOREIGN KEY ("customer_id") REFERENCES "customer" ("customer_id"),
+  FOREIGN KEY ("account_id") REFERENCES "account" ("account_id"),
+  FOREIGN KEY ("channel_id") REFERENCES "channel" ("channel_id")
+);
+COMMENT ON TABLE "service_request" IS 'A customer request for assistance. Grain: One service request opened by a customer.';
+COMMENT ON COLUMN "service_request"."service_request_id" IS 'Stable synthetic identifier for this record.';
+COMMENT ON COLUMN "service_request"."customer_id" IS 'Customer requesting assistance.';
+COMMENT ON COLUMN "service_request"."account_id" IS 'Relevant account, if account-specific.';
+COMMENT ON COLUMN "service_request"."channel_id" IS 'Intake channel.';
+COMMENT ON COLUMN "service_request"."opened_at" IS 'UTC intake time.';
+COMMENT ON COLUMN "service_request"."status" IS 'Supplied request status.';
+COMMENT ON COLUMN "service_request"."category" IS 'Project-local request category.';
 
 -- One standing-order arrangement.
 CREATE TABLE "standing_order" (
@@ -737,6 +884,80 @@ COMMENT ON COLUMN "card_status_event"."card_id" IS 'Card whose status changed.';
 COMMENT ON COLUMN "card_status_event"."status" IS 'New lifecycle status.';
 COMMENT ON COLUMN "card_status_event"."effective_at" IS 'UTC effective time.';
 
+-- One dated case event.
+CREATE TABLE "collection_case_event" (
+  "collection_case_event_id" VARCHAR NOT NULL,
+  "collection_case_id" VARCHAR NOT NULL,
+  "occurred_at" TIMESTAMP NOT NULL,
+  "event_type" VARCHAR NOT NULL,
+  "reason" VARCHAR NOT NULL,
+  PRIMARY KEY ("collection_case_event_id"),
+  FOREIGN KEY ("collection_case_id") REFERENCES "collection_case" ("collection_case_id")
+);
+COMMENT ON TABLE "collection_case_event" IS 'A historical observation in a collections workflow. Grain: One dated case event.';
+COMMENT ON COLUMN "collection_case_event"."collection_case_event_id" IS 'Stable synthetic identifier for this record.';
+COMMENT ON COLUMN "collection_case_event"."collection_case_id" IS 'Case being progressed.';
+COMMENT ON COLUMN "collection_case_event"."occurred_at" IS 'UTC event time.';
+COMMENT ON COLUMN "collection_case_event"."event_type" IS 'Project-local event classification.';
+COMMENT ON COLUMN "collection_case_event"."reason" IS 'Synthetic reason for the event.';
+
+-- One contact attempt for a collections case.
+CREATE TABLE "collection_contact" (
+  "collection_contact_id" VARCHAR NOT NULL,
+  "collection_case_id" VARCHAR NOT NULL,
+  "channel_id" VARCHAR NOT NULL,
+  "attempted_at" TIMESTAMP NOT NULL,
+  "outcome" VARCHAR NOT NULL CHECK ("outcome" IN ('REACHED', 'NO_ANSWER', 'DECLINED')),
+  "note" VARCHAR NOT NULL,
+  PRIMARY KEY ("collection_contact_id"),
+  FOREIGN KEY ("collection_case_id") REFERENCES "collection_case" ("collection_case_id"),
+  FOREIGN KEY ("channel_id") REFERENCES "channel" ("channel_id")
+);
+COMMENT ON TABLE "collection_contact" IS 'A recorded outreach attempt. Grain: One contact attempt for a collections case.';
+COMMENT ON COLUMN "collection_contact"."collection_contact_id" IS 'Stable synthetic identifier for this record.';
+COMMENT ON COLUMN "collection_contact"."collection_case_id" IS 'Case prompting contact.';
+COMMENT ON COLUMN "collection_contact"."channel_id" IS 'Communication channel.';
+COMMENT ON COLUMN "collection_contact"."attempted_at" IS 'UTC contact time.';
+COMMENT ON COLUMN "collection_contact"."outcome" IS 'Observed result.';
+COMMENT ON COLUMN "collection_contact"."note" IS 'Synthetic outcome note.';
+
+-- One outbound message attempt for a request.
+CREATE TABLE "communication" (
+  "communication_id" VARCHAR NOT NULL,
+  "service_request_id" VARCHAR NOT NULL,
+  "channel_id" VARCHAR NOT NULL,
+  "sent_at" TIMESTAMP NOT NULL,
+  "delivery_status" VARCHAR NOT NULL CHECK ("delivery_status" IN ('SENT', 'DELIVERED', 'FAILED')),
+  "template_code" VARCHAR NOT NULL,
+  PRIMARY KEY ("communication_id"),
+  FOREIGN KEY ("service_request_id") REFERENCES "service_request" ("service_request_id"),
+  FOREIGN KEY ("channel_id") REFERENCES "channel" ("channel_id")
+);
+COMMENT ON TABLE "communication" IS 'A recorded communication envelope without message content. Grain: One outbound message attempt for a request.';
+COMMENT ON COLUMN "communication"."communication_id" IS 'Stable synthetic identifier for this record.';
+COMMENT ON COLUMN "communication"."service_request_id" IS 'Request prompting communication.';
+COMMENT ON COLUMN "communication"."channel_id" IS 'Delivery channel.';
+COMMENT ON COLUMN "communication"."sent_at" IS 'UTC attempted send time.';
+COMMENT ON COLUMN "communication"."delivery_status" IS 'Supplied transport result.';
+COMMENT ON COLUMN "communication"."template_code" IS 'Synthetic message template reference.';
+
+-- One complaint linked to a service request.
+CREATE TABLE "complaint" (
+  "complaint_id" VARCHAR NOT NULL,
+  "service_request_id" VARCHAR NOT NULL,
+  "received_on" DATE NOT NULL,
+  "category" VARCHAR NOT NULL,
+  "status" VARCHAR NOT NULL CHECK ("status" IN ('OPEN', 'INVESTIGATING', 'CLOSED')),
+  PRIMARY KEY ("complaint_id"),
+  FOREIGN KEY ("service_request_id") REFERENCES "service_request" ("service_request_id")
+);
+COMMENT ON TABLE "complaint" IS 'An expression of dissatisfaction tracked separately from routine assistance. Grain: One complaint linked to a service request.';
+COMMENT ON COLUMN "complaint"."complaint_id" IS 'Stable synthetic identifier for this record.';
+COMMENT ON COLUMN "complaint"."service_request_id" IS 'Intake request.';
+COMMENT ON COLUMN "complaint"."received_on" IS 'Complaint receipt date.';
+COMMENT ON COLUMN "complaint"."category" IS 'Project-local complaint category.';
+COMMENT ON COLUMN "complaint"."status" IS 'Supplied complaint state.';
+
 -- One effective limit change per facility.
 CREATE TABLE "credit_limit_event" (
   "credit_limit_event_id" VARCHAR NOT NULL,
@@ -753,6 +974,62 @@ COMMENT ON COLUMN "credit_limit_event"."credit_facility_id" IS 'Facility whose l
 COMMENT ON COLUMN "credit_limit_event"."effective_at" IS 'UTC time from which the limit applies.';
 COMMENT ON COLUMN "credit_limit_event"."limit_amount" IS 'Nonnegative approved limit in facility currency.';
 COMMENT ON COLUMN "credit_limit_event"."reason" IS 'Reason for changing the limit.';
+
+-- One external document reference attached to a request.
+CREATE TABLE "document_reference" (
+  "document_reference_id" VARCHAR NOT NULL,
+  "service_request_id" VARCHAR NOT NULL,
+  "document_type" VARCHAR NOT NULL,
+  "external_reference" VARCHAR NOT NULL,
+  "recorded_at" TIMESTAMP NOT NULL,
+  PRIMARY KEY ("document_reference_id"),
+  FOREIGN KEY ("service_request_id") REFERENCES "service_request" ("service_request_id")
+);
+COMMENT ON TABLE "document_reference" IS 'Metadata describing evidence held outside the model. Grain: One external document reference attached to a request.';
+COMMENT ON COLUMN "document_reference"."document_reference_id" IS 'Stable synthetic identifier for this record.';
+COMMENT ON COLUMN "document_reference"."service_request_id" IS 'Request requiring evidence.';
+COMMENT ON COLUMN "document_reference"."document_type" IS 'Project-local evidence classification.';
+COMMENT ON COLUMN "document_reference"."external_reference" IS 'Opaque synthetic reference, not a signed URL.';
+COMMENT ON COLUMN "document_reference"."recorded_at" IS 'UTC evidence registration time.';
+
+-- One requested action following a fraud decision.
+CREATE TABLE "fraud_action" (
+  "fraud_action_id" VARCHAR NOT NULL,
+  "fraud_decision_id" VARCHAR NOT NULL,
+  "card_id" VARCHAR,
+  "action_type" VARCHAR NOT NULL CHECK ("action_type" IN ('BLOCK_CARD', 'CONTACT_CUSTOMER', 'REFER_DISPUTE')),
+  "status" VARCHAR NOT NULL CHECK ("status" IN ('REQUESTED', 'COMPLETED', 'FAILED')),
+  "requested_at" TIMESTAMP NOT NULL,
+  PRIMARY KEY ("fraud_action_id"),
+  FOREIGN KEY ("fraud_decision_id") REFERENCES "fraud_decision" ("fraud_decision_id"),
+  FOREIGN KEY ("card_id") REFERENCES "card" ("card_id")
+);
+COMMENT ON TABLE "fraud_action" IS 'A recorded requested response to a case decision. Grain: One requested action following a fraud decision.';
+COMMENT ON COLUMN "fraud_action"."fraud_action_id" IS 'Stable synthetic identifier for this record.';
+COMMENT ON COLUMN "fraud_action"."fraud_decision_id" IS 'Decision authorizing the request.';
+COMMENT ON COLUMN "fraud_action"."card_id" IS 'Affected instrument, when relevant.';
+COMMENT ON COLUMN "fraud_action"."action_type" IS 'Intended operational response.';
+COMMENT ON COLUMN "fraud_action"."status" IS 'Execution observation.';
+COMMENT ON COLUMN "fraud_action"."requested_at" IS 'UTC request time.';
+
+-- One version of a hardship arrangement for a collections case.
+CREATE TABLE "hardship_plan" (
+  "hardship_plan_id" VARCHAR NOT NULL,
+  "collection_case_id" VARCHAR NOT NULL,
+  "starts_on" DATE NOT NULL,
+  "ends_on" DATE NOT NULL,
+  "terms_summary" VARCHAR NOT NULL,
+  "status" VARCHAR NOT NULL CHECK ("status" IN ('PROPOSED', 'ACTIVE', 'ENDED')),
+  PRIMARY KEY ("hardship_plan_id"),
+  FOREIGN KEY ("collection_case_id") REFERENCES "collection_case" ("collection_case_id")
+);
+COMMENT ON TABLE "hardship_plan" IS 'An agreed temporary support arrangement. Grain: One version of a hardship arrangement for a collections case.';
+COMMENT ON COLUMN "hardship_plan"."hardship_plan_id" IS 'Stable synthetic identifier for this record.';
+COMMENT ON COLUMN "hardship_plan"."collection_case_id" IS 'Case receiving support.';
+COMMENT ON COLUMN "hardship_plan"."starts_on" IS 'Inclusive plan start.';
+COMMENT ON COLUMN "hardship_plan"."ends_on" IS 'Exclusive plan end.';
+COMMENT ON COLUMN "hardship_plan"."terms_summary" IS 'Synthetic summary, not a legal agreement.';
+COMMENT ON COLUMN "hardship_plan"."status" IS 'Supplied arrangement state.';
 
 -- One loan contract and its loan account.
 CREATE TABLE "loan_contract" (
@@ -815,6 +1092,77 @@ COMMENT ON COLUMN "payment_order"."requested_at" IS 'UTC acceptance time.';
 COMMENT ON COLUMN "payment_order"."requested_execution_on" IS 'Requested business execution date.';
 COMMENT ON COLUMN "payment_order"."idempotency_key" IS 'Unique client-request key in this single-bank scenario.';
 
+-- One recorded payment promise.
+CREATE TABLE "promise_to_pay" (
+  "promise_to_pay_id" VARCHAR NOT NULL,
+  "collection_case_id" VARCHAR NOT NULL,
+  "promised_on" DATE NOT NULL,
+  "due_on" DATE NOT NULL,
+  "promised_amount" DECIMAL(18,2) NOT NULL,
+  "status" VARCHAR NOT NULL CHECK ("status" IN ('OPEN', 'KEPT', 'BROKEN', 'CANCELLED')),
+  PRIMARY KEY ("promise_to_pay_id"),
+  FOREIGN KEY ("collection_case_id") REFERENCES "collection_case" ("collection_case_id")
+);
+COMMENT ON TABLE "promise_to_pay" IS 'A customer commitment that may or may not be fulfilled. Grain: One recorded payment promise.';
+COMMENT ON COLUMN "promise_to_pay"."promise_to_pay_id" IS 'Stable synthetic identifier for this record.';
+COMMENT ON COLUMN "promise_to_pay"."collection_case_id" IS 'Case receiving the promise.';
+COMMENT ON COLUMN "promise_to_pay"."promised_on" IS 'Date commitment was recorded.';
+COMMENT ON COLUMN "promise_to_pay"."due_on" IS 'Agreed payment date.';
+COMMENT ON COLUMN "promise_to_pay"."promised_amount" IS 'Positive promised amount in account currency.';
+COMMENT ON COLUMN "promise_to_pay"."status" IS 'Supplied assessment.';
+
+-- One membership points balance at business-date close.
+CREATE TABLE "reward_balance_snapshot" (
+  "reward_balance_snapshot_id" VARCHAR NOT NULL,
+  "reward_membership_id" VARCHAR NOT NULL,
+  "as_of_date" DATE NOT NULL,
+  "points_balance" INTEGER NOT NULL,
+  PRIMARY KEY ("reward_balance_snapshot_id"),
+  UNIQUE ("reward_membership_id", "as_of_date"),
+  FOREIGN KEY ("reward_membership_id") REFERENCES "reward_membership" ("reward_membership_id")
+);
+COMMENT ON TABLE "reward_balance_snapshot" IS 'A supplied points position for reconciliation. Grain: One membership points balance at business-date close.';
+COMMENT ON COLUMN "reward_balance_snapshot"."reward_balance_snapshot_id" IS 'Stable synthetic identifier for this record.';
+COMMENT ON COLUMN "reward_balance_snapshot"."reward_membership_id" IS 'Membership whose points are counted.';
+COMMENT ON COLUMN "reward_balance_snapshot"."as_of_date" IS 'Closing business date.';
+COMMENT ON COLUMN "reward_balance_snapshot"."points_balance" IS 'Signed points balance; negative exceptions require review.';
+
+-- One redemption request.
+CREATE TABLE "reward_redemption" (
+  "reward_redemption_id" VARCHAR NOT NULL,
+  "reward_membership_id" VARCHAR NOT NULL,
+  "points" INTEGER NOT NULL,
+  "requested_at" TIMESTAMP NOT NULL,
+  "status" VARCHAR NOT NULL CHECK ("status" IN ('REQUESTED', 'FULFILLED', 'CANCELLED')),
+  "benefit_reference" VARCHAR NOT NULL,
+  PRIMARY KEY ("reward_redemption_id"),
+  FOREIGN KEY ("reward_membership_id") REFERENCES "reward_membership" ("reward_membership_id")
+);
+COMMENT ON TABLE "reward_redemption" IS 'A request to spend points on a benefit. Grain: One redemption request.';
+COMMENT ON COLUMN "reward_redemption"."reward_redemption_id" IS 'Stable synthetic identifier for this record.';
+COMMENT ON COLUMN "reward_redemption"."reward_membership_id" IS 'Membership spending points.';
+COMMENT ON COLUMN "reward_redemption"."points" IS 'Positive requested integer units.';
+COMMENT ON COLUMN "reward_redemption"."requested_at" IS 'UTC redemption request time.';
+COMMENT ON COLUMN "reward_redemption"."status" IS 'Supplied fulfillment state.';
+COMMENT ON COLUMN "reward_redemption"."benefit_reference" IS 'Synthetic benefit identifier.';
+
+-- One service request event.
+CREATE TABLE "service_request_event" (
+  "service_request_event_id" VARCHAR NOT NULL,
+  "service_request_id" VARCHAR NOT NULL,
+  "occurred_at" TIMESTAMP NOT NULL,
+  "event_type" VARCHAR NOT NULL,
+  "note" VARCHAR NOT NULL,
+  PRIMARY KEY ("service_request_event_id"),
+  FOREIGN KEY ("service_request_id") REFERENCES "service_request" ("service_request_id")
+);
+COMMENT ON TABLE "service_request_event" IS 'A dated change or update on a service request. Grain: One service request event.';
+COMMENT ON COLUMN "service_request_event"."service_request_event_id" IS 'Stable synthetic identifier for this record.';
+COMMENT ON COLUMN "service_request_event"."service_request_id" IS 'Request being progressed.';
+COMMENT ON COLUMN "service_request_event"."occurred_at" IS 'UTC event time.';
+COMMENT ON COLUMN "service_request_event"."event_type" IS 'Project-local update category.';
+COMMENT ON COLUMN "service_request_event"."note" IS 'Synthetic explanatory note.';
+
 -- One reservation associated with a payment order.
 CREATE TABLE "account_hold" (
   "account_hold_id" VARCHAR NOT NULL,
@@ -866,6 +1214,23 @@ COMMENT ON COLUMN "card_transaction"."kind" IS 'Type of posted card activity.';
 COMMENT ON COLUMN "card_transaction"."amount" IS 'Positive amount; kind determines economic direction.';
 COMMENT ON COLUMN "card_transaction"."occurred_at" IS 'UTC time of merchant activity.';
 COMMENT ON COLUMN "card_transaction"."posted_on" IS 'Business date on which activity was posted.';
+
+-- One resolution observation for a complaint.
+CREATE TABLE "complaint_resolution" (
+  "complaint_resolution_id" VARCHAR NOT NULL,
+  "complaint_id" VARCHAR NOT NULL,
+  "resolved_on" DATE NOT NULL,
+  "outcome" VARCHAR NOT NULL,
+  "explanation" VARCHAR NOT NULL,
+  PRIMARY KEY ("complaint_resolution_id"),
+  FOREIGN KEY ("complaint_id") REFERENCES "complaint" ("complaint_id")
+);
+COMMENT ON TABLE "complaint_resolution" IS 'A recorded response and outcome for a complaint. Grain: One resolution observation for a complaint.';
+COMMENT ON COLUMN "complaint_resolution"."complaint_resolution_id" IS 'Stable synthetic identifier for this record.';
+COMMENT ON COLUMN "complaint_resolution"."complaint_id" IS 'Complaint being resolved.';
+COMMENT ON COLUMN "complaint_resolution"."resolved_on" IS 'Response business date.';
+COMMENT ON COLUMN "complaint_resolution"."outcome" IS 'Synthetic resolution category.';
+COMMENT ON COLUMN "complaint_resolution"."explanation" IS 'Readable response rationale.';
 
 -- One completed principal disbursement.
 CREATE TABLE "loan_disbursement" (
@@ -1026,6 +1391,44 @@ COMMENT ON COLUMN "dispute"."dispute_reason_id" IS 'Reason for the claim.';
 COMMENT ON COLUMN "dispute"."claimed_amount" IS 'Positive challenged portion of the purchase.';
 COMMENT ON COLUMN "dispute"."opened_at" IS 'UTC time the case was opened.';
 
+-- One rule-triggered alert about a posted card transaction.
+CREATE TABLE "fraud_alert" (
+  "fraud_alert_id" VARCHAR NOT NULL,
+  "card_transaction_id" VARCHAR NOT NULL,
+  "fraud_rule_id" VARCHAR NOT NULL,
+  "raised_at" TIMESTAMP NOT NULL,
+  "severity" VARCHAR NOT NULL CHECK ("severity" IN ('LOW', 'MEDIUM', 'HIGH')),
+  "reason" VARCHAR NOT NULL,
+  PRIMARY KEY ("fraud_alert_id"),
+  FOREIGN KEY ("card_transaction_id") REFERENCES "card_transaction" ("card_transaction_id"),
+  FOREIGN KEY ("fraud_rule_id") REFERENCES "fraud_rule" ("fraud_rule_id")
+);
+COMMENT ON TABLE "fraud_alert" IS 'A signal requiring review, not a confirmed loss. Grain: One rule-triggered alert about a posted card transaction.';
+COMMENT ON COLUMN "fraud_alert"."fraud_alert_id" IS 'Stable synthetic identifier for this record.';
+COMMENT ON COLUMN "fraud_alert"."card_transaction_id" IS 'Transaction that raised the signal.';
+COMMENT ON COLUMN "fraud_alert"."fraud_rule_id" IS 'Version of the detection rule.';
+COMMENT ON COLUMN "fraud_alert"."raised_at" IS 'UTC observation time.';
+COMMENT ON COLUMN "fraud_alert"."severity" IS 'Project-local review priority.';
+COMMENT ON COLUMN "fraud_alert"."reason" IS 'Readable explanation for review.';
+
+-- One earning award for a card transaction and membership.
+CREATE TABLE "reward_earn" (
+  "reward_earn_id" VARCHAR NOT NULL,
+  "reward_membership_id" VARCHAR NOT NULL,
+  "card_transaction_id" VARCHAR NOT NULL,
+  "points" INTEGER NOT NULL,
+  "earned_on" DATE NOT NULL,
+  PRIMARY KEY ("reward_earn_id"),
+  FOREIGN KEY ("reward_membership_id") REFERENCES "reward_membership" ("reward_membership_id"),
+  FOREIGN KEY ("card_transaction_id") REFERENCES "card_transaction" ("card_transaction_id")
+);
+COMMENT ON TABLE "reward_earn" IS 'A points earning observation linked to a purchase. Grain: One earning award for a card transaction and membership.';
+COMMENT ON COLUMN "reward_earn"."reward_earn_id" IS 'Stable synthetic identifier for this record.';
+COMMENT ON COLUMN "reward_earn"."reward_membership_id" IS 'Membership receiving points.';
+COMMENT ON COLUMN "reward_earn"."card_transaction_id" IS 'Purchase generating the award.';
+COMMENT ON COLUMN "reward_earn"."points" IS 'Positive awarded integer units.';
+COMMENT ON COLUMN "reward_earn"."earned_on" IS 'Award business date.';
+
 -- One event in a dispute.
 CREATE TABLE "dispute_event" (
   "dispute_event_id" VARCHAR NOT NULL,
@@ -1042,6 +1445,23 @@ COMMENT ON COLUMN "dispute_event"."dispute_id" IS 'Case being progressed.';
 COMMENT ON COLUMN "dispute_event"."status" IS 'New case status.';
 COMMENT ON COLUMN "dispute_event"."occurred_at" IS 'UTC event time.';
 COMMENT ON COLUMN "dispute_event"."summary" IS 'Synthetic operational note; no personal narrative.';
+
+-- One alert associated with one case.
+CREATE TABLE "fraud_case_alert" (
+  "fraud_case_alert_id" VARCHAR NOT NULL,
+  "fraud_case_id" VARCHAR NOT NULL,
+  "fraud_alert_id" VARCHAR NOT NULL,
+  "linked_at" TIMESTAMP NOT NULL,
+  PRIMARY KEY ("fraud_case_alert_id"),
+  UNIQUE ("fraud_case_id", "fraud_alert_id"),
+  FOREIGN KEY ("fraud_case_id") REFERENCES "fraud_case" ("fraud_case_id"),
+  FOREIGN KEY ("fraud_alert_id") REFERENCES "fraud_alert" ("fraud_alert_id")
+);
+COMMENT ON TABLE "fraud_case_alert" IS 'An explicit association between an investigation and a signal. Grain: One alert associated with one case.';
+COMMENT ON COLUMN "fraud_case_alert"."fraud_case_alert_id" IS 'Stable synthetic identifier for this record.';
+COMMENT ON COLUMN "fraud_case_alert"."fraud_case_id" IS 'Investigation reviewing this alert.';
+COMMENT ON COLUMN "fraud_case_alert"."fraud_alert_id" IS 'Signal included in the investigation.';
+COMMENT ON COLUMN "fraud_case_alert"."linked_at" IS 'UTC association time.';
 
 -- One allocation of an account entry to a journal line.
 CREATE TABLE "posting_link" (
@@ -1088,6 +1508,26 @@ COMMENT ON COLUMN "reconciliation_item"."statement_id" IS 'Statement involved wh
 COMMENT ON COLUMN "reconciliation_item"."outcome" IS 'Comparison result.';
 COMMENT ON COLUMN "reconciliation_item"."difference_amount" IS 'Signed left-side minus right-side difference in CAD.';
 COMMENT ON COLUMN "reconciliation_item"."explanation" IS 'Synthetic explanation of the match or exception.';
+
+-- One signed points adjustment.
+CREATE TABLE "reward_adjustment" (
+  "reward_adjustment_id" VARCHAR NOT NULL,
+  "reward_membership_id" VARCHAR NOT NULL,
+  "reward_earn_id" VARCHAR,
+  "points_delta" INTEGER NOT NULL,
+  "reason" VARCHAR NOT NULL,
+  "adjusted_on" DATE NOT NULL,
+  PRIMARY KEY ("reward_adjustment_id"),
+  FOREIGN KEY ("reward_membership_id") REFERENCES "reward_membership" ("reward_membership_id"),
+  FOREIGN KEY ("reward_earn_id") REFERENCES "reward_earn" ("reward_earn_id")
+);
+COMMENT ON TABLE "reward_adjustment" IS 'A manual or correction-related change in points. Grain: One signed points adjustment.';
+COMMENT ON COLUMN "reward_adjustment"."reward_adjustment_id" IS 'Stable synthetic identifier for this record.';
+COMMENT ON COLUMN "reward_adjustment"."reward_membership_id" IS 'Membership being corrected.';
+COMMENT ON COLUMN "reward_adjustment"."reward_earn_id" IS 'Original award when reversing earned points.';
+COMMENT ON COLUMN "reward_adjustment"."points_delta" IS 'Nonzero signed points change.';
+COMMENT ON COLUMN "reward_adjustment"."reason" IS 'Reason explaining the correction.';
+COMMENT ON COLUMN "reward_adjustment"."adjusted_on" IS 'Adjustment date.';
 
 -- One account entry displayed on one statement.
 CREATE TABLE "statement_line" (

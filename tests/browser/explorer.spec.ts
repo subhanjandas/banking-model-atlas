@@ -37,7 +37,7 @@ test('both journeys, focus mode, reset, and history work',async({page})=>{
 test('downloads contain model and dictionary data',async({page})=>{
  await page.goto('./');await page.getByText('Download',{exact:true}).click();
  const pending=page.waitForEvent('download');await page.getByRole('button',{name:/Model JSON/}).click();const dl=await pending;
- const data=JSON.parse(await readFile((await dl.path())!,'utf8'));expect(data.entities).toHaveLength(56);expect(data.relationships).toHaveLength(95);
+ const data=JSON.parse(await readFile((await dl.path())!,'utf8'));expect(data.entities).toHaveLength(80);expect(data.relationships).toHaveLength(128);
  await page.getByText('Download',{exact:true}).click();const pending2=page.waitForEvent('download');await page.getByRole('button',{name:/Data dictionary/}).click();const dl2=await pending2;expect(await readFile((await dl2.path())!,'utf8')).toContain('minimum_due');
  await page.getByText('Download',{exact:true}).click();const pending3=page.waitForEvent('download');await page.getByRole('button',{name:/Current graph/}).click();const dl3=await pending3;expect((await readFile((await dl3.path())!)).subarray(1,4).toString()).toBe('PNG');
 });
@@ -87,4 +87,14 @@ test('first visit honors the system dark preference',async({page})=>{
  await page.emulateMedia({colorScheme:'dark'});await page.goto('./');
  await expect(page.locator('html')).toHaveAttribute('data-theme','dark');
  await expect(page.getByRole('button',{name:'Switch to light theme'})).toBeVisible();
+});
+
+test('extension journeys distinguish modeled scope and show author credit',async({page})=>{
+ for(const id of ['review_a_fraud_alert','support_an_overdue_account','trace_reward_points','resolve_a_complaint']){
+  await page.goto('./?journey='+id);await expect(page.locator('.journey-steps button')).toHaveCount(6);
+  await page.locator('.journey-steps button').last().click();
+  await expect(page.locator('.coverage-badge')).toContainText('Schema only');
+  await expect(page.locator('.journey-strip')).toContainText('Schema walkthrough only');
+ }
+ await expect(page.locator('.statusbar')).toContainText('Built by Subhanjan Das');
 });

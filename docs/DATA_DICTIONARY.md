@@ -1278,3 +1278,540 @@ One customer account mapped to its ledger control account.
 
 **Rules:** R42
 
+## fraud_rule
+
+A versioned project-local detection rule definition.
+
+**Grain:** One immutable rule version.
+
+**Primary key:** fraud_rule_id
+
+| Column | Type | Nullable | Classification | Definition |
+|---|---|---|---|---|
+| `fraud_rule_id` | `string` | false | identifier | Stable synthetic identifier for this record. |
+| `rule_code` | `string` | false | internal | Stable family code across versions. |
+| `version_number` | `integer` | false | internal | Positive rule version number. |
+| `description` | `string` | false | internal | Human-readable detection intent. |
+| `effective_from` | `date` | false | internal | First applicable business date. |
+| `status` | `string` | false | internal | Publication state. Allowed: DRAFT, ACTIVE, RETIRED. |
+
+**Unique keys:** rule_code, version_number
+
+**Notes:** No executable fraud scoring or real detection thresholds are included.
+
+**Rules:** R43
+
+## fraud_alert
+
+A signal requiring review, not a confirmed loss.
+
+**Grain:** One rule-triggered alert about a posted card transaction.
+
+**Primary key:** fraud_alert_id
+
+| Column | Type | Nullable | Classification | Definition |
+|---|---|---|---|---|
+| `fraud_alert_id` | `string` | false | identifier | Stable synthetic identifier for this record. |
+| `card_transaction_id` | `string` | false | identifier | Transaction that raised the signal. |
+| `fraud_rule_id` | `string` | false | identifier | Version of the detection rule. |
+| `raised_at` | `timestamp` | false | internal | UTC observation time. |
+| `severity` | `string` | false | internal | Project-local review priority. Allowed: LOW, MEDIUM, HIGH. |
+| `reason` | `string` | false | internal | Readable explanation for review. |
+
+**Unique keys:** Primary key only.
+
+**Notes:** This extension covers posted-card alerts, not authorization-time decisions.
+
+**Rules:** R43
+
+## fraud_case
+
+An investigation for one customer, potentially grouping several alerts.
+
+**Grain:** One customer fraud investigation.
+
+**Primary key:** fraud_case_id
+
+| Column | Type | Nullable | Classification | Definition |
+|---|---|---|---|---|
+| `fraud_case_id` | `string` | false | identifier | Stable synthetic identifier for this record. |
+| `customer_id` | `string` | false | identifier | Customer whose activity is under review. |
+| `opened_at` | `timestamp` | false | internal | UTC case opening time. |
+| `status` | `string` | false | internal | Supplied current case state. Allowed: OPEN, REVIEWING, CLOSED. |
+| `summary` | `string` | false | internal | Synthetic investigation context. |
+
+**Unique keys:** Primary key only.
+
+**Notes:** A case may collect multiple alerts; status transitions are not yet executable.
+
+**Rules:** R43
+
+## fraud_case_alert
+
+An explicit association between an investigation and a signal.
+
+**Grain:** One alert associated with one case.
+
+**Primary key:** fraud_case_alert_id
+
+| Column | Type | Nullable | Classification | Definition |
+|---|---|---|---|---|
+| `fraud_case_alert_id` | `string` | false | identifier | Stable synthetic identifier for this record. |
+| `fraud_case_id` | `string` | false | identifier | Investigation reviewing this alert. |
+| `fraud_alert_id` | `string` | false | identifier | Signal included in the investigation. |
+| `linked_at` | `timestamp` | false | internal | UTC association time. |
+
+**Unique keys:** fraud_case_id, fraud_alert_id
+
+**Notes:** Association is not a verdict. Check customer ownership separately.
+
+**Rules:** R43
+
+## fraud_decision
+
+A recorded assessment of an investigation.
+
+**Grain:** One dated decision for a fraud case.
+
+**Primary key:** fraud_decision_id
+
+| Column | Type | Nullable | Classification | Definition |
+|---|---|---|---|---|
+| `fraud_decision_id` | `string` | false | identifier | Stable synthetic identifier for this record. |
+| `fraud_case_id` | `string` | false | identifier | Case being assessed. |
+| `decided_at` | `timestamp` | false | internal | UTC decision time. |
+| `outcome` | `string` | false | internal | Investigator conclusion. Allowed: CONFIRMED, NOT_FRAUD, INCONCLUSIVE. |
+| `rationale` | `string` | false | internal | Synthetic explanation for the assessment. |
+
+**Unique keys:** Primary key only.
+
+**Notes:** A decision does not itself book a refund or loss.
+
+**Rules:** R43
+
+## fraud_action
+
+A recorded requested response to a case decision.
+
+**Grain:** One requested action following a fraud decision.
+
+**Primary key:** fraud_action_id
+
+| Column | Type | Nullable | Classification | Definition |
+|---|---|---|---|---|
+| `fraud_action_id` | `string` | false | identifier | Stable synthetic identifier for this record. |
+| `fraud_decision_id` | `string` | false | identifier | Decision authorizing the request. |
+| `card_id` | `string` | true | identifier | Affected instrument, when relevant. |
+| `action_type` | `string` | false | internal | Intended operational response. Allowed: BLOCK_CARD, CONTACT_CUSTOMER, REFER_DISPUTE. |
+| `status` | `string` | false | internal | Execution observation. Allowed: REQUESTED, COMPLETED, FAILED. |
+| `requested_at` | `timestamp` | false | internal | UTC request time. |
+
+**Unique keys:** Primary key only.
+
+**Notes:** COMPLETED is supplied evidence; this schema does not call card systems.
+
+**Rules:** R43
+
+## delinquency_snapshot
+
+A supplied point-in-time view of overdue obligations.
+
+**Grain:** One account delinquency assessment for a business date.
+
+**Primary key:** delinquency_snapshot_id
+
+| Column | Type | Nullable | Classification | Definition |
+|---|---|---|---|---|
+| `delinquency_snapshot_id` | `string` | false | identifier | Stable synthetic identifier for this record. |
+| `account_id` | `string` | false | identifier | Account with assessed obligations. |
+| `as_of_date` | `date` | false | internal | Business date of assessment. |
+| `days_past_due` | `integer` | false | internal | Nonnegative days since the oldest unpaid due date. |
+| `overdue_amount` | `decimal(18,2)` | false | financial | Nonnegative overdue amount in account currency. |
+
+**Unique keys:** account_id, as_of_date
+
+**Notes:** Overdue calculation and payment allocation are not implemented.
+
+**Rules:** R44
+
+## collection_case
+
+A work item for follow-up on a credit obligation.
+
+**Grain:** One collections case for an account.
+
+**Primary key:** collection_case_id
+
+| Column | Type | Nullable | Classification | Definition |
+|---|---|---|---|---|
+| `collection_case_id` | `string` | false | identifier | Stable synthetic identifier for this record. |
+| `account_id` | `string` | false | identifier | Credit account being serviced. |
+| `customer_id` | `string` | false | identifier | Customer contacted about the obligation. |
+| `opened_on` | `date` | false | internal | Business date opened. |
+| `status` | `string` | false | internal | Supplied workflow state. Allowed: OPEN, PAUSED, CLOSED. |
+
+**Unique keys:** Primary key only.
+
+**Notes:** Contact person must have an appropriate relationship to the account.
+
+**Rules:** R44
+
+## collection_contact
+
+A recorded outreach attempt.
+
+**Grain:** One contact attempt for a collections case.
+
+**Primary key:** collection_contact_id
+
+| Column | Type | Nullable | Classification | Definition |
+|---|---|---|---|---|
+| `collection_contact_id` | `string` | false | identifier | Stable synthetic identifier for this record. |
+| `collection_case_id` | `string` | false | identifier | Case prompting contact. |
+| `channel_id` | `string` | false | identifier | Communication channel. |
+| `attempted_at` | `timestamp` | false | internal | UTC contact time. |
+| `outcome` | `string` | false | internal | Observed result. Allowed: REACHED, NO_ANSWER, DECLINED. |
+| `note` | `string` | false | internal | Synthetic outcome note. |
+
+**Unique keys:** Primary key only.
+
+**Notes:** No real recordings, phone numbers or collection scripts are stored.
+
+**Rules:** R44
+
+## promise_to_pay
+
+A customer commitment that may or may not be fulfilled.
+
+**Grain:** One recorded payment promise.
+
+**Primary key:** promise_to_pay_id
+
+| Column | Type | Nullable | Classification | Definition |
+|---|---|---|---|---|
+| `promise_to_pay_id` | `string` | false | identifier | Stable synthetic identifier for this record. |
+| `collection_case_id` | `string` | false | identifier | Case receiving the promise. |
+| `promised_on` | `date` | false | internal | Date commitment was recorded. |
+| `due_on` | `date` | false | internal | Agreed payment date. |
+| `promised_amount` | `decimal(18,2)` | false | financial | Positive promised amount in account currency. |
+| `status` | `string` | false | internal | Supplied assessment. Allowed: OPEN, KEPT, BROKEN, CANCELLED. |
+
+**Unique keys:** Primary key only.
+
+**Notes:** KEPT must be supported by payments; a promise is not booked money.
+
+**Rules:** R44
+
+## hardship_plan
+
+An agreed temporary support arrangement.
+
+**Grain:** One version of a hardship arrangement for a collections case.
+
+**Primary key:** hardship_plan_id
+
+| Column | Type | Nullable | Classification | Definition |
+|---|---|---|---|---|
+| `hardship_plan_id` | `string` | false | identifier | Stable synthetic identifier for this record. |
+| `collection_case_id` | `string` | false | identifier | Case receiving support. |
+| `starts_on` | `date` | false | internal | Inclusive plan start. |
+| `ends_on` | `date` | false | internal | Exclusive plan end. |
+| `terms_summary` | `string` | false | internal | Synthetic summary, not a legal agreement. |
+| `status` | `string` | false | internal | Supplied arrangement state. Allowed: PROPOSED, ACTIVE, ENDED. |
+
+**Unique keys:** Primary key only.
+
+**Notes:** Contract changes, interest treatment and legal eligibility are outside this extension.
+
+**Rules:** R44
+
+## collection_case_event
+
+A historical observation in a collections workflow.
+
+**Grain:** One dated case event.
+
+**Primary key:** collection_case_event_id
+
+| Column | Type | Nullable | Classification | Definition |
+|---|---|---|---|---|
+| `collection_case_event_id` | `string` | false | identifier | Stable synthetic identifier for this record. |
+| `collection_case_id` | `string` | false | identifier | Case being progressed. |
+| `occurred_at` | `timestamp` | false | internal | UTC event time. |
+| `event_type` | `string` | false | internal | Project-local event classification. |
+| `reason` | `string` | false | internal | Synthetic reason for the event. |
+
+**Unique keys:** Primary key only.
+
+**Notes:** This event vocabulary is descriptive; no transition validator is supplied yet.
+
+**Rules:** R44
+
+## reward_program
+
+A versioned definition of a points offering.
+
+**Grain:** One program version.
+
+**Primary key:** reward_program_id
+
+| Column | Type | Nullable | Classification | Definition |
+|---|---|---|---|---|
+| `reward_program_id` | `string` | false | identifier | Stable synthetic identifier for this record. |
+| `program_code` | `string` | false | internal | Stable program family. |
+| `version_number` | `integer` | false | internal | Positive terms version. |
+| `name` | `string` | false | internal | Display name. |
+| `effective_from` | `date` | false | internal | First applicable date. |
+
+**Unique keys:** program_code, version_number
+
+**Notes:** Points are integer units; no universal cash value is assumed.
+
+**Rules:** R45
+
+## reward_membership
+
+An account enrollment in a rewards program.
+
+**Grain:** One account enrollment interval.
+
+**Primary key:** reward_membership_id
+
+| Column | Type | Nullable | Classification | Definition |
+|---|---|---|---|---|
+| `reward_membership_id` | `string` | false | identifier | Stable synthetic identifier for this record. |
+| `account_id` | `string` | false | identifier | Eligible account. |
+| `reward_program_id` | `string` | false | identifier | Program version accepted. |
+| `enrolled_on` | `date` | false | internal | Enrollment business date. |
+| `status` | `string` | false | internal | Supplied membership state. Allowed: ACTIVE, SUSPENDED, CLOSED. |
+
+**Unique keys:** Primary key only.
+
+**Notes:** The account owns the points in this fictional design; household pooling is excluded.
+
+**Rules:** R45
+
+## reward_earn
+
+A points earning observation linked to a purchase.
+
+**Grain:** One earning award for a card transaction and membership.
+
+**Primary key:** reward_earn_id
+
+| Column | Type | Nullable | Classification | Definition |
+|---|---|---|---|---|
+| `reward_earn_id` | `string` | false | identifier | Stable synthetic identifier for this record. |
+| `reward_membership_id` | `string` | false | identifier | Membership receiving points. |
+| `card_transaction_id` | `string` | false | identifier | Purchase generating the award. |
+| `points` | `integer` | false | internal | Positive awarded integer units. |
+| `earned_on` | `date` | false | internal | Award business date. |
+
+**Unique keys:** Primary key only.
+
+**Notes:** Multiple awards may represent base and promotional points. Earning rates are not calculated.
+
+**Rules:** R45
+
+## reward_redemption
+
+A request to spend points on a benefit.
+
+**Grain:** One redemption request.
+
+**Primary key:** reward_redemption_id
+
+| Column | Type | Nullable | Classification | Definition |
+|---|---|---|---|---|
+| `reward_redemption_id` | `string` | false | identifier | Stable synthetic identifier for this record. |
+| `reward_membership_id` | `string` | false | identifier | Membership spending points. |
+| `points` | `integer` | false | internal | Positive requested integer units. |
+| `requested_at` | `timestamp` | false | internal | UTC redemption request time. |
+| `status` | `string` | false | internal | Supplied fulfillment state. Allowed: REQUESTED, FULFILLED, CANCELLED. |
+| `benefit_reference` | `string` | false | internal | Synthetic benefit identifier. |
+
+**Unique keys:** Primary key only.
+
+**Notes:** A cancelled request should not consume settled points. Fulfillment is not automated.
+
+**Rules:** R45
+
+## reward_adjustment
+
+A manual or correction-related change in points.
+
+**Grain:** One signed points adjustment.
+
+**Primary key:** reward_adjustment_id
+
+| Column | Type | Nullable | Classification | Definition |
+|---|---|---|---|---|
+| `reward_adjustment_id` | `string` | false | identifier | Stable synthetic identifier for this record. |
+| `reward_membership_id` | `string` | false | identifier | Membership being corrected. |
+| `reward_earn_id` | `string` | true | identifier | Original award when reversing earned points. |
+| `points_delta` | `integer` | false | internal | Nonzero signed points change. |
+| `reason` | `string` | false | internal | Reason explaining the correction. |
+| `adjusted_on` | `date` | false | internal | Adjustment date. |
+
+**Unique keys:** Primary key only.
+
+**Notes:** Refund clawbacks need explicit policy and allocation; they are not inferred automatically.
+
+**Rules:** R45
+
+## reward_balance_snapshot
+
+A supplied points position for reconciliation.
+
+**Grain:** One membership points balance at business-date close.
+
+**Primary key:** reward_balance_snapshot_id
+
+| Column | Type | Nullable | Classification | Definition |
+|---|---|---|---|---|
+| `reward_balance_snapshot_id` | `string` | false | identifier | Stable synthetic identifier for this record. |
+| `reward_membership_id` | `string` | false | identifier | Membership whose points are counted. |
+| `as_of_date` | `date` | false | internal | Closing business date. |
+| `points_balance` | `integer` | false | internal | Signed points balance; negative exceptions require review. |
+
+**Unique keys:** reward_membership_id, as_of_date
+
+**Notes:** Snapshot reconciliation against earns, fulfilled redemptions and adjustments remains future work.
+
+**Rules:** R45
+
+## service_request
+
+A customer request for assistance.
+
+**Grain:** One service request opened by a customer.
+
+**Primary key:** service_request_id
+
+| Column | Type | Nullable | Classification | Definition |
+|---|---|---|---|---|
+| `service_request_id` | `string` | false | identifier | Stable synthetic identifier for this record. |
+| `customer_id` | `string` | false | identifier | Customer requesting assistance. |
+| `account_id` | `string` | true | identifier | Relevant account, if account-specific. |
+| `channel_id` | `string` | false | identifier | Intake channel. |
+| `opened_at` | `timestamp` | false | internal | UTC intake time. |
+| `status` | `string` | false | internal | Supplied request status. Allowed: OPEN, IN_PROGRESS, RESOLVED. |
+| `category` | `string` | false | internal | Project-local request category. |
+
+**Unique keys:** Primary key only.
+
+**Notes:** A request is distinct from a dispute and does not imply financial adjustment.
+
+**Rules:** R46
+
+## service_request_event
+
+A dated change or update on a service request.
+
+**Grain:** One service request event.
+
+**Primary key:** service_request_event_id
+
+| Column | Type | Nullable | Classification | Definition |
+|---|---|---|---|---|
+| `service_request_event_id` | `string` | false | identifier | Stable synthetic identifier for this record. |
+| `service_request_id` | `string` | false | identifier | Request being progressed. |
+| `occurred_at` | `timestamp` | false | internal | UTC event time. |
+| `event_type` | `string` | false | internal | Project-local update category. |
+| `note` | `string` | false | internal | Synthetic explanatory note. |
+
+**Unique keys:** Primary key only.
+
+**Notes:** Late-arrival correction and service workflow transitions are not implemented.
+
+**Rules:** R46
+
+## complaint
+
+An expression of dissatisfaction tracked separately from routine assistance.
+
+**Grain:** One complaint linked to a service request.
+
+**Primary key:** complaint_id
+
+| Column | Type | Nullable | Classification | Definition |
+|---|---|---|---|---|
+| `complaint_id` | `string` | false | identifier | Stable synthetic identifier for this record. |
+| `service_request_id` | `string` | false | identifier | Intake request. |
+| `received_on` | `date` | false | internal | Complaint receipt date. |
+| `category` | `string` | false | internal | Project-local complaint category. |
+| `status` | `string` | false | internal | Supplied complaint state. Allowed: OPEN, INVESTIGATING, CLOSED. |
+
+**Unique keys:** Primary key only.
+
+**Notes:** No jurisdiction-specific resolution deadline or regulatory reporting is claimed.
+
+**Rules:** R46
+
+## complaint_resolution
+
+A recorded response and outcome for a complaint.
+
+**Grain:** One resolution observation for a complaint.
+
+**Primary key:** complaint_resolution_id
+
+| Column | Type | Nullable | Classification | Definition |
+|---|---|---|---|---|
+| `complaint_resolution_id` | `string` | false | identifier | Stable synthetic identifier for this record. |
+| `complaint_id` | `string` | false | identifier | Complaint being resolved. |
+| `resolved_on` | `date` | false | internal | Response business date. |
+| `outcome` | `string` | false | internal | Synthetic resolution category. |
+| `explanation` | `string` | false | internal | Readable response rationale. |
+
+**Unique keys:** Primary key only.
+
+**Notes:** A goodwill credit would require a separately booked and reconciled account entry.
+
+**Rules:** R46
+
+## communication
+
+A recorded communication envelope without message content.
+
+**Grain:** One outbound message attempt for a request.
+
+**Primary key:** communication_id
+
+| Column | Type | Nullable | Classification | Definition |
+|---|---|---|---|---|
+| `communication_id` | `string` | false | identifier | Stable synthetic identifier for this record. |
+| `service_request_id` | `string` | false | identifier | Request prompting communication. |
+| `channel_id` | `string` | false | identifier | Delivery channel. |
+| `sent_at` | `timestamp` | false | internal | UTC attempted send time. |
+| `delivery_status` | `string` | false | internal | Supplied transport result. Allowed: SENT, DELIVERED, FAILED. |
+| `template_code` | `string` | false | internal | Synthetic message template reference. |
+
+**Unique keys:** Primary key only.
+
+**Notes:** No addresses, tokens or message bodies are stored. Delivery does not prove the customer read it.
+
+**Rules:** R46
+
+## document_reference
+
+Metadata describing evidence held outside the model.
+
+**Grain:** One external document reference attached to a request.
+
+**Primary key:** document_reference_id
+
+| Column | Type | Nullable | Classification | Definition |
+|---|---|---|---|---|
+| `document_reference_id` | `string` | false | identifier | Stable synthetic identifier for this record. |
+| `service_request_id` | `string` | false | identifier | Request requiring evidence. |
+| `document_type` | `string` | false | internal | Project-local evidence classification. |
+| `external_reference` | `string` | false | internal | Opaque synthetic reference, not a signed URL. |
+| `recorded_at` | `timestamp` | false | internal | UTC evidence registration time. |
+
+**Unique keys:** Primary key only.
+
+**Notes:** No actual files or credentials are included. Retention and access control require implementation.
+
+**Rules:** R46
+

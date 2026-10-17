@@ -1,0 +1,23 @@
+// Run in CI after Pages deployment. These are captures of the public URL.
+import {chromium} from '@playwright/test';
+import {mkdir,writeFile} from 'node:fs/promises';
+const url='https://subhanjandas.github.io/banking-model-atlas/';
+const out='live-evidence';await mkdir(out,{recursive:true});
+const browser=await chromium.launch();
+const page=await browser.newPage({viewport:{width:1440,height:1000},colorScheme:'light'});
+await page.goto(url,{waitUntil:'networkidle'});
+await page.getByTestId('view-summary').filter({hasText:'16 domains · 80 entities'}).waitFor({timeout:30000});
+await page.evaluate(()=>document.fonts.ready);await page.screenshot({path:out+'/light-overview.png'});
+await page.getByRole('button',{name:'Switch to dark theme'}).click();await page.waitForTimeout(400);
+await page.screenshot({path:out+'/dark-overview.png'});
+await page.goto(url+'?journey=investigate_disputed_purchase',{waitUntil:'networkidle'});
+await page.locator('.journey-steps button').nth(3).click();await page.waitForTimeout(300);
+await page.screenshot({path:out+'/journey-detail.png'});
+await page.goto(url+'?journey=review_a_fraud_alert',{waitUntil:'networkidle'});
+await page.locator('.journey-steps button').last().click();await page.waitForTimeout(300);
+await page.screenshot({path:out+'/fraud-journey.png'});
+await page.setViewportSize({width:390,height:844});
+await page.goto(url+'?entity=gl_balance_snapshot',{waitUntil:'networkidle'});
+await page.screenshot({path:out+'/mobile-detail.png'});
+await writeFile(out+'/provenance.json',JSON.stringify({url,captured_at:new Date().toISOString(),commit:process.env.GITHUB_SHA,model_version:'0.4.0',method:'Playwright Chromium, public GitHub Pages after deployment'},null,2)+'\n');
+await browser.close();

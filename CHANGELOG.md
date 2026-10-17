@@ -1,3 +1,11 @@
+# Application 1.0.0 / model 0.4.0
+
+- Expand to 80 entities, 16 domains, 128 relationships and ten journeys.
+- Add fraud, collections, rewards and customer-service schema extensions.
+- Label example coverage in entity panels and add beginner guidance.
+- Add professional author credit, visual portfolio documentation, interview notes and contributor templates.
+- Capture screenshots from the deployed public website in CI.
+
 # Application 0.4.0 / model 0.3.0
 
 - Add full internal reversals and outbound returns while preserving original postings.

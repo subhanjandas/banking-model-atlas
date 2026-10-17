@@ -97,3 +97,63 @@ A balanced journal can still be economically wrong. Reconciliation and source co
 
 Highlighted relationships: `posting_link__account_entry_id`, `posting_link__journal_line_id`, `journal_line__gl_account_id`, `journal_line__journal_id`, `reconciliation_item__account_entry_id`, `reconciliation_item__reconciliation_run_id`.
 
+## Review a fraud alert
+
+How does a signal become an investigated decision?
+
+1. **card_transaction** — Identify the posted activity.
+2. **fraud_alert** — Read the signal and its reason.
+3. **fraud_case_alert** — Locate the investigation association.
+4. **fraud_case** — Review the customer case.
+5. **fraud_decision** — Read the recorded conclusion.
+6. **fraud_action** — Inspect the requested response.
+
+Schema walkthrough only: detection, investigation outcomes and action execution have no synthetic scenario yet.
+
+Highlighted relationships: `fraud_alert__card_transaction_id`, `fraud_case_alert__fraud_alert_id`, `fraud_case_alert__fraud_case_id`, `fraud_decision__fraud_case_id`, `fraud_action__fraud_decision_id`.
+
+## Support an overdue account
+
+How are arrears, outreach and support kept distinct?
+
+1. **delinquency_snapshot** — Inspect the supplied overdue position.
+2. **account** — Identify the financial relationship.
+3. **collection_case** — Find the follow-up case.
+4. **collection_contact** — Review outreach attempts.
+5. **promise_to_pay** — Read the commitment, not a payment.
+6. **hardship_plan** — Inspect any agreed support terms.
+
+Schema walkthrough only: arrears calculations, eligibility and promise fulfillment are not implemented.
+
+Highlighted relationships: `delinquency_snapshot__account_id`, `collection_case__account_id`, `collection_contact__collection_case_id`, `promise_to_pay__collection_case_id`, `hardship_plan__collection_case_id`.
+
+## Trace reward points
+
+How do purchases, redemptions and adjustments affect points?
+
+1. **card_transaction** — Find the original purchase.
+2. **reward_earn** — Inspect the recorded award.
+3. **reward_membership** — Identify the account membership.
+4. **reward_redemption** — Review requested or fulfilled benefits.
+5. **reward_adjustment** — Review explicit corrections.
+6. **reward_balance_snapshot** — Compare the supplied closing position.
+
+Schema walkthrough only: points reconciliation and refund clawback policy remain unimplemented.
+
+Highlighted relationships: `reward_earn__card_transaction_id`, `reward_earn__reward_membership_id`, `reward_redemption__reward_membership_id`, `reward_adjustment__reward_membership_id`, `reward_balance_snapshot__reward_membership_id`.
+
+## Resolve a complaint
+
+How is a customer concern recorded and answered?
+
+1. **customer** — Identify who raised the concern.
+2. **service_request** — Read the intake context.
+3. **complaint** — Separate dissatisfaction from routine assistance.
+4. **complaint_resolution** — Read the recorded outcome.
+5. **communication** — Inspect response delivery.
+6. **document_reference** — Find references to supporting evidence.
+
+Schema walkthrough only: workflow automation and regulatory complaint obligations are outside scope.
+
+Highlighted relationships: `service_request__customer_id`, `complaint__service_request_id`, `complaint_resolution__complaint_id`, `communication__service_request_id`, `document_reference__service_request_id`.
+

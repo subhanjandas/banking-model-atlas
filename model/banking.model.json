@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "model_version": "0.3.0",
+  "model_version": "0.4.0",
   "id": "banking_model_atlas",
   "title": "Banking Model Atlas",
   "status": "educational_reference",
@@ -82,6 +82,30 @@
       "label": "Accounting and reconciliation",
       "description": "Double-entry journals, account-entry mappings and reconciliation exceptions.",
       "color": "#a17751"
+    },
+    {
+      "id": "fraud",
+      "label": "Fraud operations",
+      "description": "Signals, investigations and recorded decisions; an alert is not proof of fraud.",
+      "color": "#b77978"
+    },
+    {
+      "id": "collections",
+      "label": "Collections and hardship",
+      "description": "Overdue obligations, outreach and agreed support; a promise is not a payment.",
+      "color": "#b89459"
+    },
+    {
+      "id": "rewards",
+      "label": "Rewards and loyalty",
+      "description": "Enrollment, earning, redemption and points accounting; points are not cash.",
+      "color": "#7ca56f"
+    },
+    {
+      "id": "service",
+      "label": "Customer service",
+      "description": "Requests, complaints, evidence and communication across the customer relationship.",
+      "color": "#6d9eb3"
     }
   ],
   "entities": [
@@ -143,7 +167,8 @@
         "Organizations and beneficial ownership are outside this version."
       ],
       "rule_ids": [],
-      "unique_keys": []
+      "unique_keys": [],
+      "example_coverage": "sample_records"
     },
     {
       "id": "customer_address",
@@ -215,7 +240,8 @@
       "rule_ids": [
         "R03"
       ],
-      "unique_keys": []
+      "unique_keys": [],
+      "example_coverage": "schema_only"
     },
     {
       "id": "customer_contact",
@@ -273,7 +299,8 @@
       "rule_ids": [
         "R19"
       ],
-      "unique_keys": []
+      "unique_keys": [],
+      "example_coverage": "schema_only"
     },
     {
       "id": "customer_consent",
@@ -343,7 +370,8 @@
         "R17",
         "R21"
       ],
-      "unique_keys": []
+      "unique_keys": [],
+      "example_coverage": "schema_only"
     },
     {
       "id": "branch",
@@ -392,7 +420,8 @@
         [
           "branch_code"
         ]
-      ]
+      ],
+      "example_coverage": "sample_records"
     },
     {
       "id": "channel",
@@ -441,7 +470,8 @@
         [
           "code"
         ]
-      ]
+      ],
+      "example_coverage": "sample_records"
     },
     {
       "id": "currency",
@@ -488,7 +518,8 @@
         [
           "code"
         ]
-      ]
+      ],
+      "example_coverage": "sample_records"
     },
     {
       "id": "product",
@@ -537,7 +568,8 @@
         "R14",
         "R15"
       ],
-      "unique_keys": []
+      "unique_keys": [],
+      "example_coverage": "sample_records"
     },
     {
       "id": "product_version",
@@ -604,7 +636,8 @@
           "product_id",
           "version_number"
         ]
-      ]
+      ],
+      "example_coverage": "sample_records"
     },
     {
       "id": "fee_type",
@@ -653,7 +686,8 @@
         [
           "code"
         ]
-      ]
+      ],
+      "example_coverage": "schema_only"
     },
     {
       "id": "account",
@@ -726,7 +760,8 @@
         "R30",
         "R35"
       ],
-      "unique_keys": []
+      "unique_keys": [],
+      "example_coverage": "sample_records"
     },
     {
       "id": "account_holder",
@@ -794,7 +829,8 @@
         "R16",
         "R30"
       ],
-      "unique_keys": []
+      "unique_keys": [],
+      "example_coverage": "sample_records"
     },
     {
       "id": "account_status_event",
@@ -860,7 +896,8 @@
           "account_id",
           "effective_at"
         ]
-      ]
+      ],
+      "example_coverage": "sample_records"
     },
     {
       "id": "credit_facility",
@@ -911,7 +948,8 @@
         [
           "account_id"
         ]
-      ]
+      ],
+      "example_coverage": "sample_records"
     },
     {
       "id": "credit_limit_event",
@@ -966,7 +1004,8 @@
         "R04",
         "R17"
       ],
-      "unique_keys": []
+      "unique_keys": [],
+      "example_coverage": "sample_records"
     },
     {
       "id": "card",
@@ -1024,7 +1063,8 @@
         "R11",
         "R16"
       ],
-      "unique_keys": []
+      "unique_keys": [],
+      "example_coverage": "sample_records"
     },
     {
       "id": "card_assignment",
@@ -1091,7 +1131,8 @@
         "R05",
         "R16"
       ],
-      "unique_keys": []
+      "unique_keys": [],
+      "example_coverage": "sample_records"
     },
     {
       "id": "card_status_event",
@@ -1151,7 +1192,8 @@
           "card_id",
           "effective_at"
         ]
-      ]
+      ],
+      "example_coverage": "sample_records"
     },
     {
       "id": "merchant_category",
@@ -1193,7 +1235,8 @@
         [
           "code"
         ]
-      ]
+      ],
+      "example_coverage": "sample_records"
     },
     {
       "id": "merchant",
@@ -1243,7 +1286,8 @@
       "rule_ids": [
         "R07"
       ],
-      "unique_keys": []
+      "unique_keys": [],
+      "example_coverage": "sample_records"
     },
     {
       "id": "card_authorization",
@@ -1324,7 +1368,8 @@
         "R09",
         "R18"
       ],
-      "unique_keys": []
+      "unique_keys": [],
+      "example_coverage": "sample_records"
     },
     {
       "id": "card_transaction",
@@ -1423,7 +1468,8 @@
         "R16",
         "R18"
       ],
-      "unique_keys": []
+      "unique_keys": [],
+      "example_coverage": "sample_records"
     },
     {
       "id": "account_entry",
@@ -1565,7 +1611,8 @@
         "R39",
         "R42"
       ],
-      "unique_keys": []
+      "unique_keys": [],
+      "example_coverage": "sample_records"
     },
     {
       "id": "payment",
@@ -1641,7 +1688,8 @@
         "R11",
         "R18"
       ],
-      "unique_keys": []
+      "unique_keys": [],
+      "example_coverage": "sample_records"
     },
     {
       "id": "statement",
@@ -1730,7 +1778,8 @@
           "period_start",
           "period_end_exclusive"
         ]
-      ]
+      ],
+      "example_coverage": "sample_records"
     },
     {
       "id": "statement_line",
@@ -1792,7 +1841,8 @@
         [
           "account_entry_id"
         ]
-      ]
+      ],
+      "example_coverage": "sample_records"
     },
     {
       "id": "account_balance_snapshot",
@@ -1845,7 +1895,8 @@
           "account_id",
           "as_of_date"
         ]
-      ]
+      ],
+      "example_coverage": "sample_records"
     },
     {
       "id": "dispute_reason",
@@ -1892,7 +1943,8 @@
         [
           "code"
         ]
-      ]
+      ],
+      "example_coverage": "schema_only"
     },
     {
       "id": "dispute",
@@ -1954,7 +2006,8 @@
         "R09",
         "R16"
       ],
-      "unique_keys": []
+      "unique_keys": [],
+      "example_coverage": "schema_only"
     },
     {
       "id": "dispute_event",
@@ -2015,7 +2068,8 @@
       "rule_ids": [
         "R17"
       ],
-      "unique_keys": []
+      "unique_keys": [],
+      "example_coverage": "schema_only"
     },
     {
       "id": "onboarding_case",
@@ -2088,7 +2142,8 @@
           "description": "UTC closure time, if complete.",
           "classification": "internal"
         }
-      ]
+      ],
+      "example_coverage": "sample_records"
     },
     {
       "id": "identity_check",
@@ -2158,7 +2213,8 @@
           "description": "Synthetic opaque reference; no document number or image.",
           "classification": "personal"
         }
-      ]
+      ],
+      "example_coverage": "sample_records"
     },
     {
       "id": "kyc_review",
@@ -2217,7 +2273,8 @@
           "description": "Synthetic policy rationale code.",
           "classification": "internal"
         }
-      ]
+      ],
+      "example_coverage": "sample_records"
     },
     {
       "id": "screening_review",
@@ -2280,7 +2337,8 @@
           "description": "UTC time screening occurred.",
           "classification": "internal"
         }
-      ]
+      ],
+      "example_coverage": "sample_records"
     },
     {
       "id": "customer_risk_assessment",
@@ -2346,7 +2404,8 @@
           "description": "Planned review date.",
           "classification": "internal"
         }
-      ]
+      ],
+      "example_coverage": "sample_records"
     },
     {
       "id": "product_application",
@@ -2424,7 +2483,8 @@
           "description": "Account opened after approval, if booked.",
           "classification": "identifier"
         }
-      ]
+      ],
+      "example_coverage": "sample_records"
     },
     {
       "id": "beneficiary",
@@ -2482,7 +2542,8 @@
             "DISABLED"
           ]
         }
-      ]
+      ],
+      "example_coverage": "sample_records"
     },
     {
       "id": "standing_order",
@@ -2564,7 +2625,8 @@
             "CANCELLED"
           ]
         }
-      ]
+      ],
+      "example_coverage": "sample_records"
     },
     {
       "id": "payment_order",
@@ -2679,7 +2741,8 @@
           "description": "Unique client-request key in this single-bank scenario.",
           "classification": "internal"
         }
-      ]
+      ],
+      "example_coverage": "sample_records"
     },
     {
       "id": "payment_event",
@@ -2752,7 +2815,8 @@
           "description": "Project-local processing reason.",
           "classification": "internal"
         }
-      ]
+      ],
+      "example_coverage": "sample_records"
     },
     {
       "id": "payment_settlement",
@@ -2817,7 +2881,8 @@
           "description": "Synthetic clearing reference.",
           "classification": "internal"
         }
-      ]
+      ],
+      "example_coverage": "sample_records"
     },
     {
       "id": "account_hold",
@@ -2885,7 +2950,8 @@
           "description": "UTC expiry time.",
           "classification": "internal"
         }
-      ]
+      ],
+      "example_coverage": "sample_records"
     },
     {
       "id": "loan_application",
@@ -2953,7 +3019,8 @@
           "description": "UTC submission time.",
           "classification": "internal"
         }
-      ]
+      ],
+      "example_coverage": "sample_records"
     },
     {
       "id": "credit_decision",
@@ -3027,7 +3094,8 @@
           "description": "Last valid acceptance date.",
           "classification": "internal"
         }
-      ]
+      ],
+      "example_coverage": "sample_records"
     },
     {
       "id": "loan_contract",
@@ -3105,7 +3173,8 @@
           "description": "Contractual maturity date.",
           "classification": "internal"
         }
-      ]
+      ],
+      "example_coverage": "sample_records"
     },
     {
       "id": "loan_schedule_item",
@@ -3171,7 +3240,8 @@
           "description": "Nonnegative supplied interest amount.",
           "classification": "financial"
         }
-      ]
+      ],
+      "example_coverage": "sample_records"
     },
     {
       "id": "loan_disbursement",
@@ -3229,7 +3299,8 @@
           "description": "Funding business date.",
           "classification": "internal"
         }
-      ]
+      ],
+      "example_coverage": "sample_records"
     },
     {
       "id": "loan_repayment",
@@ -3295,7 +3366,8 @@
             "FAILED"
           ]
         }
-      ]
+      ],
+      "example_coverage": "sample_records"
     },
     {
       "id": "gl_account",
@@ -3365,7 +3437,8 @@
             "CREDIT"
           ]
         }
-      ]
+      ],
+      "example_coverage": "sample_records"
     },
     {
       "id": "journal",
@@ -3446,7 +3519,8 @@
           "description": "Unique producer event reference for idempotent ingestion.",
           "classification": "internal"
         }
-      ]
+      ],
+      "example_coverage": "sample_records"
     },
     {
       "id": "journal_line",
@@ -3519,7 +3593,8 @@
           "description": "Positive amount in journal currency.",
           "classification": "financial"
         }
-      ]
+      ],
+      "example_coverage": "sample_records"
     },
     {
       "id": "posting_link",
@@ -3572,7 +3647,8 @@
           "description": "Positive mapped portion of the account entry.",
           "classification": "financial"
         }
-      ]
+      ],
+      "example_coverage": "sample_records"
     },
     {
       "id": "reconciliation_run",
@@ -3643,7 +3719,8 @@
             "FAILED"
           ]
         }
-      ]
+      ],
+      "example_coverage": "sample_records"
     },
     {
       "id": "reconciliation_item",
@@ -3730,7 +3807,8 @@
           "description": "Synthetic explanation of the match or exception.",
           "classification": "internal"
         }
-      ]
+      ],
+      "example_coverage": "sample_records"
     },
     {
       "id": "gl_balance_snapshot",
@@ -3783,7 +3861,8 @@
       "rule_ids": [
         "R41",
         "R42"
-      ]
+      ],
+      "example_coverage": "sample_records"
     },
     {
       "id": "account_gl_mapping",
@@ -3827,7 +3906,1492 @@
       ],
       "rule_ids": [
         "R42"
-      ]
+      ],
+      "example_coverage": "sample_records"
+    },
+    {
+      "id": "fraud_rule",
+      "label": "Fraud Rule",
+      "domain": "fraud",
+      "description": "A versioned project-local detection rule definition.",
+      "grain": "One immutable rule version.",
+      "primary_key": [
+        "fraud_rule_id"
+      ],
+      "unique_keys": [
+        [
+          "rule_code",
+          "version_number"
+        ]
+      ],
+      "columns": [
+        {
+          "id": "fraud_rule_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for this record.",
+          "classification": "identifier"
+        },
+        {
+          "id": "rule_code",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable family code across versions.",
+          "classification": "internal"
+        },
+        {
+          "id": "version_number",
+          "type": "integer",
+          "nullable": false,
+          "description": "Positive rule version number.",
+          "classification": "internal"
+        },
+        {
+          "id": "description",
+          "type": "string",
+          "nullable": false,
+          "description": "Human-readable detection intent.",
+          "classification": "internal"
+        },
+        {
+          "id": "effective_from",
+          "type": "date",
+          "nullable": false,
+          "description": "First applicable business date.",
+          "classification": "internal"
+        },
+        {
+          "id": "status",
+          "type": "string",
+          "nullable": false,
+          "description": "Publication state.",
+          "classification": "internal",
+          "allowed_values": [
+            "DRAFT",
+            "ACTIVE",
+            "RETIRED"
+          ]
+        }
+      ],
+      "rule_ids": [
+        "R43"
+      ],
+      "notes": [
+        "No executable fraud scoring or real detection thresholds are included."
+      ],
+      "example_coverage": "schema_only"
+    },
+    {
+      "id": "fraud_alert",
+      "label": "Fraud Alert",
+      "domain": "fraud",
+      "description": "A signal requiring review, not a confirmed loss.",
+      "grain": "One rule-triggered alert about a posted card transaction.",
+      "primary_key": [
+        "fraud_alert_id"
+      ],
+      "unique_keys": [],
+      "columns": [
+        {
+          "id": "fraud_alert_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for this record.",
+          "classification": "identifier"
+        },
+        {
+          "id": "card_transaction_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Transaction that raised the signal.",
+          "classification": "identifier"
+        },
+        {
+          "id": "fraud_rule_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Version of the detection rule.",
+          "classification": "identifier"
+        },
+        {
+          "id": "raised_at",
+          "type": "timestamp",
+          "nullable": false,
+          "description": "UTC observation time.",
+          "classification": "internal"
+        },
+        {
+          "id": "severity",
+          "type": "string",
+          "nullable": false,
+          "description": "Project-local review priority.",
+          "classification": "internal",
+          "allowed_values": [
+            "LOW",
+            "MEDIUM",
+            "HIGH"
+          ]
+        },
+        {
+          "id": "reason",
+          "type": "string",
+          "nullable": false,
+          "description": "Readable explanation for review.",
+          "classification": "internal"
+        }
+      ],
+      "rule_ids": [
+        "R43"
+      ],
+      "notes": [
+        "This extension covers posted-card alerts, not authorization-time decisions."
+      ],
+      "example_coverage": "schema_only"
+    },
+    {
+      "id": "fraud_case",
+      "label": "Fraud Case",
+      "domain": "fraud",
+      "description": "An investigation for one customer, potentially grouping several alerts.",
+      "grain": "One customer fraud investigation.",
+      "primary_key": [
+        "fraud_case_id"
+      ],
+      "unique_keys": [],
+      "columns": [
+        {
+          "id": "fraud_case_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for this record.",
+          "classification": "identifier"
+        },
+        {
+          "id": "customer_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Customer whose activity is under review.",
+          "classification": "identifier"
+        },
+        {
+          "id": "opened_at",
+          "type": "timestamp",
+          "nullable": false,
+          "description": "UTC case opening time.",
+          "classification": "internal"
+        },
+        {
+          "id": "status",
+          "type": "string",
+          "nullable": false,
+          "description": "Supplied current case state.",
+          "classification": "internal",
+          "allowed_values": [
+            "OPEN",
+            "REVIEWING",
+            "CLOSED"
+          ]
+        },
+        {
+          "id": "summary",
+          "type": "string",
+          "nullable": false,
+          "description": "Synthetic investigation context.",
+          "classification": "internal"
+        }
+      ],
+      "rule_ids": [
+        "R43"
+      ],
+      "notes": [
+        "A case may collect multiple alerts; status transitions are not yet executable."
+      ],
+      "example_coverage": "schema_only"
+    },
+    {
+      "id": "fraud_case_alert",
+      "label": "Fraud Case Alert",
+      "domain": "fraud",
+      "description": "An explicit association between an investigation and a signal.",
+      "grain": "One alert associated with one case.",
+      "primary_key": [
+        "fraud_case_alert_id"
+      ],
+      "unique_keys": [
+        [
+          "fraud_case_id",
+          "fraud_alert_id"
+        ]
+      ],
+      "columns": [
+        {
+          "id": "fraud_case_alert_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for this record.",
+          "classification": "identifier"
+        },
+        {
+          "id": "fraud_case_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Investigation reviewing this alert.",
+          "classification": "identifier"
+        },
+        {
+          "id": "fraud_alert_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Signal included in the investigation.",
+          "classification": "identifier"
+        },
+        {
+          "id": "linked_at",
+          "type": "timestamp",
+          "nullable": false,
+          "description": "UTC association time.",
+          "classification": "internal"
+        }
+      ],
+      "rule_ids": [
+        "R43"
+      ],
+      "notes": [
+        "Association is not a verdict. Check customer ownership separately."
+      ],
+      "example_coverage": "schema_only"
+    },
+    {
+      "id": "fraud_decision",
+      "label": "Fraud Decision",
+      "domain": "fraud",
+      "description": "A recorded assessment of an investigation.",
+      "grain": "One dated decision for a fraud case.",
+      "primary_key": [
+        "fraud_decision_id"
+      ],
+      "unique_keys": [],
+      "columns": [
+        {
+          "id": "fraud_decision_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for this record.",
+          "classification": "identifier"
+        },
+        {
+          "id": "fraud_case_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Case being assessed.",
+          "classification": "identifier"
+        },
+        {
+          "id": "decided_at",
+          "type": "timestamp",
+          "nullable": false,
+          "description": "UTC decision time.",
+          "classification": "internal"
+        },
+        {
+          "id": "outcome",
+          "type": "string",
+          "nullable": false,
+          "description": "Investigator conclusion.",
+          "classification": "internal",
+          "allowed_values": [
+            "CONFIRMED",
+            "NOT_FRAUD",
+            "INCONCLUSIVE"
+          ]
+        },
+        {
+          "id": "rationale",
+          "type": "string",
+          "nullable": false,
+          "description": "Synthetic explanation for the assessment.",
+          "classification": "internal"
+        }
+      ],
+      "rule_ids": [
+        "R43"
+      ],
+      "notes": [
+        "A decision does not itself book a refund or loss."
+      ],
+      "example_coverage": "schema_only"
+    },
+    {
+      "id": "fraud_action",
+      "label": "Fraud Action",
+      "domain": "fraud",
+      "description": "A recorded requested response to a case decision.",
+      "grain": "One requested action following a fraud decision.",
+      "primary_key": [
+        "fraud_action_id"
+      ],
+      "unique_keys": [],
+      "columns": [
+        {
+          "id": "fraud_action_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for this record.",
+          "classification": "identifier"
+        },
+        {
+          "id": "fraud_decision_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Decision authorizing the request.",
+          "classification": "identifier"
+        },
+        {
+          "id": "card_id",
+          "type": "string",
+          "nullable": true,
+          "description": "Affected instrument, when relevant.",
+          "classification": "identifier"
+        },
+        {
+          "id": "action_type",
+          "type": "string",
+          "nullable": false,
+          "description": "Intended operational response.",
+          "classification": "internal",
+          "allowed_values": [
+            "BLOCK_CARD",
+            "CONTACT_CUSTOMER",
+            "REFER_DISPUTE"
+          ]
+        },
+        {
+          "id": "status",
+          "type": "string",
+          "nullable": false,
+          "description": "Execution observation.",
+          "classification": "internal",
+          "allowed_values": [
+            "REQUESTED",
+            "COMPLETED",
+            "FAILED"
+          ]
+        },
+        {
+          "id": "requested_at",
+          "type": "timestamp",
+          "nullable": false,
+          "description": "UTC request time.",
+          "classification": "internal"
+        }
+      ],
+      "rule_ids": [
+        "R43"
+      ],
+      "notes": [
+        "COMPLETED is supplied evidence; this schema does not call card systems."
+      ],
+      "example_coverage": "schema_only"
+    },
+    {
+      "id": "delinquency_snapshot",
+      "label": "Delinquency Snapshot",
+      "domain": "collections",
+      "description": "A supplied point-in-time view of overdue obligations.",
+      "grain": "One account delinquency assessment for a business date.",
+      "primary_key": [
+        "delinquency_snapshot_id"
+      ],
+      "unique_keys": [
+        [
+          "account_id",
+          "as_of_date"
+        ]
+      ],
+      "columns": [
+        {
+          "id": "delinquency_snapshot_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for this record.",
+          "classification": "identifier"
+        },
+        {
+          "id": "account_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Account with assessed obligations.",
+          "classification": "identifier"
+        },
+        {
+          "id": "as_of_date",
+          "type": "date",
+          "nullable": false,
+          "description": "Business date of assessment.",
+          "classification": "internal"
+        },
+        {
+          "id": "days_past_due",
+          "type": "integer",
+          "nullable": false,
+          "description": "Nonnegative days since the oldest unpaid due date.",
+          "classification": "internal"
+        },
+        {
+          "id": "overdue_amount",
+          "type": "decimal(18,2)",
+          "nullable": false,
+          "description": "Nonnegative overdue amount in account currency.",
+          "classification": "financial"
+        }
+      ],
+      "rule_ids": [
+        "R44"
+      ],
+      "notes": [
+        "Overdue calculation and payment allocation are not implemented."
+      ],
+      "example_coverage": "schema_only"
+    },
+    {
+      "id": "collection_case",
+      "label": "Collection Case",
+      "domain": "collections",
+      "description": "A work item for follow-up on a credit obligation.",
+      "grain": "One collections case for an account.",
+      "primary_key": [
+        "collection_case_id"
+      ],
+      "unique_keys": [],
+      "columns": [
+        {
+          "id": "collection_case_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for this record.",
+          "classification": "identifier"
+        },
+        {
+          "id": "account_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Credit account being serviced.",
+          "classification": "identifier"
+        },
+        {
+          "id": "customer_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Customer contacted about the obligation.",
+          "classification": "identifier"
+        },
+        {
+          "id": "opened_on",
+          "type": "date",
+          "nullable": false,
+          "description": "Business date opened.",
+          "classification": "internal"
+        },
+        {
+          "id": "status",
+          "type": "string",
+          "nullable": false,
+          "description": "Supplied workflow state.",
+          "classification": "internal",
+          "allowed_values": [
+            "OPEN",
+            "PAUSED",
+            "CLOSED"
+          ]
+        }
+      ],
+      "rule_ids": [
+        "R44"
+      ],
+      "notes": [
+        "Contact person must have an appropriate relationship to the account."
+      ],
+      "example_coverage": "schema_only"
+    },
+    {
+      "id": "collection_contact",
+      "label": "Collection Contact",
+      "domain": "collections",
+      "description": "A recorded outreach attempt.",
+      "grain": "One contact attempt for a collections case.",
+      "primary_key": [
+        "collection_contact_id"
+      ],
+      "unique_keys": [],
+      "columns": [
+        {
+          "id": "collection_contact_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for this record.",
+          "classification": "identifier"
+        },
+        {
+          "id": "collection_case_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Case prompting contact.",
+          "classification": "identifier"
+        },
+        {
+          "id": "channel_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Communication channel.",
+          "classification": "identifier"
+        },
+        {
+          "id": "attempted_at",
+          "type": "timestamp",
+          "nullable": false,
+          "description": "UTC contact time.",
+          "classification": "internal"
+        },
+        {
+          "id": "outcome",
+          "type": "string",
+          "nullable": false,
+          "description": "Observed result.",
+          "classification": "internal",
+          "allowed_values": [
+            "REACHED",
+            "NO_ANSWER",
+            "DECLINED"
+          ]
+        },
+        {
+          "id": "note",
+          "type": "string",
+          "nullable": false,
+          "description": "Synthetic outcome note.",
+          "classification": "internal"
+        }
+      ],
+      "rule_ids": [
+        "R44"
+      ],
+      "notes": [
+        "No real recordings, phone numbers or collection scripts are stored."
+      ],
+      "example_coverage": "schema_only"
+    },
+    {
+      "id": "promise_to_pay",
+      "label": "Promise to Pay",
+      "domain": "collections",
+      "description": "A customer commitment that may or may not be fulfilled.",
+      "grain": "One recorded payment promise.",
+      "primary_key": [
+        "promise_to_pay_id"
+      ],
+      "unique_keys": [],
+      "columns": [
+        {
+          "id": "promise_to_pay_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for this record.",
+          "classification": "identifier"
+        },
+        {
+          "id": "collection_case_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Case receiving the promise.",
+          "classification": "identifier"
+        },
+        {
+          "id": "promised_on",
+          "type": "date",
+          "nullable": false,
+          "description": "Date commitment was recorded.",
+          "classification": "internal"
+        },
+        {
+          "id": "due_on",
+          "type": "date",
+          "nullable": false,
+          "description": "Agreed payment date.",
+          "classification": "internal"
+        },
+        {
+          "id": "promised_amount",
+          "type": "decimal(18,2)",
+          "nullable": false,
+          "description": "Positive promised amount in account currency.",
+          "classification": "financial"
+        },
+        {
+          "id": "status",
+          "type": "string",
+          "nullable": false,
+          "description": "Supplied assessment.",
+          "classification": "internal",
+          "allowed_values": [
+            "OPEN",
+            "KEPT",
+            "BROKEN",
+            "CANCELLED"
+          ]
+        }
+      ],
+      "rule_ids": [
+        "R44"
+      ],
+      "notes": [
+        "KEPT must be supported by payments; a promise is not booked money."
+      ],
+      "example_coverage": "schema_only"
+    },
+    {
+      "id": "hardship_plan",
+      "label": "Hardship Plan",
+      "domain": "collections",
+      "description": "An agreed temporary support arrangement.",
+      "grain": "One version of a hardship arrangement for a collections case.",
+      "primary_key": [
+        "hardship_plan_id"
+      ],
+      "unique_keys": [],
+      "columns": [
+        {
+          "id": "hardship_plan_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for this record.",
+          "classification": "identifier"
+        },
+        {
+          "id": "collection_case_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Case receiving support.",
+          "classification": "identifier"
+        },
+        {
+          "id": "starts_on",
+          "type": "date",
+          "nullable": false,
+          "description": "Inclusive plan start.",
+          "classification": "internal"
+        },
+        {
+          "id": "ends_on",
+          "type": "date",
+          "nullable": false,
+          "description": "Exclusive plan end.",
+          "classification": "internal"
+        },
+        {
+          "id": "terms_summary",
+          "type": "string",
+          "nullable": false,
+          "description": "Synthetic summary, not a legal agreement.",
+          "classification": "internal"
+        },
+        {
+          "id": "status",
+          "type": "string",
+          "nullable": false,
+          "description": "Supplied arrangement state.",
+          "classification": "internal",
+          "allowed_values": [
+            "PROPOSED",
+            "ACTIVE",
+            "ENDED"
+          ]
+        }
+      ],
+      "rule_ids": [
+        "R44"
+      ],
+      "notes": [
+        "Contract changes, interest treatment and legal eligibility are outside this extension."
+      ],
+      "example_coverage": "schema_only"
+    },
+    {
+      "id": "collection_case_event",
+      "label": "Collection Case Event",
+      "domain": "collections",
+      "description": "A historical observation in a collections workflow.",
+      "grain": "One dated case event.",
+      "primary_key": [
+        "collection_case_event_id"
+      ],
+      "unique_keys": [],
+      "columns": [
+        {
+          "id": "collection_case_event_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for this record.",
+          "classification": "identifier"
+        },
+        {
+          "id": "collection_case_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Case being progressed.",
+          "classification": "identifier"
+        },
+        {
+          "id": "occurred_at",
+          "type": "timestamp",
+          "nullable": false,
+          "description": "UTC event time.",
+          "classification": "internal"
+        },
+        {
+          "id": "event_type",
+          "type": "string",
+          "nullable": false,
+          "description": "Project-local event classification.",
+          "classification": "internal"
+        },
+        {
+          "id": "reason",
+          "type": "string",
+          "nullable": false,
+          "description": "Synthetic reason for the event.",
+          "classification": "internal"
+        }
+      ],
+      "rule_ids": [
+        "R44"
+      ],
+      "notes": [
+        "This event vocabulary is descriptive; no transition validator is supplied yet."
+      ],
+      "example_coverage": "schema_only"
+    },
+    {
+      "id": "reward_program",
+      "label": "Reward Program",
+      "domain": "rewards",
+      "description": "A versioned definition of a points offering.",
+      "grain": "One program version.",
+      "primary_key": [
+        "reward_program_id"
+      ],
+      "unique_keys": [
+        [
+          "program_code",
+          "version_number"
+        ]
+      ],
+      "columns": [
+        {
+          "id": "reward_program_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for this record.",
+          "classification": "identifier"
+        },
+        {
+          "id": "program_code",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable program family.",
+          "classification": "internal"
+        },
+        {
+          "id": "version_number",
+          "type": "integer",
+          "nullable": false,
+          "description": "Positive terms version.",
+          "classification": "internal"
+        },
+        {
+          "id": "name",
+          "type": "string",
+          "nullable": false,
+          "description": "Display name.",
+          "classification": "internal"
+        },
+        {
+          "id": "effective_from",
+          "type": "date",
+          "nullable": false,
+          "description": "First applicable date.",
+          "classification": "internal"
+        }
+      ],
+      "rule_ids": [
+        "R45"
+      ],
+      "notes": [
+        "Points are integer units; no universal cash value is assumed."
+      ],
+      "example_coverage": "schema_only"
+    },
+    {
+      "id": "reward_membership",
+      "label": "Reward Membership",
+      "domain": "rewards",
+      "description": "An account enrollment in a rewards program.",
+      "grain": "One account enrollment interval.",
+      "primary_key": [
+        "reward_membership_id"
+      ],
+      "unique_keys": [],
+      "columns": [
+        {
+          "id": "reward_membership_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for this record.",
+          "classification": "identifier"
+        },
+        {
+          "id": "account_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Eligible account.",
+          "classification": "identifier"
+        },
+        {
+          "id": "reward_program_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Program version accepted.",
+          "classification": "identifier"
+        },
+        {
+          "id": "enrolled_on",
+          "type": "date",
+          "nullable": false,
+          "description": "Enrollment business date.",
+          "classification": "internal"
+        },
+        {
+          "id": "status",
+          "type": "string",
+          "nullable": false,
+          "description": "Supplied membership state.",
+          "classification": "internal",
+          "allowed_values": [
+            "ACTIVE",
+            "SUSPENDED",
+            "CLOSED"
+          ]
+        }
+      ],
+      "rule_ids": [
+        "R45"
+      ],
+      "notes": [
+        "The account owns the points in this fictional design; household pooling is excluded."
+      ],
+      "example_coverage": "schema_only"
+    },
+    {
+      "id": "reward_earn",
+      "label": "Reward Earn",
+      "domain": "rewards",
+      "description": "A points earning observation linked to a purchase.",
+      "grain": "One earning award for a card transaction and membership.",
+      "primary_key": [
+        "reward_earn_id"
+      ],
+      "unique_keys": [],
+      "columns": [
+        {
+          "id": "reward_earn_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for this record.",
+          "classification": "identifier"
+        },
+        {
+          "id": "reward_membership_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Membership receiving points.",
+          "classification": "identifier"
+        },
+        {
+          "id": "card_transaction_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Purchase generating the award.",
+          "classification": "identifier"
+        },
+        {
+          "id": "points",
+          "type": "integer",
+          "nullable": false,
+          "description": "Positive awarded integer units.",
+          "classification": "internal"
+        },
+        {
+          "id": "earned_on",
+          "type": "date",
+          "nullable": false,
+          "description": "Award business date.",
+          "classification": "internal"
+        }
+      ],
+      "rule_ids": [
+        "R45"
+      ],
+      "notes": [
+        "Multiple awards may represent base and promotional points. Earning rates are not calculated."
+      ],
+      "example_coverage": "schema_only"
+    },
+    {
+      "id": "reward_redemption",
+      "label": "Reward Redemption",
+      "domain": "rewards",
+      "description": "A request to spend points on a benefit.",
+      "grain": "One redemption request.",
+      "primary_key": [
+        "reward_redemption_id"
+      ],
+      "unique_keys": [],
+      "columns": [
+        {
+          "id": "reward_redemption_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for this record.",
+          "classification": "identifier"
+        },
+        {
+          "id": "reward_membership_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Membership spending points.",
+          "classification": "identifier"
+        },
+        {
+          "id": "points",
+          "type": "integer",
+          "nullable": false,
+          "description": "Positive requested integer units.",
+          "classification": "internal"
+        },
+        {
+          "id": "requested_at",
+          "type": "timestamp",
+          "nullable": false,
+          "description": "UTC redemption request time.",
+          "classification": "internal"
+        },
+        {
+          "id": "status",
+          "type": "string",
+          "nullable": false,
+          "description": "Supplied fulfillment state.",
+          "classification": "internal",
+          "allowed_values": [
+            "REQUESTED",
+            "FULFILLED",
+            "CANCELLED"
+          ]
+        },
+        {
+          "id": "benefit_reference",
+          "type": "string",
+          "nullable": false,
+          "description": "Synthetic benefit identifier.",
+          "classification": "internal"
+        }
+      ],
+      "rule_ids": [
+        "R45"
+      ],
+      "notes": [
+        "A cancelled request should not consume settled points. Fulfillment is not automated."
+      ],
+      "example_coverage": "schema_only"
+    },
+    {
+      "id": "reward_adjustment",
+      "label": "Reward Adjustment",
+      "domain": "rewards",
+      "description": "A manual or correction-related change in points.",
+      "grain": "One signed points adjustment.",
+      "primary_key": [
+        "reward_adjustment_id"
+      ],
+      "unique_keys": [],
+      "columns": [
+        {
+          "id": "reward_adjustment_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for this record.",
+          "classification": "identifier"
+        },
+        {
+          "id": "reward_membership_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Membership being corrected.",
+          "classification": "identifier"
+        },
+        {
+          "id": "reward_earn_id",
+          "type": "string",
+          "nullable": true,
+          "description": "Original award when reversing earned points.",
+          "classification": "identifier"
+        },
+        {
+          "id": "points_delta",
+          "type": "integer",
+          "nullable": false,
+          "description": "Nonzero signed points change.",
+          "classification": "internal"
+        },
+        {
+          "id": "reason",
+          "type": "string",
+          "nullable": false,
+          "description": "Reason explaining the correction.",
+          "classification": "internal"
+        },
+        {
+          "id": "adjusted_on",
+          "type": "date",
+          "nullable": false,
+          "description": "Adjustment date.",
+          "classification": "internal"
+        }
+      ],
+      "rule_ids": [
+        "R45"
+      ],
+      "notes": [
+        "Refund clawbacks need explicit policy and allocation; they are not inferred automatically."
+      ],
+      "example_coverage": "schema_only"
+    },
+    {
+      "id": "reward_balance_snapshot",
+      "label": "Reward Balance Snapshot",
+      "domain": "rewards",
+      "description": "A supplied points position for reconciliation.",
+      "grain": "One membership points balance at business-date close.",
+      "primary_key": [
+        "reward_balance_snapshot_id"
+      ],
+      "unique_keys": [
+        [
+          "reward_membership_id",
+          "as_of_date"
+        ]
+      ],
+      "columns": [
+        {
+          "id": "reward_balance_snapshot_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for this record.",
+          "classification": "identifier"
+        },
+        {
+          "id": "reward_membership_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Membership whose points are counted.",
+          "classification": "identifier"
+        },
+        {
+          "id": "as_of_date",
+          "type": "date",
+          "nullable": false,
+          "description": "Closing business date.",
+          "classification": "internal"
+        },
+        {
+          "id": "points_balance",
+          "type": "integer",
+          "nullable": false,
+          "description": "Signed points balance; negative exceptions require review.",
+          "classification": "internal"
+        }
+      ],
+      "rule_ids": [
+        "R45"
+      ],
+      "notes": [
+        "Snapshot reconciliation against earns, fulfilled redemptions and adjustments remains future work."
+      ],
+      "example_coverage": "schema_only"
+    },
+    {
+      "id": "service_request",
+      "label": "Service Request",
+      "domain": "service",
+      "description": "A customer request for assistance.",
+      "grain": "One service request opened by a customer.",
+      "primary_key": [
+        "service_request_id"
+      ],
+      "unique_keys": [],
+      "columns": [
+        {
+          "id": "service_request_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for this record.",
+          "classification": "identifier"
+        },
+        {
+          "id": "customer_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Customer requesting assistance.",
+          "classification": "identifier"
+        },
+        {
+          "id": "account_id",
+          "type": "string",
+          "nullable": true,
+          "description": "Relevant account, if account-specific.",
+          "classification": "identifier"
+        },
+        {
+          "id": "channel_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Intake channel.",
+          "classification": "identifier"
+        },
+        {
+          "id": "opened_at",
+          "type": "timestamp",
+          "nullable": false,
+          "description": "UTC intake time.",
+          "classification": "internal"
+        },
+        {
+          "id": "status",
+          "type": "string",
+          "nullable": false,
+          "description": "Supplied request status.",
+          "classification": "internal",
+          "allowed_values": [
+            "OPEN",
+            "IN_PROGRESS",
+            "RESOLVED"
+          ]
+        },
+        {
+          "id": "category",
+          "type": "string",
+          "nullable": false,
+          "description": "Project-local request category.",
+          "classification": "internal"
+        }
+      ],
+      "rule_ids": [
+        "R46"
+      ],
+      "notes": [
+        "A request is distinct from a dispute and does not imply financial adjustment."
+      ],
+      "example_coverage": "schema_only"
+    },
+    {
+      "id": "service_request_event",
+      "label": "Service Request Event",
+      "domain": "service",
+      "description": "A dated change or update on a service request.",
+      "grain": "One service request event.",
+      "primary_key": [
+        "service_request_event_id"
+      ],
+      "unique_keys": [],
+      "columns": [
+        {
+          "id": "service_request_event_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for this record.",
+          "classification": "identifier"
+        },
+        {
+          "id": "service_request_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Request being progressed.",
+          "classification": "identifier"
+        },
+        {
+          "id": "occurred_at",
+          "type": "timestamp",
+          "nullable": false,
+          "description": "UTC event time.",
+          "classification": "internal"
+        },
+        {
+          "id": "event_type",
+          "type": "string",
+          "nullable": false,
+          "description": "Project-local update category.",
+          "classification": "internal"
+        },
+        {
+          "id": "note",
+          "type": "string",
+          "nullable": false,
+          "description": "Synthetic explanatory note.",
+          "classification": "internal"
+        }
+      ],
+      "rule_ids": [
+        "R46"
+      ],
+      "notes": [
+        "Late-arrival correction and service workflow transitions are not implemented."
+      ],
+      "example_coverage": "schema_only"
+    },
+    {
+      "id": "complaint",
+      "label": "Complaint",
+      "domain": "service",
+      "description": "An expression of dissatisfaction tracked separately from routine assistance.",
+      "grain": "One complaint linked to a service request.",
+      "primary_key": [
+        "complaint_id"
+      ],
+      "unique_keys": [],
+      "columns": [
+        {
+          "id": "complaint_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for this record.",
+          "classification": "identifier"
+        },
+        {
+          "id": "service_request_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Intake request.",
+          "classification": "identifier"
+        },
+        {
+          "id": "received_on",
+          "type": "date",
+          "nullable": false,
+          "description": "Complaint receipt date.",
+          "classification": "internal"
+        },
+        {
+          "id": "category",
+          "type": "string",
+          "nullable": false,
+          "description": "Project-local complaint category.",
+          "classification": "internal"
+        },
+        {
+          "id": "status",
+          "type": "string",
+          "nullable": false,
+          "description": "Supplied complaint state.",
+          "classification": "internal",
+          "allowed_values": [
+            "OPEN",
+            "INVESTIGATING",
+            "CLOSED"
+          ]
+        }
+      ],
+      "rule_ids": [
+        "R46"
+      ],
+      "notes": [
+        "No jurisdiction-specific resolution deadline or regulatory reporting is claimed."
+      ],
+      "example_coverage": "schema_only"
+    },
+    {
+      "id": "complaint_resolution",
+      "label": "Complaint Resolution",
+      "domain": "service",
+      "description": "A recorded response and outcome for a complaint.",
+      "grain": "One resolution observation for a complaint.",
+      "primary_key": [
+        "complaint_resolution_id"
+      ],
+      "unique_keys": [],
+      "columns": [
+        {
+          "id": "complaint_resolution_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for this record.",
+          "classification": "identifier"
+        },
+        {
+          "id": "complaint_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Complaint being resolved.",
+          "classification": "identifier"
+        },
+        {
+          "id": "resolved_on",
+          "type": "date",
+          "nullable": false,
+          "description": "Response business date.",
+          "classification": "internal"
+        },
+        {
+          "id": "outcome",
+          "type": "string",
+          "nullable": false,
+          "description": "Synthetic resolution category.",
+          "classification": "internal"
+        },
+        {
+          "id": "explanation",
+          "type": "string",
+          "nullable": false,
+          "description": "Readable response rationale.",
+          "classification": "internal"
+        }
+      ],
+      "rule_ids": [
+        "R46"
+      ],
+      "notes": [
+        "A goodwill credit would require a separately booked and reconciled account entry."
+      ],
+      "example_coverage": "schema_only"
+    },
+    {
+      "id": "communication",
+      "label": "Communication",
+      "domain": "service",
+      "description": "A recorded communication envelope without message content.",
+      "grain": "One outbound message attempt for a request.",
+      "primary_key": [
+        "communication_id"
+      ],
+      "unique_keys": [],
+      "columns": [
+        {
+          "id": "communication_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for this record.",
+          "classification": "identifier"
+        },
+        {
+          "id": "service_request_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Request prompting communication.",
+          "classification": "identifier"
+        },
+        {
+          "id": "channel_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Delivery channel.",
+          "classification": "identifier"
+        },
+        {
+          "id": "sent_at",
+          "type": "timestamp",
+          "nullable": false,
+          "description": "UTC attempted send time.",
+          "classification": "internal"
+        },
+        {
+          "id": "delivery_status",
+          "type": "string",
+          "nullable": false,
+          "description": "Supplied transport result.",
+          "classification": "internal",
+          "allowed_values": [
+            "SENT",
+            "DELIVERED",
+            "FAILED"
+          ]
+        },
+        {
+          "id": "template_code",
+          "type": "string",
+          "nullable": false,
+          "description": "Synthetic message template reference.",
+          "classification": "internal"
+        }
+      ],
+      "rule_ids": [
+        "R46"
+      ],
+      "notes": [
+        "No addresses, tokens or message bodies are stored. Delivery does not prove the customer read it."
+      ],
+      "example_coverage": "schema_only"
+    },
+    {
+      "id": "document_reference",
+      "label": "Document Reference",
+      "domain": "service",
+      "description": "Metadata describing evidence held outside the model.",
+      "grain": "One external document reference attached to a request.",
+      "primary_key": [
+        "document_reference_id"
+      ],
+      "unique_keys": [],
+      "columns": [
+        {
+          "id": "document_reference_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable synthetic identifier for this record.",
+          "classification": "identifier"
+        },
+        {
+          "id": "service_request_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Request requiring evidence.",
+          "classification": "identifier"
+        },
+        {
+          "id": "document_type",
+          "type": "string",
+          "nullable": false,
+          "description": "Project-local evidence classification.",
+          "classification": "internal"
+        },
+        {
+          "id": "external_reference",
+          "type": "string",
+          "nullable": false,
+          "description": "Opaque synthetic reference, not a signed URL.",
+          "classification": "internal"
+        },
+        {
+          "id": "recorded_at",
+          "type": "timestamp",
+          "nullable": false,
+          "description": "UTC evidence registration time.",
+          "classification": "internal"
+        }
+      ],
+      "rule_ids": [
+        "R46"
+      ],
+      "notes": [
+        "No actual files or credentials are included. Retention and access control require implementation."
+      ],
+      "example_coverage": "schema_only"
     }
   ],
   "relationships": [
@@ -4875,6 +6439,369 @@
       "target_to_source": "zero_or_many",
       "description": "Connect the reconciliation record to its represented account.",
       "enforcement": "DuckDB foreign key"
+    },
+    {
+      "id": "fraud_alert__card_transaction_id",
+      "source_entity": "fraud_alert",
+      "source_column": "card_transaction_id",
+      "target_entity": "card_transaction",
+      "target_column": "card_transaction_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Transaction that raised the signal.",
+      "enforcement": "DuckDB foreign key; business semantics require separate checks"
+    },
+    {
+      "id": "fraud_alert__fraud_rule_id",
+      "source_entity": "fraud_alert",
+      "source_column": "fraud_rule_id",
+      "target_entity": "fraud_rule",
+      "target_column": "fraud_rule_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Version of the detection rule.",
+      "enforcement": "DuckDB foreign key; business semantics require separate checks"
+    },
+    {
+      "id": "fraud_case__customer_id",
+      "source_entity": "fraud_case",
+      "source_column": "customer_id",
+      "target_entity": "customer",
+      "target_column": "customer_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Customer whose activity is under review.",
+      "enforcement": "DuckDB foreign key; business semantics require separate checks"
+    },
+    {
+      "id": "fraud_case_alert__fraud_case_id",
+      "source_entity": "fraud_case_alert",
+      "source_column": "fraud_case_id",
+      "target_entity": "fraud_case",
+      "target_column": "fraud_case_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Investigation reviewing this alert.",
+      "enforcement": "DuckDB foreign key; business semantics require separate checks"
+    },
+    {
+      "id": "fraud_case_alert__fraud_alert_id",
+      "source_entity": "fraud_case_alert",
+      "source_column": "fraud_alert_id",
+      "target_entity": "fraud_alert",
+      "target_column": "fraud_alert_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Signal included in the investigation.",
+      "enforcement": "DuckDB foreign key; business semantics require separate checks"
+    },
+    {
+      "id": "fraud_decision__fraud_case_id",
+      "source_entity": "fraud_decision",
+      "source_column": "fraud_case_id",
+      "target_entity": "fraud_case",
+      "target_column": "fraud_case_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Case being assessed.",
+      "enforcement": "DuckDB foreign key; business semantics require separate checks"
+    },
+    {
+      "id": "fraud_action__fraud_decision_id",
+      "source_entity": "fraud_action",
+      "source_column": "fraud_decision_id",
+      "target_entity": "fraud_decision",
+      "target_column": "fraud_decision_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Decision authorizing the request.",
+      "enforcement": "DuckDB foreign key; business semantics require separate checks"
+    },
+    {
+      "id": "fraud_action__card_id",
+      "source_entity": "fraud_action",
+      "source_column": "card_id",
+      "target_entity": "card",
+      "target_column": "card_id",
+      "source_to_target": "zero_or_one",
+      "target_to_source": "zero_or_many",
+      "description": "Affected instrument, when relevant.",
+      "enforcement": "DuckDB foreign key; business semantics require separate checks"
+    },
+    {
+      "id": "delinquency_snapshot__account_id",
+      "source_entity": "delinquency_snapshot",
+      "source_column": "account_id",
+      "target_entity": "account",
+      "target_column": "account_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Account with assessed obligations.",
+      "enforcement": "DuckDB foreign key; business semantics require separate checks"
+    },
+    {
+      "id": "collection_case__account_id",
+      "source_entity": "collection_case",
+      "source_column": "account_id",
+      "target_entity": "account",
+      "target_column": "account_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Credit account being serviced.",
+      "enforcement": "DuckDB foreign key; business semantics require separate checks"
+    },
+    {
+      "id": "collection_case__customer_id",
+      "source_entity": "collection_case",
+      "source_column": "customer_id",
+      "target_entity": "customer",
+      "target_column": "customer_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Customer contacted about the obligation.",
+      "enforcement": "DuckDB foreign key; business semantics require separate checks"
+    },
+    {
+      "id": "collection_contact__collection_case_id",
+      "source_entity": "collection_contact",
+      "source_column": "collection_case_id",
+      "target_entity": "collection_case",
+      "target_column": "collection_case_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Case prompting contact.",
+      "enforcement": "DuckDB foreign key; business semantics require separate checks"
+    },
+    {
+      "id": "collection_contact__channel_id",
+      "source_entity": "collection_contact",
+      "source_column": "channel_id",
+      "target_entity": "channel",
+      "target_column": "channel_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Communication channel.",
+      "enforcement": "DuckDB foreign key; business semantics require separate checks"
+    },
+    {
+      "id": "promise_to_pay__collection_case_id",
+      "source_entity": "promise_to_pay",
+      "source_column": "collection_case_id",
+      "target_entity": "collection_case",
+      "target_column": "collection_case_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Case receiving the promise.",
+      "enforcement": "DuckDB foreign key; business semantics require separate checks"
+    },
+    {
+      "id": "hardship_plan__collection_case_id",
+      "source_entity": "hardship_plan",
+      "source_column": "collection_case_id",
+      "target_entity": "collection_case",
+      "target_column": "collection_case_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Case receiving support.",
+      "enforcement": "DuckDB foreign key; business semantics require separate checks"
+    },
+    {
+      "id": "collection_case_event__collection_case_id",
+      "source_entity": "collection_case_event",
+      "source_column": "collection_case_id",
+      "target_entity": "collection_case",
+      "target_column": "collection_case_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Case being progressed.",
+      "enforcement": "DuckDB foreign key; business semantics require separate checks"
+    },
+    {
+      "id": "reward_membership__account_id",
+      "source_entity": "reward_membership",
+      "source_column": "account_id",
+      "target_entity": "account",
+      "target_column": "account_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Eligible account.",
+      "enforcement": "DuckDB foreign key; business semantics require separate checks"
+    },
+    {
+      "id": "reward_membership__reward_program_id",
+      "source_entity": "reward_membership",
+      "source_column": "reward_program_id",
+      "target_entity": "reward_program",
+      "target_column": "reward_program_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Program version accepted.",
+      "enforcement": "DuckDB foreign key; business semantics require separate checks"
+    },
+    {
+      "id": "reward_earn__reward_membership_id",
+      "source_entity": "reward_earn",
+      "source_column": "reward_membership_id",
+      "target_entity": "reward_membership",
+      "target_column": "reward_membership_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Membership receiving points.",
+      "enforcement": "DuckDB foreign key; business semantics require separate checks"
+    },
+    {
+      "id": "reward_earn__card_transaction_id",
+      "source_entity": "reward_earn",
+      "source_column": "card_transaction_id",
+      "target_entity": "card_transaction",
+      "target_column": "card_transaction_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Purchase generating the award.",
+      "enforcement": "DuckDB foreign key; business semantics require separate checks"
+    },
+    {
+      "id": "reward_redemption__reward_membership_id",
+      "source_entity": "reward_redemption",
+      "source_column": "reward_membership_id",
+      "target_entity": "reward_membership",
+      "target_column": "reward_membership_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Membership spending points.",
+      "enforcement": "DuckDB foreign key; business semantics require separate checks"
+    },
+    {
+      "id": "reward_adjustment__reward_membership_id",
+      "source_entity": "reward_adjustment",
+      "source_column": "reward_membership_id",
+      "target_entity": "reward_membership",
+      "target_column": "reward_membership_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Membership being corrected.",
+      "enforcement": "DuckDB foreign key; business semantics require separate checks"
+    },
+    {
+      "id": "reward_adjustment__reward_earn_id",
+      "source_entity": "reward_adjustment",
+      "source_column": "reward_earn_id",
+      "target_entity": "reward_earn",
+      "target_column": "reward_earn_id",
+      "source_to_target": "zero_or_one",
+      "target_to_source": "zero_or_many",
+      "description": "Original award when reversing earned points.",
+      "enforcement": "DuckDB foreign key; business semantics require separate checks"
+    },
+    {
+      "id": "reward_balance_snapshot__reward_membership_id",
+      "source_entity": "reward_balance_snapshot",
+      "source_column": "reward_membership_id",
+      "target_entity": "reward_membership",
+      "target_column": "reward_membership_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Membership whose points are counted.",
+      "enforcement": "DuckDB foreign key; business semantics require separate checks"
+    },
+    {
+      "id": "service_request__customer_id",
+      "source_entity": "service_request",
+      "source_column": "customer_id",
+      "target_entity": "customer",
+      "target_column": "customer_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Customer requesting assistance.",
+      "enforcement": "DuckDB foreign key; business semantics require separate checks"
+    },
+    {
+      "id": "service_request__account_id",
+      "source_entity": "service_request",
+      "source_column": "account_id",
+      "target_entity": "account",
+      "target_column": "account_id",
+      "source_to_target": "zero_or_one",
+      "target_to_source": "zero_or_many",
+      "description": "Relevant account, if account-specific.",
+      "enforcement": "DuckDB foreign key; business semantics require separate checks"
+    },
+    {
+      "id": "service_request__channel_id",
+      "source_entity": "service_request",
+      "source_column": "channel_id",
+      "target_entity": "channel",
+      "target_column": "channel_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Intake channel.",
+      "enforcement": "DuckDB foreign key; business semantics require separate checks"
+    },
+    {
+      "id": "service_request_event__service_request_id",
+      "source_entity": "service_request_event",
+      "source_column": "service_request_id",
+      "target_entity": "service_request",
+      "target_column": "service_request_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Request being progressed.",
+      "enforcement": "DuckDB foreign key; business semantics require separate checks"
+    },
+    {
+      "id": "complaint__service_request_id",
+      "source_entity": "complaint",
+      "source_column": "service_request_id",
+      "target_entity": "service_request",
+      "target_column": "service_request_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Intake request.",
+      "enforcement": "DuckDB foreign key; business semantics require separate checks"
+    },
+    {
+      "id": "complaint_resolution__complaint_id",
+      "source_entity": "complaint_resolution",
+      "source_column": "complaint_id",
+      "target_entity": "complaint",
+      "target_column": "complaint_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Complaint being resolved.",
+      "enforcement": "DuckDB foreign key; business semantics require separate checks"
+    },
+    {
+      "id": "communication__service_request_id",
+      "source_entity": "communication",
+      "source_column": "service_request_id",
+      "target_entity": "service_request",
+      "target_column": "service_request_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Request prompting communication.",
+      "enforcement": "DuckDB foreign key; business semantics require separate checks"
+    },
+    {
+      "id": "communication__channel_id",
+      "source_entity": "communication",
+      "source_column": "channel_id",
+      "target_entity": "channel",
+      "target_column": "channel_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Delivery channel.",
+      "enforcement": "DuckDB foreign key; business semantics require separate checks"
+    },
+    {
+      "id": "document_reference__service_request_id",
+      "source_entity": "document_reference",
+      "source_column": "service_request_id",
+      "target_entity": "service_request",
+      "target_column": "service_request_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Request requiring evidence.",
+      "enforcement": "DuckDB foreign key; business semantics require separate checks"
     }
   ],
   "rules": [
@@ -5384,6 +7311,66 @@
       "statement": "Every customer account maps to one control account and every booked entry has complete allocations to that control account. Signed account balances reconcile to control balances at opening and closing. Deposit balances are negated for debit-positive accounting.",
       "enforcement_plan": "dataset_validation",
       "implementation_status": "specified_not_implemented"
+    },
+    {
+      "id": "R43",
+      "entities": [
+        "fraud_rule",
+        "fraud_alert",
+        "fraud_case",
+        "fraud_case_alert",
+        "fraud_decision",
+        "fraud_action"
+      ],
+      "category": "cross_row",
+      "statement": "An alert is a signal, not a verdict. Case-alert associations must concern the case customer; a confirmed decision does not automatically book a loss or refund.",
+      "enforcement_plan": "dataset_validation",
+      "implementation_status": "specified_not_implemented"
+    },
+    {
+      "id": "R44",
+      "entities": [
+        "delinquency_snapshot",
+        "collection_case",
+        "collection_contact",
+        "promise_to_pay",
+        "hardship_plan",
+        "collection_case_event"
+      ],
+      "category": "cross_row",
+      "statement": "Overdue amounts and days past due are nonnegative. Promises have positive amounts and due dates no earlier than their recorded dates; kept promises require independent payment evidence.",
+      "enforcement_plan": "dataset_validation",
+      "implementation_status": "specified_not_implemented"
+    },
+    {
+      "id": "R45",
+      "entities": [
+        "reward_program",
+        "reward_membership",
+        "reward_earn",
+        "reward_redemption",
+        "reward_adjustment",
+        "reward_balance_snapshot"
+      ],
+      "category": "cross_row",
+      "statement": "Earning and redemption amounts are positive integer points. Membership, purchase and account ownership must agree. Closing points equal opening plus earnings and adjustments minus fulfilled redemptions.",
+      "enforcement_plan": "dataset_validation",
+      "implementation_status": "specified_not_implemented"
+    },
+    {
+      "id": "R46",
+      "entities": [
+        "service_request",
+        "service_request_event",
+        "complaint",
+        "complaint_resolution",
+        "communication",
+        "document_reference"
+      ],
+      "category": "cross_row",
+      "statement": "Request events and complaint resolutions cannot precede intake. Account-specific requests require a valid customer relationship. Documents are references only and contain no credentials.",
+      "enforcement_plan": "dataset_validation",
+      "implementation_status": "specified_not_implemented"
     }
   ],
   "journeys": [
@@ -5645,6 +7632,162 @@
         "reconciliation_item__reconciliation_run_id"
       ],
       "caveat": "A balanced journal can still be economically wrong. Reconciliation and source completeness remain separate checks."
+    },
+    {
+      "id": "review_a_fraud_alert",
+      "title": "Review a fraud alert",
+      "question": "How does a signal become an investigated decision?",
+      "steps": [
+        {
+          "entity": "card_transaction",
+          "text": "Identify the posted activity."
+        },
+        {
+          "entity": "fraud_alert",
+          "text": "Read the signal and its reason."
+        },
+        {
+          "entity": "fraud_case_alert",
+          "text": "Locate the investigation association."
+        },
+        {
+          "entity": "fraud_case",
+          "text": "Review the customer case."
+        },
+        {
+          "entity": "fraud_decision",
+          "text": "Read the recorded conclusion."
+        },
+        {
+          "entity": "fraud_action",
+          "text": "Inspect the requested response."
+        }
+      ],
+      "relationship_ids": [
+        "fraud_alert__card_transaction_id",
+        "fraud_case_alert__fraud_alert_id",
+        "fraud_case_alert__fraud_case_id",
+        "fraud_decision__fraud_case_id",
+        "fraud_action__fraud_decision_id"
+      ],
+      "caveat": "Schema walkthrough only: detection, investigation outcomes and action execution have no synthetic scenario yet."
+    },
+    {
+      "id": "support_an_overdue_account",
+      "title": "Support an overdue account",
+      "question": "How are arrears, outreach and support kept distinct?",
+      "steps": [
+        {
+          "entity": "delinquency_snapshot",
+          "text": "Inspect the supplied overdue position."
+        },
+        {
+          "entity": "account",
+          "text": "Identify the financial relationship."
+        },
+        {
+          "entity": "collection_case",
+          "text": "Find the follow-up case."
+        },
+        {
+          "entity": "collection_contact",
+          "text": "Review outreach attempts."
+        },
+        {
+          "entity": "promise_to_pay",
+          "text": "Read the commitment, not a payment."
+        },
+        {
+          "entity": "hardship_plan",
+          "text": "Inspect any agreed support terms."
+        }
+      ],
+      "relationship_ids": [
+        "delinquency_snapshot__account_id",
+        "collection_case__account_id",
+        "collection_contact__collection_case_id",
+        "promise_to_pay__collection_case_id",
+        "hardship_plan__collection_case_id"
+      ],
+      "caveat": "Schema walkthrough only: arrears calculations, eligibility and promise fulfillment are not implemented."
+    },
+    {
+      "id": "trace_reward_points",
+      "title": "Trace reward points",
+      "question": "How do purchases, redemptions and adjustments affect points?",
+      "steps": [
+        {
+          "entity": "card_transaction",
+          "text": "Find the original purchase."
+        },
+        {
+          "entity": "reward_earn",
+          "text": "Inspect the recorded award."
+        },
+        {
+          "entity": "reward_membership",
+          "text": "Identify the account membership."
+        },
+        {
+          "entity": "reward_redemption",
+          "text": "Review requested or fulfilled benefits."
+        },
+        {
+          "entity": "reward_adjustment",
+          "text": "Review explicit corrections."
+        },
+        {
+          "entity": "reward_balance_snapshot",
+          "text": "Compare the supplied closing position."
+        }
+      ],
+      "relationship_ids": [
+        "reward_earn__card_transaction_id",
+        "reward_earn__reward_membership_id",
+        "reward_redemption__reward_membership_id",
+        "reward_adjustment__reward_membership_id",
+        "reward_balance_snapshot__reward_membership_id"
+      ],
+      "caveat": "Schema walkthrough only: points reconciliation and refund clawback policy remain unimplemented."
+    },
+    {
+      "id": "resolve_a_complaint",
+      "title": "Resolve a complaint",
+      "question": "How is a customer concern recorded and answered?",
+      "steps": [
+        {
+          "entity": "customer",
+          "text": "Identify who raised the concern."
+        },
+        {
+          "entity": "service_request",
+          "text": "Read the intake context."
+        },
+        {
+          "entity": "complaint",
+          "text": "Separate dissatisfaction from routine assistance."
+        },
+        {
+          "entity": "complaint_resolution",
+          "text": "Read the recorded outcome."
+        },
+        {
+          "entity": "communication",
+          "text": "Inspect response delivery."
+        },
+        {
+          "entity": "document_reference",
+          "text": "Find references to supporting evidence."
+        }
+      ],
+      "relationship_ids": [
+        "service_request__customer_id",
+        "complaint__service_request_id",
+        "complaint_resolution__complaint_id",
+        "communication__service_request_id",
+        "document_reference__service_request_id"
+      ],
+      "caveat": "Schema walkthrough only: workflow automation and regulatory complaint obligations are outside scope."
     }
   ]
 }
