@@ -41,3 +41,7 @@
 [data-theme=dark] .menu-note,[data-theme=dark] .sidebar-footer,[data-theme=dark] .statusbar{background:#263234;color:#aabdb1}
 [data-theme=dark] .orbit{border-color:#536452}[data-theme=dark] .orbit-point{border-color:#263234}
 [data-theme=dark] ::-webkit-scrollbar-thumb{background:#52635b}
+[data-theme=dark] .field-illustration{background:radial-gradient(ellipse at center,#354b40 0%,transparent 68%)}
+[data-theme=dark] .share-button{background:#2d3b3d;border-color:#465653;color:#c3d5c7}
+[data-theme=dark] .graph-controls button,[data-theme=dark] .graph-controls>span,[data-theme=dark] .bottom-guide>button,[data-theme=dark] .version,[data-theme=dark] .grain>span{color:#b7cbb9}
+[data-theme=dark] .graph-stage{background-image:radial-gradient(#394744 0.8px,transparent 0.8px)}
