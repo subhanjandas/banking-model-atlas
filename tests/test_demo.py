@@ -11,9 +11,9 @@ class DemoTests(unittest.TestCase):
         with database() as db:
             result=report(db)
             self.assertEqual(result['closing_balances'],{'D1':'2000.00','D2':'0.00','CC1':'50.00','LN1':'900.00'})
-            self.assertEqual(len(db.execute('SHOW TABLES').fetchall()),80)
+            self.assertEqual(len(db.execute('SHOW TABLES').fetchall()),81)
     def test_check_metadata(self):
-        self.assertEqual(len({c['id'] for c in CHECKS}),19)
+        self.assertEqual(len({c['id'] for c in CHECKS}),27)
         for e in MODEL['entities']:
             self.assertEqual(e['example_coverage']=='sample_records',bool(FIXTURE['tables'].get(e['id'])))
         rules={r['id'] for r in MODEL['rules']}
@@ -26,7 +26,15 @@ class DemoTests(unittest.TestCase):
                 db.execute("UPDATE posting_link SET account_entry_id='missing'")
 
 MUTATIONS={
-'C14':"UPDATE account_entry SET amount=74 WHERE account_entry_id='REV_E_OUT'",
+'C20':"UPDATE payment_return SET amount=46 WHERE payment_return_id='RET2'",
+'C21':"UPDATE account_entry SET amount=44 WHERE account_entry_id='E_RETURN2'",
+'C22':"UPDATE payment_event SET status='RETURNED' WHERE payment_event_id='PO_OUT_PARTIAL'",
+'C23':"UPDATE fraud_decision SET decided_at='2026-09-01T10:00:00'",
+'C24':"UPDATE promise_to_pay SET due_on='2026-10-01'",
+'C25':"UPDATE reward_balance_snapshot SET points_balance=61",
+'C26':"UPDATE reward_earn SET points=-120",
+'C27':"UPDATE complaint_resolution SET resolved_on='2026-09-01'",
+'C14':"UPDATE account_entry SET amount=249 WHERE account_entry_id='REV_E_TD'",
 'C15':"UPDATE payment_event SET status='REVERSED' WHERE payment_event_id='PO_OUT_END'",
 'C16':"UPDATE payment_event SET status='FAILED' WHERE payment_event_id='PO_OUT1'",
 'C17':"UPDATE account_status_event SET status='CLOSED' WHERE account_status_event_id='D2_RESTRICTED'",

@@ -113,6 +113,7 @@ Payment instructions, execution events, settlement and reserved funds.
 | `payment_event` | A lifecycle event for a deposit payment instruction. | One execution event for an order. |
 | `payment_settlement` | An observed external settlement result. | One settlement observation for an outbound order. |
 | `account_hold` | A temporary reservation of funds on a deposit account. | One reservation associated with a payment order. |
+| `payment_return` | An observed returned amount against a settled outbound payment. | One separately identified returned installment. |
 
 ## Term lending
 

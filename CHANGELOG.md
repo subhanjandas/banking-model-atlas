@@ -1,3 +1,10 @@
+# Application 1.1.0 / model 0.5.0
+
+- Populate fraud, collections, rewards and customer service with synthetic records and targeted checks.
+- Add payment_return installments and validate partial-to-full return behavior.
+- Add source-version contracts, duplicate suppression, knowledge-time replay, producer-manifest checks and atomic local publication.
+- Add negative tests and a senior engineering roadmap with measurable next-step criteria.
+
 # Application 1.0.0 / model 0.4.0
 
 - Expand to 80 entities, 16 domains, 128 relationships and ten journeys.

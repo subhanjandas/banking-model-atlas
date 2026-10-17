@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "model_version": "0.4.0",
+  "model_version": "0.5.0",
   "id": "banking_model_atlas",
   "title": "Banking Model Atlas",
   "status": "educational_reference",
@@ -1537,7 +1537,8 @@
             "REVERSAL",
             "DEPOSIT_PAYMENT",
             "LOAN_DRAW",
-            "LOAN_REPAYMENT"
+            "LOAN_REPAYMENT",
+            "PAYMENT_RETURN"
           ]
         },
         {
@@ -1592,6 +1593,13 @@
           "nullable": true,
           "description": "Loan repayment behind a principal reduction, if any.",
           "classification": "identifier"
+        },
+        {
+          "id": "payment_return_id",
+          "type": "string",
+          "nullable": true,
+          "description": "Return installment behind this credit.",
+          "classification": "identifier"
         }
       ],
       "notes": [
@@ -1609,7 +1617,8 @@
         "R33",
         "R35",
         "R39",
-        "R42"
+        "R42",
+        "R47"
       ],
       "unique_keys": [],
       "example_coverage": "sample_records"
@@ -2650,7 +2659,8 @@
         "R26",
         "R27",
         "R28",
-        "R39"
+        "R39",
+        "R47"
       ],
       "columns": [
         {
@@ -2767,7 +2777,8 @@
         "R27",
         "R29",
         "R39",
-        "R40"
+        "R40",
+        "R47"
       ],
       "columns": [
         {
@@ -2798,7 +2809,8 @@
             "FAILED",
             "CANCELLED",
             "REVERSED",
-            "RETURNED"
+            "RETURNED",
+            "PARTIALLY_RETURNED"
           ]
         },
         {
@@ -3979,7 +3991,7 @@
       "notes": [
         "No executable fraud scoring or real detection thresholds are included."
       ],
-      "example_coverage": "schema_only"
+      "example_coverage": "sample_records"
     },
     {
       "id": "fraud_alert",
@@ -4046,7 +4058,7 @@
       "notes": [
         "This extension covers posted-card alerts, not authorization-time decisions."
       ],
-      "example_coverage": "schema_only"
+      "example_coverage": "sample_records"
     },
     {
       "id": "fraud_case",
@@ -4106,7 +4118,7 @@
       "notes": [
         "A case may collect multiple alerts; status transitions are not yet executable."
       ],
-      "example_coverage": "schema_only"
+      "example_coverage": "sample_records"
     },
     {
       "id": "fraud_case_alert",
@@ -4159,7 +4171,7 @@
       "notes": [
         "Association is not a verdict. Check customer ownership separately."
       ],
-      "example_coverage": "schema_only"
+      "example_coverage": "sample_records"
     },
     {
       "id": "fraud_decision",
@@ -4219,7 +4231,7 @@
       "notes": [
         "A decision does not itself book a refund or loss."
       ],
-      "example_coverage": "schema_only"
+      "example_coverage": "sample_records"
     },
     {
       "id": "fraud_action",
@@ -4291,7 +4303,7 @@
       "notes": [
         "COMPLETED is supplied evidence; this schema does not call card systems."
       ],
-      "example_coverage": "schema_only"
+      "example_coverage": "sample_records"
     },
     {
       "id": "delinquency_snapshot",
@@ -4351,7 +4363,7 @@
       "notes": [
         "Overdue calculation and payment allocation are not implemented."
       ],
-      "example_coverage": "schema_only"
+      "example_coverage": "sample_records"
     },
     {
       "id": "collection_case",
@@ -4411,7 +4423,7 @@
       "notes": [
         "Contact person must have an appropriate relationship to the account."
       ],
-      "example_coverage": "schema_only"
+      "example_coverage": "sample_records"
     },
     {
       "id": "collection_contact",
@@ -4478,7 +4490,7 @@
       "notes": [
         "No real recordings, phone numbers or collection scripts are stored."
       ],
-      "example_coverage": "schema_only"
+      "example_coverage": "sample_records"
     },
     {
       "id": "promise_to_pay",
@@ -4546,7 +4558,7 @@
       "notes": [
         "KEPT must be supported by payments; a promise is not booked money."
       ],
-      "example_coverage": "schema_only"
+      "example_coverage": "sample_records"
     },
     {
       "id": "hardship_plan",
@@ -4613,7 +4625,7 @@
       "notes": [
         "Contract changes, interest treatment and legal eligibility are outside this extension."
       ],
-      "example_coverage": "schema_only"
+      "example_coverage": "sample_records"
     },
     {
       "id": "collection_case_event",
@@ -4668,7 +4680,7 @@
       "notes": [
         "This event vocabulary is descriptive; no transition validator is supplied yet."
       ],
-      "example_coverage": "schema_only"
+      "example_coverage": "sample_records"
     },
     {
       "id": "reward_program",
@@ -4728,7 +4740,7 @@
       "notes": [
         "Points are integer units; no universal cash value is assumed."
       ],
-      "example_coverage": "schema_only"
+      "example_coverage": "sample_records"
     },
     {
       "id": "reward_membership",
@@ -4788,7 +4800,7 @@
       "notes": [
         "The account owns the points in this fictional design; household pooling is excluded."
       ],
-      "example_coverage": "schema_only"
+      "example_coverage": "sample_records"
     },
     {
       "id": "reward_earn",
@@ -4843,7 +4855,7 @@
       "notes": [
         "Multiple awards may represent base and promotional points. Earning rates are not calculated."
       ],
-      "example_coverage": "schema_only"
+      "example_coverage": "sample_records"
     },
     {
       "id": "reward_redemption",
@@ -4910,7 +4922,7 @@
       "notes": [
         "A cancelled request should not consume settled points. Fulfillment is not automated."
       ],
-      "example_coverage": "schema_only"
+      "example_coverage": "sample_records"
     },
     {
       "id": "reward_adjustment",
@@ -4972,7 +4984,7 @@
       "notes": [
         "Refund clawbacks need explicit policy and allocation; they are not inferred automatically."
       ],
-      "example_coverage": "schema_only"
+      "example_coverage": "sample_records"
     },
     {
       "id": "reward_balance_snapshot",
@@ -5025,7 +5037,7 @@
       "notes": [
         "Snapshot reconciliation against earns, fulfilled redemptions and adjustments remains future work."
       ],
-      "example_coverage": "schema_only"
+      "example_coverage": "sample_records"
     },
     {
       "id": "service_request",
@@ -5099,7 +5111,7 @@
       "notes": [
         "A request is distinct from a dispute and does not imply financial adjustment."
       ],
-      "example_coverage": "schema_only"
+      "example_coverage": "sample_records"
     },
     {
       "id": "service_request_event",
@@ -5154,7 +5166,7 @@
       "notes": [
         "Late-arrival correction and service workflow transitions are not implemented."
       ],
-      "example_coverage": "schema_only"
+      "example_coverage": "sample_records"
     },
     {
       "id": "complaint",
@@ -5214,7 +5226,7 @@
       "notes": [
         "No jurisdiction-specific resolution deadline or regulatory reporting is claimed."
       ],
-      "example_coverage": "schema_only"
+      "example_coverage": "sample_records"
     },
     {
       "id": "complaint_resolution",
@@ -5269,7 +5281,7 @@
       "notes": [
         "A goodwill credit would require a separately booked and reconciled account entry."
       ],
-      "example_coverage": "schema_only"
+      "example_coverage": "sample_records"
     },
     {
       "id": "communication",
@@ -5336,7 +5348,7 @@
       "notes": [
         "No addresses, tokens or message bodies are stored. Delivery does not prove the customer read it."
       ],
-      "example_coverage": "schema_only"
+      "example_coverage": "sample_records"
     },
     {
       "id": "document_reference",
@@ -5391,7 +5403,66 @@
       "notes": [
         "No actual files or credentials are included. Retention and access control require implementation."
       ],
-      "example_coverage": "schema_only"
+      "example_coverage": "sample_records"
+    },
+    {
+      "id": "payment_return",
+      "label": "Payment Return",
+      "domain": "payments",
+      "description": "An observed returned amount against a settled outbound payment.",
+      "grain": "One separately identified returned installment.",
+      "primary_key": [
+        "payment_return_id"
+      ],
+      "unique_keys": [
+        [
+          "external_reference"
+        ]
+      ],
+      "columns": [
+        {
+          "id": "payment_return_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Stable source return identity.",
+          "classification": "identifier"
+        },
+        {
+          "id": "payment_order_id",
+          "type": "string",
+          "nullable": false,
+          "description": "Original outbound instruction.",
+          "classification": "identifier"
+        },
+        {
+          "id": "amount",
+          "type": "decimal(18,2)",
+          "nullable": false,
+          "description": "Positive returned amount in the original order currency.",
+          "classification": "financial"
+        },
+        {
+          "id": "returned_on",
+          "type": "date",
+          "nullable": false,
+          "description": "Date returned funds were booked.",
+          "classification": "internal"
+        },
+        {
+          "id": "external_reference",
+          "type": "string",
+          "nullable": false,
+          "description": "Unique synthetic return observation reference.",
+          "classification": "internal"
+        }
+      ],
+      "rule_ids": [
+        "R47"
+      ],
+      "notes": [
+        "Several installments may return one payment. Total returned cannot exceed the settled amount. Source corrections are resolved before this curated snapshot; posted journals remain immutable."
+      ],
+      "example_coverage": "sample_records"
     }
   ],
   "relationships": [
@@ -6802,6 +6873,28 @@
       "target_to_source": "zero_or_many",
       "description": "Request requiring evidence.",
       "enforcement": "DuckDB foreign key; business semantics require separate checks"
+    },
+    {
+      "id": "payment_return__payment_order_id",
+      "source_entity": "payment_return",
+      "source_column": "payment_order_id",
+      "target_entity": "payment_order",
+      "target_column": "payment_order_id",
+      "source_to_target": "exactly_one",
+      "target_to_source": "zero_or_many",
+      "description": "Links the returned installment to its instruction or account credit.",
+      "enforcement": "DuckDB foreign key"
+    },
+    {
+      "id": "account_entry__payment_return_id",
+      "source_entity": "account_entry",
+      "source_column": "payment_return_id",
+      "target_entity": "payment_return",
+      "target_column": "payment_return_id",
+      "source_to_target": "zero_or_one",
+      "target_to_source": "zero_or_many",
+      "description": "Links the returned installment to its instruction or account credit.",
+      "enforcement": "DuckDB foreign key"
     }
   ],
   "rules": [
@@ -6922,7 +7015,7 @@
         "fee_type"
       ],
       "category": "conditional",
-      "statement": "Exactly the source reference corresponding to kind is populated: CARD\u2192card_transaction_id, PAYMENT\u2192payment_id, FEE\u2192fee_type_id, REVERSAL\u2192reverses_entry_id, DEPOSIT_PAYMENT\u2192payment_order_id, LOAN_DRAW\u2192loan_disbursement_id, LOAN_REPAYMENT\u2192loan_repayment_id. ADJUSTMENT has none. All other source references are null.",
+      "statement": "Exactly the source reference corresponding to kind is populated: CARD\u2192card_transaction_id, PAYMENT\u2192payment_id, FEE\u2192fee_type_id, REVERSAL\u2192reverses_entry_id, DEPOSIT_PAYMENT\u2192payment_order_id, LOAN_DRAW\u2192loan_disbursement_id, LOAN_REPAYMENT\u2192loan_repayment_id. ADJUSTMENT has none. All other source references are null. PAYMENT_RETURN entries use payment_return_id as their sole source reference.",
       "enforcement_plan": "dataset_validation",
       "implementation_status": "specified_not_implemented"
     },
@@ -7269,7 +7362,7 @@
         "account_entry"
       ],
       "category": "cross_row",
-      "statement": "Full internal reversals follow POSTED; full outbound returns follow SETTLED. Preserve original entries and append one equal opposite entry per original entry, on the same account and a later or equal business date. Partial and repeated reversals are excluded.",
+      "statement": "Full internal reversals preserve original entries and append one equal opposite entry per original entry on the same account. Outbound returns use payment_return installments and new PAYMENT_RETURN credits; partial and full returned totals are reconciled separately.",
       "enforcement_plan": "dataset_validation",
       "implementation_status": "specified_not_implemented"
     },
@@ -7369,6 +7462,19 @@
       ],
       "category": "cross_row",
       "statement": "Request events and complaint resolutions cannot precede intake. Account-specific requests require a valid customer relationship. Documents are references only and contain no credentials.",
+      "enforcement_plan": "dataset_validation",
+      "implementation_status": "specified_not_implemented"
+    },
+    {
+      "id": "R47",
+      "entities": [
+        "payment_return",
+        "payment_order",
+        "payment_event",
+        "account_entry"
+      ],
+      "category": "cross_row",
+      "statement": "Returned installments are positive, follow outbound settlement and cumulatively do not exceed it. Each installment has one equal credit on the original source account. PARTIALLY_RETURNED means a positive total below the original amount; RETURNED means the full amount.",
       "enforcement_plan": "dataset_validation",
       "implementation_status": "specified_not_implemented"
     }
@@ -7670,7 +7776,7 @@
         "fraud_decision__fraud_case_id",
         "fraud_action__fraud_decision_id"
       ],
-      "caveat": "Schema walkthrough only: detection, investigation outcomes and action execution have no synthetic scenario yet."
+      "caveat": "Synthetic records and selected checks are included. Full workflow automation and domain-specific policy are not implemented."
     },
     {
       "id": "support_an_overdue_account",
@@ -7709,7 +7815,7 @@
         "promise_to_pay__collection_case_id",
         "hardship_plan__collection_case_id"
       ],
-      "caveat": "Schema walkthrough only: arrears calculations, eligibility and promise fulfillment are not implemented."
+      "caveat": "Synthetic records and selected checks are included. Full workflow automation and domain-specific policy are not implemented."
     },
     {
       "id": "trace_reward_points",
@@ -7748,7 +7854,7 @@
         "reward_adjustment__reward_membership_id",
         "reward_balance_snapshot__reward_membership_id"
       ],
-      "caveat": "Schema walkthrough only: points reconciliation and refund clawback policy remain unimplemented."
+      "caveat": "Synthetic records and selected checks are included. Full workflow automation and domain-specific policy are not implemented."
     },
     {
       "id": "resolve_a_complaint",
@@ -7787,7 +7893,7 @@
         "communication__service_request_id",
         "document_reference__service_request_id"
       ],
-      "caveat": "Schema walkthrough only: workflow automation and regulatory complaint obligations are outside scope."
+      "caveat": "Synthetic records and selected checks are included. Full workflow automation and domain-specific policy are not implemented."
     }
   ]
 }

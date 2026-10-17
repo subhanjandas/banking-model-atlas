@@ -132,3 +132,5 @@ Read each row from the referencing table to the referenced table. Reverse cardin
 | `communication__service_request_id` | `communication.service_request_id` | `service_request.service_request_id` | exactly_one | zero_or_many | Request prompting communication. |
 | `communication__channel_id` | `communication.channel_id` | `channel.channel_id` | exactly_one | zero_or_many | Delivery channel. |
 | `document_reference__service_request_id` | `document_reference.service_request_id` | `service_request.service_request_id` | exactly_one | zero_or_many | Request requiring evidence. |
+| `payment_return__payment_order_id` | `payment_return.payment_order_id` | `payment_order.payment_order_id` | exactly_one | zero_or_many | Links the returned installment to its instruction or account credit. |
+| `account_entry__payment_return_id` | `account_entry.payment_return_id` | `payment_return.payment_return_id` | zero_or_one | zero_or_many | Links the returned installment to its instruction or account credit. |

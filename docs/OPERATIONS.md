@@ -1,14 +1,14 @@
 # Operational behavior and reconciliation
 
-Application 0.4.0 / model 0.3.0.
+Application 1.1.0 / model 0.5.0.
 
 ## Corrections preserve history
 
 The internal CAD 250 transfer first posts a debit to D1 and a credit to D2. Its later REVERSED event accompanies two new opposite entries, each linked through reverses_entry_id. The original transfer remains visible.
 
-The outbound CAD 75 order progresses to SETTLED, with settlement evidence. Its later RETURNED event accompanies a deposit credit and a journal debiting cash and crediting deposits. This represents receipt of the full returned money. It does not erase the original payment or settlement.
+The outbound CAD 75 order progresses to SETTLED, with settlement evidence. Two payment_return installments of 30 and 45 accompany separate deposit credits and journals debiting cash and crediting deposits. PARTIALLY_RETURNED precedes RETURNED. This represents receipt of the full returned money. It does not erase the original payment or settlement.
 
-Checks reject wrong direction, amount, account, earlier booking date, duplicate reversals and reversal-of-reversal. Corrected terminal payments must have one reversal per original entry. Partial returns, fees and network messages are not implemented. Append-only fixtures demonstrate immutability; the analytical database does not prevent privileged historical updates.
+Checks reject wrong direction, amount, account, earlier booking date, duplicate reversals and reversal-of-reversal. Internal reversed payments must have one reversal per original entry; outbound installments each have one matching credit. Partial returns are now implemented; fees and network messages remain outside scope. Append-only fixtures demonstrate immutability; the analytical database does not prevent privileged historical updates.
 
 ## Lifecycle rules
 

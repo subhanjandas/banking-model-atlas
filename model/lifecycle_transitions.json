@@ -19,12 +19,17 @@
         "REVERSED"
       ],
       "SETTLED": [
+        "PARTIALLY_RETURNED",
         "RETURNED"
       ],
       "FAILED": [],
       "CANCELLED": [],
       "REVERSED": [],
-      "RETURNED": []
+      "RETURNED": [],
+      "PARTIALLY_RETURNED": [
+        "PARTIALLY_RETURNED",
+        "RETURNED"
+      ]
     }
   },
   "account_status_event": {

@@ -108,7 +108,7 @@ How does a signal become an investigated decision?
 5. **fraud_decision** — Read the recorded conclusion.
 6. **fraud_action** — Inspect the requested response.
 
-Schema walkthrough only: detection, investigation outcomes and action execution have no synthetic scenario yet.
+Synthetic records and selected checks are included. Full workflow automation and domain-specific policy are not implemented.
 
 Highlighted relationships: `fraud_alert__card_transaction_id`, `fraud_case_alert__fraud_alert_id`, `fraud_case_alert__fraud_case_id`, `fraud_decision__fraud_case_id`, `fraud_action__fraud_decision_id`.
 
@@ -123,7 +123,7 @@ How are arrears, outreach and support kept distinct?
 5. **promise_to_pay** — Read the commitment, not a payment.
 6. **hardship_plan** — Inspect any agreed support terms.
 
-Schema walkthrough only: arrears calculations, eligibility and promise fulfillment are not implemented.
+Synthetic records and selected checks are included. Full workflow automation and domain-specific policy are not implemented.
 
 Highlighted relationships: `delinquency_snapshot__account_id`, `collection_case__account_id`, `collection_contact__collection_case_id`, `promise_to_pay__collection_case_id`, `hardship_plan__collection_case_id`.
 
@@ -138,7 +138,7 @@ How do purchases, redemptions and adjustments affect points?
 5. **reward_adjustment** — Review explicit corrections.
 6. **reward_balance_snapshot** — Compare the supplied closing position.
 
-Schema walkthrough only: points reconciliation and refund clawback policy remain unimplemented.
+Synthetic records and selected checks are included. Full workflow automation and domain-specific policy are not implemented.
 
 Highlighted relationships: `reward_earn__card_transaction_id`, `reward_earn__reward_membership_id`, `reward_redemption__reward_membership_id`, `reward_adjustment__reward_membership_id`, `reward_balance_snapshot__reward_membership_id`.
 
@@ -153,7 +153,7 @@ How is a customer concern recorded and answered?
 5. **communication** — Inspect response delivery.
 6. **document_reference** — Find references to supporting evidence.
 
-Schema walkthrough only: workflow automation and regulatory complaint obligations are outside scope.
+Synthetic records and selected checks are included. Full workflow automation and domain-specific policy are not implemented.
 
 Highlighted relationships: `service_request__customer_id`, `complaint__service_request_id`, `complaint_resolution__complaint_id`, `communication__service_request_id`, `document_reference__service_request_id`.
 

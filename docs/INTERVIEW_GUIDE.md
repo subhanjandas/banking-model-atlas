@@ -2,7 +2,7 @@
 
 ## A 30-second introduction
 
-“I built Banking Model Atlas to make banking data models easier to explore and explain. It connects 80 entities across 16 domains through a searchable graph, with definitions, relationships and ten business walkthroughs. I also built an executable DuckDB reference schema and a synthetic financial scenario that tests payment corrections, lifecycle transitions and opening-to-closing ledger reconciliation. The broader schema and the tested scenario have different coverage, and the interface makes that distinction visible.”
+“I built Banking Model Atlas to make banking data models easier to explore and explain. It connects 81 entities across 16 domains through a searchable graph, with definitions, relationships and ten business walkthroughs. I also built an executable DuckDB reference schema and a synthetic financial scenario that tests payment corrections, lifecycle transitions and opening-to-closing ledger reconciliation. The broader schema and the tested scenario have different coverage, and the interface makes that distinction visible.”
 
 Use this wording only when you can explain the code and decisions yourself. The project was built with AI assistance; understanding and reviewing the result matters more than claiming every line was handwritten.
 
@@ -15,7 +15,7 @@ Use this wording only when you can explain the code and decisions yourself. The 
 | 1:30–2:20 | Entity inspector and relationships | Grain, keys, optional relationships and business rules prevent misleading joins. |
 | 2:20–3:20 | generated/demo-report.json | Opening + movements = closing. A balanced journal can still be wrong; independent snapshots catch that. |
 | 3:20–4:10 | tests/test_ledger.py and tests/test_demo.py | Show a balanced-but-wrong closing balance and an excessive refund being rejected. |
-| 4:10–5:00 | Fraud journey and schema-only badge | State limits honestly. Describe the next fixture and check you would implement. |
+| 4:10–5:00 | Fraud journey and sample-record badge | State limits honestly. Show source failure handling and describe the next persistent-state checkpoint. |
 
 ## Questions worth preparing for
 
@@ -39,4 +39,4 @@ Use this wording only when you can explain the code and decisions yourself. The 
 
 ## Avoid these claims
 
-Do not say “production banking platform,” “BIAN compliant,” “regulatory compliant,” “all rules enforced,” or “80 tables fully tested with data.” All 80 tables are created by the schema replay; 49 contain synthetic records. The four latest domains are modeled extensions with no operational fixtures yet.
+Do not say “production banking platform,” “BIAN compliant,” “regulatory compliant,” “all rules enforced,” or “80 tables fully tested with data.” All 81 tables are created by the schema replay; 74 contain synthetic records. All 16 domains have fixtures, with selected rule checks; full workflow automation is not implemented.

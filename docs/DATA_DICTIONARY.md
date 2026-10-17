@@ -503,7 +503,7 @@ An immutable customer-account movement used for statement presentation.
 | `payment_id` | `string` | true | identifier | Repayment behind this entry, if any. |
 | `fee_type_id` | `string` | true | identifier | Fee category when this is a fee. |
 | `reverses_entry_id` | `string` | true | identifier | Earlier entry reversed by this entry. |
-| `kind` | `string` | false | internal | Business source of the entry. Allowed: CARD, PAYMENT, FEE, ADJUSTMENT, REVERSAL, DEPOSIT_PAYMENT, LOAN_DRAW, LOAN_REPAYMENT. |
+| `kind` | `string` | false | internal | Business source of the entry. Allowed: CARD, PAYMENT, FEE, ADJUSTMENT, REVERSAL, DEPOSIT_PAYMENT, LOAN_DRAW, LOAN_REPAYMENT, PAYMENT_RETURN. |
 | `direction` | `string` | false | internal | Customer-account debit or credit. Allowed: DEBIT, CREDIT. |
 | `amount` | `decimal(18,2)` | false | financial | Positive amount in account currency. |
 | `posted_on` | `date` | false | internal | Booking business date. |
@@ -511,12 +511,13 @@ An immutable customer-account movement used for statement presentation.
 | `payment_order_id` | `string` | true | identifier | Deposit payment instruction behind this entry, if any. |
 | `loan_disbursement_id` | `string` | true | identifier | Loan draw behind this principal or deposit entry, if any. |
 | `loan_repayment_id` | `string` | true | identifier | Loan repayment behind a principal reduction, if any. |
+| `payment_return_id` | `string` | true | identifier | Return installment behind this credit. |
 
 **Unique keys:** Primary key only.
 
 **Notes:** Customer-facing account entries form a subledger view. The separate journal and posting_link entities support accounting and reconciliation; the model is not a complete bank ledger platform.
 
-**Rules:** R09, R10, R11, R12, R13, R15, R26, R32, R33, R35, R39, R42
+**Rules:** R09, R10, R11, R12, R13, R15, R26, R32, R33, R35, R39, R42, R47
 
 ## payment
 
@@ -887,7 +888,7 @@ An instruction to move funds from a deposit account.
 
 **Notes:** Status comes from payment_event. Internal movements have two customer-account entries; external ones have one.
 
-**Rules:** R25, R26, R27, R28, R39
+**Rules:** R25, R26, R27, R28, R39, R47
 
 ## payment_event
 
@@ -901,7 +902,7 @@ A lifecycle event for a deposit payment instruction.
 |---|---|---|---|---|
 | `payment_event_id` | `string` | false | identifier | Stable synthetic identifier for payment event. |
 | `payment_order_id` | `string` | false | identifier | Instruction being progressed. |
-| `status` | `string` | false | internal | New execution state. Allowed: RECEIVED, VALIDATED, POSTED, SETTLED, FAILED, CANCELLED, REVERSED, RETURNED. |
+| `status` | `string` | false | internal | New execution state. Allowed: RECEIVED, VALIDATED, POSTED, SETTLED, FAILED, CANCELLED, REVERSED, RETURNED, PARTIALLY_RETURNED. |
 | `occurred_at` | `timestamp` | false | internal | UTC event time. |
 | `reason_code` | `string` | false | internal | Project-local processing reason. |
 
@@ -909,7 +910,7 @@ A lifecycle event for a deposit payment instruction.
 
 **Notes:** Latest event gives status. Posting and external settlement are separate milestones.
 
-**Rules:** R26, R27, R29, R39, R40
+**Rules:** R26, R27, R29, R39, R40, R47
 
 ## payment_settlement
 
@@ -1814,4 +1815,26 @@ Metadata describing evidence held outside the model.
 **Notes:** No actual files or credentials are included. Retention and access control require implementation.
 
 **Rules:** R46
+
+## payment_return
+
+An observed returned amount against a settled outbound payment.
+
+**Grain:** One separately identified returned installment.
+
+**Primary key:** payment_return_id
+
+| Column | Type | Nullable | Classification | Definition |
+|---|---|---|---|---|
+| `payment_return_id` | `string` | false | identifier | Stable source return identity. |
+| `payment_order_id` | `string` | false | identifier | Original outbound instruction. |
+| `amount` | `decimal(18,2)` | false | financial | Positive returned amount in the original order currency. |
+| `returned_on` | `date` | false | internal | Date returned funds were booked. |
+| `external_reference` | `string` | false | internal | Unique synthetic return observation reference. |
+
+**Unique keys:** external_reference
+
+**Notes:** Several installments may return one payment. Total returned cannot exceed the settled amount. Source corrections are resolved before this curated snapshot; posted journals remain immutable.
+
+**Rules:** R47
 

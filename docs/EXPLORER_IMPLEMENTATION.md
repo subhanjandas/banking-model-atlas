@@ -1,6 +1,6 @@
 # Explorer implementation
 
-Application release: 1.0.0. Banking model release: 0.4.0. These are separate versions: building a viewer does not silently change banking semantics.
+Application release: 1.1.0. Banking model release: 0.5.0. These are separate versions: building a viewer does not silently change banking semantics.
 
 ## What works
 
@@ -48,7 +48,7 @@ The browser suite is set up for CI. To run it on your own machine after building
 
 ## Design choices
 
-The overview is the starting point because a full 80-table graph is dense at laptop size. Domain filters and the neighbour view provide readable detail. The layout is deterministic rather than a continuously moving force simulation. Compound graph nodes group tables by domain; arrows point from the foreign key to the referenced key.
+The overview is the starting point because a full 81-table graph is dense at laptop size. Domain filters and the neighbour view provide readable detail. The layout is deterministic rather than a continuously moving force simulation. Compound graph nodes group tables by domain; arrows point from the foreign key to the referenced key.
 
 All data and fonts are bundled locally. Browsing does not call an LLM, database or analytics service. External links lead only to the source repository and its documentation. The fictional model contains definitions, not customer records.
 

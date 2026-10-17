@@ -493,6 +493,13 @@
         "status": "RETURNED",
         "occurred_at": "2026-09-28T12:00:00",
         "reason_code": "DEMO_RETURNED"
+      },
+      {
+        "payment_event_id": "PO_OUT_PARTIAL",
+        "payment_order_id": "PO_OUT",
+        "status": "PARTIALLY_RETURNED",
+        "occurred_at": "2026-09-26T12:00:00",
+        "reason_code": "RETURN_INSTALLMENT"
       }
     ],
     "payment_settlement": [
@@ -762,14 +769,24 @@
         "reverses_entry_id": "E_TC"
       },
       {
-        "account_entry_id": "REV_E_OUT",
+        "account_entry_id": "E_RETURN1",
         "account_id": "D2",
-        "kind": "REVERSAL",
+        "payment_return_id": "RET1",
+        "kind": "PAYMENT_RETURN",
         "direction": "CREDIT",
-        "amount": "75.00",
+        "amount": "30.00",
+        "posted_on": "2026-09-26",
+        "description": "Observed outbound return installment"
+      },
+      {
+        "account_entry_id": "E_RETURN2",
+        "account_id": "D2",
+        "payment_return_id": "RET2",
+        "kind": "PAYMENT_RETURN",
+        "direction": "CREDIT",
+        "amount": "45.00",
         "posted_on": "2026-09-28",
-        "description": "Full correction of E_OUT",
-        "reverses_entry_id": "E_OUT"
+        "description": "Observed outbound return installment"
       }
     ],
     "statement": [
@@ -985,13 +1002,22 @@
         "source_reference": "SRC_J_REV_INT"
       },
       {
-        "journal_id": "J_RETURN",
+        "journal_id": "J_RETURN1",
+        "currency_id": "CAD",
+        "legal_entity_code": "MHB_BANK",
+        "booked_on": "2026-09-26",
+        "status": "POSTED",
+        "description": "Received returned funds",
+        "source_reference": "SRC_J_RETURN1"
+      },
+      {
+        "journal_id": "J_RETURN2",
         "currency_id": "CAD",
         "legal_entity_code": "MHB_BANK",
         "booked_on": "2026-09-28",
         "status": "POSTED",
-        "description": "Append-only full payment correction",
-        "source_reference": "SRC_J_RETURN"
+        "description": "Received returned funds",
+        "source_reference": "SRC_J_RETURN2"
       }
     ],
     "journal_line": [
@@ -1148,20 +1174,36 @@
         "amount": "250.00"
       },
       {
-        "journal_line_id": "J_RETURN_1",
-        "journal_id": "J_RETURN",
+        "journal_line_id": "J_RETURN1_1",
+        "journal_id": "J_RETURN1",
         "gl_account_id": "G_CASH",
         "line_number": 1,
         "direction": "DEBIT",
-        "amount": "75.00"
+        "amount": "30.00"
       },
       {
-        "journal_line_id": "J_RETURN_2",
-        "journal_id": "J_RETURN",
+        "journal_line_id": "J_RETURN1_2",
+        "journal_id": "J_RETURN1",
         "gl_account_id": "G_DEP",
         "line_number": 2,
         "direction": "CREDIT",
-        "amount": "75.00"
+        "amount": "30.00"
+      },
+      {
+        "journal_line_id": "J_RETURN2_1",
+        "journal_id": "J_RETURN2",
+        "gl_account_id": "G_CASH",
+        "line_number": 1,
+        "direction": "DEBIT",
+        "amount": "45.00"
+      },
+      {
+        "journal_line_id": "J_RETURN2_2",
+        "journal_id": "J_RETURN2",
+        "gl_account_id": "G_DEP",
+        "line_number": 2,
+        "direction": "CREDIT",
+        "amount": "45.00"
       }
     ],
     "posting_link": [
@@ -1232,10 +1274,16 @@
         "allocated_amount": "250.00"
       },
       {
-        "posting_link_id": "MAP_REV_E_OUT",
-        "account_entry_id": "REV_E_OUT",
-        "journal_line_id": "J_RETURN_2",
-        "allocated_amount": "75.00"
+        "posting_link_id": "MAP_E_RETURN1",
+        "account_entry_id": "E_RETURN1",
+        "journal_line_id": "J_RETURN1_2",
+        "allocated_amount": "30.00"
+      },
+      {
+        "posting_link_id": "MAP_E_RETURN2",
+        "account_entry_id": "E_RETURN2",
+        "journal_line_id": "J_RETURN2_2",
+        "allocated_amount": "45.00"
       }
     ],
     "reconciliation_run": [
@@ -1425,6 +1473,247 @@
         "gl_account_id": "G_INT",
         "as_of_date": "2026-09-30",
         "signed_balance": "-10.00"
+      }
+    ],
+    "payment_return": [
+      {
+        "payment_return_id": "RET1",
+        "payment_order_id": "PO_OUT",
+        "amount": "30.00",
+        "returned_on": "2026-09-26",
+        "external_reference": "SRC_RET1"
+      },
+      {
+        "payment_return_id": "RET2",
+        "payment_order_id": "PO_OUT",
+        "amount": "45.00",
+        "returned_on": "2026-09-28",
+        "external_reference": "SRC_RET2"
+      }
+    ],
+    "fraud_rule": [
+      {
+        "fraud_rule_id": "FR1",
+        "rule_code": "DEMO_REVIEW",
+        "version_number": 1,
+        "description": "Synthetic review signal only",
+        "effective_from": "2026-09-01",
+        "status": "ACTIVE"
+      }
+    ],
+    "fraud_alert": [
+      {
+        "fraud_alert_id": "FA1",
+        "card_transaction_id": "PUR1",
+        "fraud_rule_id": "FR1",
+        "raised_at": "2026-09-12T10:00:00",
+        "severity": "MEDIUM",
+        "reason": "Synthetic customer review scenario"
+      }
+    ],
+    "fraud_case": [
+      {
+        "fraud_case_id": "FC1",
+        "customer_id": "C2",
+        "opened_at": "2026-09-12T11:00:00",
+        "status": "CLOSED",
+        "summary": "Supplementary cardholder confirms activity"
+      }
+    ],
+    "fraud_case_alert": [
+      {
+        "fraud_case_alert_id": "FCA1",
+        "fraud_case_id": "FC1",
+        "fraud_alert_id": "FA1",
+        "linked_at": "2026-09-12T11:05:00"
+      }
+    ],
+    "fraud_decision": [
+      {
+        "fraud_decision_id": "FD1",
+        "fraud_case_id": "FC1",
+        "decided_at": "2026-09-13T10:00:00",
+        "outcome": "NOT_FRAUD",
+        "rationale": "Synthetic confirmation received"
+      }
+    ],
+    "fraud_action": [
+      {
+        "fraud_action_id": "FACT1",
+        "fraud_decision_id": "FD1",
+        "card_id": "CARD1",
+        "action_type": "CONTACT_CUSTOMER",
+        "status": "COMPLETED",
+        "requested_at": "2026-09-13T11:00:00"
+      }
+    ],
+    "delinquency_snapshot": [
+      {
+        "delinquency_snapshot_id": "DS1",
+        "account_id": "CC1",
+        "as_of_date": "2026-11-01",
+        "days_past_due": 1,
+        "overdue_amount": "50.00"
+      }
+    ],
+    "collection_case": [
+      {
+        "collection_case_id": "COL1",
+        "account_id": "CC1",
+        "customer_id": "C1",
+        "opened_on": "2026-11-01",
+        "status": "OPEN"
+      }
+    ],
+    "collection_contact": [
+      {
+        "collection_contact_id": "CONTACT1",
+        "collection_case_id": "COL1",
+        "channel_id": "WEB",
+        "attempted_at": "2026-11-02T10:00:00",
+        "outcome": "REACHED",
+        "note": "Synthetic outreach recorded"
+      }
+    ],
+    "promise_to_pay": [
+      {
+        "promise_to_pay_id": "PROM1",
+        "collection_case_id": "COL1",
+        "promised_on": "2026-11-02",
+        "due_on": "2026-11-10",
+        "promised_amount": "50.00",
+        "status": "OPEN"
+      }
+    ],
+    "hardship_plan": [
+      {
+        "hardship_plan_id": "HP1",
+        "collection_case_id": "COL1",
+        "starts_on": "2026-11-02",
+        "ends_on": "2026-12-02",
+        "terms_summary": "Illustrative proposed support; no contract mutation",
+        "status": "PROPOSED"
+      }
+    ],
+    "collection_case_event": [
+      {
+        "collection_case_event_id": "CE1",
+        "collection_case_id": "COL1",
+        "occurred_at": "2026-11-02T10:05:00",
+        "event_type": "PROMISE_RECORDED",
+        "reason": "Synthetic commitment recorded, not a payment"
+      }
+    ],
+    "reward_program": [
+      {
+        "reward_program_id": "RP1",
+        "program_code": "MAPLE_POINTS",
+        "version_number": 1,
+        "name": "Maple Points",
+        "effective_from": "2026-09-01"
+      }
+    ],
+    "reward_membership": [
+      {
+        "reward_membership_id": "RM1",
+        "account_id": "CC1",
+        "reward_program_id": "RP1",
+        "enrolled_on": "2026-09-01",
+        "status": "ACTIVE"
+      }
+    ],
+    "reward_earn": [
+      {
+        "reward_earn_id": "RE1",
+        "reward_membership_id": "RM1",
+        "card_transaction_id": "PUR1",
+        "points": 120,
+        "earned_on": "2026-09-11"
+      }
+    ],
+    "reward_redemption": [
+      {
+        "reward_redemption_id": "RR1",
+        "reward_membership_id": "RM1",
+        "points": 40,
+        "requested_at": "2026-09-20T10:00:00",
+        "status": "FULFILLED",
+        "benefit_reference": "SYNTH_BENEFIT"
+      }
+    ],
+    "reward_adjustment": [
+      {
+        "reward_adjustment_id": "RA1",
+        "reward_membership_id": "RM1",
+        "reward_earn_id": "RE1",
+        "points_delta": -20,
+        "reason": "Supplied refund-related adjustment; no automatic earning policy",
+        "adjusted_on": "2026-09-13"
+      }
+    ],
+    "reward_balance_snapshot": [
+      {
+        "reward_balance_snapshot_id": "RB1",
+        "reward_membership_id": "RM1",
+        "as_of_date": "2026-09-30",
+        "points_balance": 60
+      }
+    ],
+    "service_request": [
+      {
+        "service_request_id": "SR1",
+        "customer_id": "C1",
+        "account_id": "CC1",
+        "channel_id": "WEB",
+        "opened_at": "2026-10-01T10:00:00",
+        "status": "RESOLVED",
+        "category": "STATEMENT_EXPLANATION"
+      }
+    ],
+    "service_request_event": [
+      {
+        "service_request_event_id": "SE1",
+        "service_request_id": "SR1",
+        "occurred_at": "2026-10-01T11:00:00",
+        "event_type": "ASSIGNED",
+        "note": "Synthetic review assigned"
+      }
+    ],
+    "complaint": [
+      {
+        "complaint_id": "COM1",
+        "service_request_id": "SR1",
+        "received_on": "2026-10-02",
+        "category": "EXPLANATION_DELAY",
+        "status": "CLOSED"
+      }
+    ],
+    "complaint_resolution": [
+      {
+        "complaint_resolution_id": "CR1",
+        "complaint_id": "COM1",
+        "resolved_on": "2026-10-05",
+        "outcome": "EXPLAINED",
+        "explanation": "Statement explained; no goodwill entry"
+      }
+    ],
+    "communication": [
+      {
+        "communication_id": "COMM1",
+        "service_request_id": "SR1",
+        "channel_id": "WEB",
+        "sent_at": "2026-10-05T10:00:00",
+        "delivery_status": "DELIVERED",
+        "template_code": "SYNTH_RESOLUTION"
+      }
+    ],
+    "document_reference": [
+      {
+        "document_reference_id": "DOC1",
+        "service_request_id": "SR1",
+        "document_type": "STATEMENT_REFERENCE",
+        "external_reference": "SYNTH_DOC_001",
+        "recorded_at": "2026-10-02T10:00:00"
       }
     ]
   },

@@ -1,4 +1,4 @@
--- Banking Model Atlas | model 0.4.0
+-- Banking Model Atlas | model 0.5.0
 -- Dialect: DuckDB. Run in a fresh database. No DROP or destructive reset.
 -- PK, non-self FK, UNIQUE, NOT NULL and enumerations are enforced.
 -- Self-reference integrity and selected business rules are checked by scripts/run_demo.py.
@@ -1294,7 +1294,7 @@ COMMENT ON COLUMN "loan_schedule_item"."interest_due" IS 'Nonnegative supplied i
 CREATE TABLE "payment_event" (
   "payment_event_id" VARCHAR NOT NULL,
   "payment_order_id" VARCHAR NOT NULL,
-  "status" VARCHAR NOT NULL CHECK ("status" IN ('RECEIVED', 'VALIDATED', 'POSTED', 'SETTLED', 'FAILED', 'CANCELLED', 'REVERSED', 'RETURNED')),
+  "status" VARCHAR NOT NULL CHECK ("status" IN ('RECEIVED', 'VALIDATED', 'POSTED', 'SETTLED', 'FAILED', 'CANCELLED', 'REVERSED', 'RETURNED', 'PARTIALLY_RETURNED')),
   "occurred_at" TIMESTAMP NOT NULL,
   "reason_code" VARCHAR NOT NULL,
   PRIMARY KEY ("payment_event_id"),
@@ -1307,6 +1307,24 @@ COMMENT ON COLUMN "payment_event"."payment_order_id" IS 'Instruction being progr
 COMMENT ON COLUMN "payment_event"."status" IS 'New execution state.';
 COMMENT ON COLUMN "payment_event"."occurred_at" IS 'UTC event time.';
 COMMENT ON COLUMN "payment_event"."reason_code" IS 'Project-local processing reason.';
+
+-- One separately identified returned installment.
+CREATE TABLE "payment_return" (
+  "payment_return_id" VARCHAR NOT NULL,
+  "payment_order_id" VARCHAR NOT NULL,
+  "amount" DECIMAL(18,2) NOT NULL,
+  "returned_on" DATE NOT NULL,
+  "external_reference" VARCHAR NOT NULL,
+  PRIMARY KEY ("payment_return_id"),
+  UNIQUE ("external_reference"),
+  FOREIGN KEY ("payment_order_id") REFERENCES "payment_order" ("payment_order_id")
+);
+COMMENT ON TABLE "payment_return" IS 'An observed returned amount against a settled outbound payment. Grain: One separately identified returned installment.';
+COMMENT ON COLUMN "payment_return"."payment_return_id" IS 'Stable source return identity.';
+COMMENT ON COLUMN "payment_return"."payment_order_id" IS 'Original outbound instruction.';
+COMMENT ON COLUMN "payment_return"."amount" IS 'Positive returned amount in the original order currency.';
+COMMENT ON COLUMN "payment_return"."returned_on" IS 'Date returned funds were booked.';
+COMMENT ON COLUMN "payment_return"."external_reference" IS 'Unique synthetic return observation reference.';
 
 -- One settlement observation for an outbound order.
 CREATE TABLE "payment_settlement" (
@@ -1337,7 +1355,7 @@ CREATE TABLE "account_entry" (
   "payment_id" VARCHAR,
   "fee_type_id" VARCHAR,
   "reverses_entry_id" VARCHAR,
-  "kind" VARCHAR NOT NULL CHECK ("kind" IN ('CARD', 'PAYMENT', 'FEE', 'ADJUSTMENT', 'REVERSAL', 'DEPOSIT_PAYMENT', 'LOAN_DRAW', 'LOAN_REPAYMENT')),
+  "kind" VARCHAR NOT NULL CHECK ("kind" IN ('CARD', 'PAYMENT', 'FEE', 'ADJUSTMENT', 'REVERSAL', 'DEPOSIT_PAYMENT', 'LOAN_DRAW', 'LOAN_REPAYMENT', 'PAYMENT_RETURN')),
   "direction" VARCHAR NOT NULL CHECK ("direction" IN ('DEBIT', 'CREDIT')),
   "amount" DECIMAL(18,2) NOT NULL,
   "posted_on" DATE NOT NULL,
@@ -1345,6 +1363,7 @@ CREATE TABLE "account_entry" (
   "payment_order_id" VARCHAR,
   "loan_disbursement_id" VARCHAR,
   "loan_repayment_id" VARCHAR,
+  "payment_return_id" VARCHAR,
   PRIMARY KEY ("account_entry_id"),
   FOREIGN KEY ("account_id") REFERENCES "account" ("account_id"),
   FOREIGN KEY ("card_transaction_id") REFERENCES "card_transaction" ("card_transaction_id"),
@@ -1352,7 +1371,8 @@ CREATE TABLE "account_entry" (
   FOREIGN KEY ("fee_type_id") REFERENCES "fee_type" ("fee_type_id"),
   FOREIGN KEY ("payment_order_id") REFERENCES "payment_order" ("payment_order_id"),
   FOREIGN KEY ("loan_disbursement_id") REFERENCES "loan_disbursement" ("loan_disbursement_id"),
-  FOREIGN KEY ("loan_repayment_id") REFERENCES "loan_repayment" ("loan_repayment_id")
+  FOREIGN KEY ("loan_repayment_id") REFERENCES "loan_repayment" ("loan_repayment_id"),
+  FOREIGN KEY ("payment_return_id") REFERENCES "payment_return" ("payment_return_id")
 );
 COMMENT ON TABLE "account_entry" IS 'An immutable customer-account movement used for statement presentation. Grain: One booked debit or credit on an account.';
 COMMENT ON COLUMN "account_entry"."account_entry_id" IS 'Stable synthetic identifier for account entry.';
@@ -1369,6 +1389,7 @@ COMMENT ON COLUMN "account_entry"."description" IS 'Short statement narrative.';
 COMMENT ON COLUMN "account_entry"."payment_order_id" IS 'Deposit payment instruction behind this entry, if any.';
 COMMENT ON COLUMN "account_entry"."loan_disbursement_id" IS 'Loan draw behind this principal or deposit entry, if any.';
 COMMENT ON COLUMN "account_entry"."loan_repayment_id" IS 'Loan repayment behind a principal reduction, if any.';
+COMMENT ON COLUMN "account_entry"."payment_return_id" IS 'Return installment behind this credit.';
 
 -- One dispute case against one purchase.
 CREATE TABLE "dispute" (

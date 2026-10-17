@@ -1,6 +1,6 @@
 # Executable coverage
 
-Nineteen SQL checks cover selected portions of 46 rule specifications. Every query has a bad-data regression test. Eight additional ledger tests cover complete-period reconciliation, missing snapshots, balanced-but-wrong positions, opening trial imbalance, subledger differences, period boundaries duplicate event timestamps and offsetting customer-account errors.
+Twenty-seven SQL checks cover selected portions of 47 rule specifications. Each query has a negative-data test. Additional tests cover ledger reconciliation, valid intermediate partial returns and source-ingestion failure/replay behavior. Full banking policy enforcement is not claimed.
 
 ## C01 — R34
 
@@ -48,7 +48,7 @@ Posted deposit orders have exactly the expected customer-account entries.
 
 Outbound settlement agrees with instructions and SETTLED status has evidence.
 
-**Limit:** Full outbound settlement and return only; partial settlement and rail calendars are excluded.
+**Limit:** Original outbound settlement is full; returns can arrive in installments. Rail calendars and fees remain excluded.
 
 ## C09 — R31
 
@@ -88,9 +88,9 @@ Reversals preserve the original and negate its exact account movement.
 
 ## C15 — R39
 
-Terminal corrected payments have exactly one reversal per original entry and correct payment kind.
+Full internal reversals have one opposite entry per original; outbound returns use installments.
 
-**Limit:** Does not model partial returns, fees, network messages or reversal-of-reversal.
+**Limit:** C20-C22 validate outbound installments separately. Reversal-of-reversal remains unsupported.
 
 ## C16 — R40
 
@@ -116,4 +116,52 @@ Every account and entry has complete, correctly targeted ledger mappings.
 
 **Limit:** Completeness is relative to supplied source rows, not an external bank feed.
 
-Full rule enforcement remains incomplete. See OPERATIONS.md for the reconciliation scope and lifecycle assumptions.
+## C20 — R47
+
+Return installments follow settlement, are positive and never exceed the order amount.
+
+**Limit:** Single-currency full original settlement, with no return fees or FX.
+
+## C21 — R47
+
+Each installment has exactly one equal customer credit on the source account and matching booking date.
+
+**Limit:** Ledger mapping and balances are checked separately; does not prove receipt from a real network.
+
+## C22 — R47
+
+Return status agrees with cumulative returned funds as of every return-state event and latest state.
+
+**Limit:** Return observations use business dates; intraday ordering of same-day installments is not modeled.
+
+## C23 — R43
+
+Fraud case links have a matching card user or account holder, and decisions follow case opening.
+
+**Limit:** Does not perform fraud detection, validate action execution or confirm the assessment is correct.
+
+## C24 — R44
+
+Collections values, promise dates, support intervals and account relationships are structurally coherent.
+
+**Limit:** Days past due and overdue amount are supplied, not calculated. Promise fulfillment and legal eligibility are not implemented.
+
+## C25 — R45
+
+Points snapshots reconcile independently aggregated earnings, fulfilled redemptions and adjustments.
+
+**Limit:** Assumes zero points at enrollment and complete lifetime records. Fulfillment timing is simplified to request date for fulfilled rows.
+
+## C26 — R45
+
+Reward awards use the membership account and valid positive purchase units; corrections stay in membership.
+
+**Limit:** Earning rates, redemption availability and refund clawback policies are supplied, not calculated.
+
+## C27 — R46
+
+Service and complaint events respect intake dates and customer-account relationships.
+
+**Limit:** No regulatory deadlines, delivery confirmation verification or full service workflow transition engine.
+
+See ENGINEERING.md for source completeness relative to a producer manifest and its limitations.

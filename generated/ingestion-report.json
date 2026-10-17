@@ -1,0 +1,47 @@
+{
+  "batch_id": "RETURNS_202609_CLOSE",
+  "contract": "payment-return-v1",
+  "as_of": null,
+  "deliveries": 4,
+  "distinct_source_versions": 3,
+  "duplicate_deliveries": 1,
+  "late_versions": 2,
+  "revision_control_total": "115.00",
+  "curated_total": "75.00",
+  "selected_versions": {
+    "RET1": 1,
+    "RET2": 2
+  },
+  "curated_rows": [
+    {
+      "payment_return_id": "RET1",
+      "payment_order_id": "PO_OUT",
+      "amount": "30.00",
+      "returned_on": "2026-09-26",
+      "external_reference": "SRC_RET1"
+    },
+    {
+      "payment_return_id": "RET2",
+      "payment_order_id": "PO_OUT",
+      "amount": "45.00",
+      "returned_on": "2026-09-28",
+      "external_reference": "SRC_RET2"
+    }
+  ],
+  "lineage": [
+    {
+      "key": "RET1",
+      "version": 1,
+      "source_sha256": "6ea13e6bbf2a2bc43598112adc50e45be69e4ef75638cb7e0d797a2bfd4a89eb",
+      "event_at": "2026-09-26T12:00:00Z",
+      "received_at": "2026-09-29T09:00:00Z"
+    },
+    {
+      "key": "RET2",
+      "version": 2,
+      "source_sha256": "5914d2cfc699295f817aa65cfe0365dfe96a5487ad686a7e0322e262785237e8",
+      "event_at": "2026-09-28T12:00:00Z",
+      "received_at": "2026-09-30T09:00:00Z"
+    }
+  ]
+}

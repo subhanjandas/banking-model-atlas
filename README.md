@@ -10,7 +10,7 @@
 [![Model validation](https://github.com/subhanjandas/banking-model-atlas/actions/workflows/validate.yml/badge.svg)](https://github.com/subhanjandas/banking-model-atlas/actions/workflows/validate.yml)
 [![MIT license](https://img.shields.io/badge/license-MIT-8aad94)](LICENSE)
 
-Built by **[Subhanjan Das](https://github.com/subhanjandas)** · Application **1.0.0** · Model **0.4.0**
+Built by **[Subhanjan Das](https://github.com/subhanjandas)** · Application **1.1.0** · Model **0.5.0**
 
 </div>
 
@@ -18,7 +18,7 @@ Built by **[Subhanjan Das](https://github.com/subhanjandas)** · Application **1
 
 <a href="https://subhanjandas.github.io/banking-model-atlas/"><img src="docs/assets/explorer-tour.gif" alt="Animated tour of the deployed explorer: light overview, Dusk theme and a business journey" width="100%"></a>
 
-*Actual captures of the public website, assembled into a looping tour. [Capture provenance](docs/assets/provenance.json). Prefer a still image? Use the screenshots below.*
+*Actual captures of the public website, assembled into a looping tour. [Capture provenance](docs/assets/provenance.json). These captures document release 1.0.0; current counters and coverage labels have advanced. Prefer a still image? Use the screenshots below.*
 
 A customer disputes a purchase. Which account, card, merchant, transaction and case belong together? Atlas makes those connections visible—and explains what each record means.
 
@@ -36,11 +36,13 @@ It is useful for learning, design discussions and demonstrating data-modeling de
 
 | Model breadth | Executable depth |
 |---|---|
-| **80 entities · 16 domains · 453 columns** | All **80 tables** created in DuckDB |
-| **128 relationships · 46 rule specifications** | **175 synthetic records** across **49 tables** |
-| **10 connected journeys** | **19 SQL checks** plus opening-to-closing ledger reconciliation |
+| **81 entities · 16 domains · 459 columns** | All **81 tables** created in DuckDB |
+| **130 relationships · 47 rule specifications** | **207 synthetic records** across **74 tables** |
+| **10 connected journeys** | **27 SQL checks** plus opening-to-closing ledger reconciliation |
 
-**Coverage matters:** the four newest domains—fraud, collections, rewards and customer service—are schema-only extensions. Their structures are validated; their operational workflows have no data fixtures yet. The inspector labels this distinction. [Exact check coverage →](docs/VALIDATION_COVERAGE.md)
+**Coverage matters:** all 16 domains now contain synthetic examples, with selected checks for fraud, collections, rewards and service. Seven tables remain schema-only. Examples do not implement every rule or automate whole business workflows. [Exact coverage →](docs/VALIDATION_COVERAGE.md)
+
+**New engineering checkpoint:** source contracts, duplicate suppression, late corrections, producer-manifest completeness and atomic local publication. [Run the engineering walkthrough →](docs/ENGINEERING.md)
 
 ## A closer look
 
@@ -48,7 +50,7 @@ It is useful for learning, design discussions and demonstrating data-modeling de
 |---|---|
 | ![Live light overview showing 16 domains](docs/assets/light-overview.png) | ![Live Dusk overview showing muted slate surfaces](docs/assets/dark-overview.png) |
 
-![Live fraud journey with definitions and a schema-only coverage label](docs/assets/fraud-journey.png)
+![Release 1.0.0 fraud journey before synthetic examples were added](docs/assets/fraud-journey.png)
 
 *Start with a domain or journey. Select a table for its grain and columns, then follow a relationship. The full graph is an overview; focus mode provides readable detail.*
 
@@ -73,7 +75,7 @@ It is useful for learning, design discussions and demonstrating data-modeling de
 | [Reward points](https://subhanjandas.github.io/banking-model-atlas/?journey=trace_reward_points) | How should earning, redemption and corrections connect? |
 | [Complaint resolution](https://subhanjandas.github.io/banking-model-atlas/?journey=resolve_a_complaint) | How is a concern recorded, investigated and answered? |
 
-The last four journeys explain proposed structures; they are not executed business processes.
+All journeys have example records; the rules panel shows which selected checks are executable. They remain demonstrations, not complete operational workflows.
 
 ## How it works
 
@@ -145,12 +147,13 @@ A balanced journal can still use the wrong accounts or amounts. That is why the 
 | Layer | Tests | Examples |
 |---|---:|---|
 | Metadata | 18 | Broken foreign keys, nullable primary keys, wrong cardinality, disconnected journeys |
-| SQL and reconciliation | 30 | Excess refunds, incorrect reversals, invalid transitions, missing mappings, balanced-but-wrong closing balances |
+| SQL and reconciliation | 43 | Excess refunds, incorrect reversals, invalid transitions, missing mappings, balanced-but-wrong closing balances |
+| Source ingestion | 16 | Duplicate/out-of-order replay, version conflicts, changed fingerprints, missing records, failed publication preserving the last good file |
 | Explorer logic | 24 | Search, filters, URL state, neighbour focus, all ten journey subgraphs |
 | Browser | 10 | Navigation, downloads, mobile overflow, theme persistence, system preference, coverage labels |
 | Post-deploy evidence | Separate capture | Opens the public site and saves screenshots with timestamp and commit |
 
-**82 automated tests**, plus post-deploy capture. The workflow badges above show the current run status. [Validation details](docs/VALIDATION.md) · [Reproducible demo report](generated/demo-report.json)
+**111 automated tests**, plus post-deploy capture. The workflow badges above show the current run status. [Validation details](docs/VALIDATION.md) · [Reproducible demo report](generated/demo-report.json)
 
 ## Decisions worth discussing in an interview
 
@@ -163,6 +166,8 @@ A balanced journal can still use the wrong accounts or amounts. That is why the 
 | Separate customer entries from journals | Principal, interest, cash and customer presentation have different grains. |
 | Validate independent snapshots | Detect errors that still leave total debits equal to credits. |
 | Label coverage honestly | Model breadth is different from executable business behavior. |
+
+**[Engineering failure-and-replay demo →](docs/ENGINEERING.md)** shows the source boundary and its limits.
 
 **[Interview guide →](docs/INTERVIEW_GUIDE.md)** includes a 30-second introduction, five-minute walkthrough and questions to prepare for. **[Learning notes →](docs/LEARNINGS.md)** explain the lessons and a real documentation mismatch found during development.
 
@@ -184,13 +189,13 @@ A balanced journal can still use the wrong accounts or amounts. That is why the 
 
 The portfolio reference release is complete. The highest-value next work is deeper evidence:
 
-- Populate and test the four schema-only domains, starting with reward-point reconciliation.
-- Add partial returns, late-arriving corrections and source-ingestion idempotency.
-- Validate effective-time ownership and completeness against an independent source feed.
+- Add persistent incremental state and a bounded backfill command.
+- Extend the tested local return-ingestion boundary to durable orchestration and concurrent-writer control.
+- Extend supplied-manifest completeness to an authenticated external-source contract and post-close correction policy.
 - Add model migrations and a deliberately designed analytical layer.
 - Expand accessibility testing and measure larger-graph performance.
 
-[Roadmap and boundaries →](docs/ROADMAP.md). Multicurrency banking, real fraud scoring, regulatory reporting and production bank operations remain outside scope.
+[Senior engineering roadmap →](docs/SENIOR_ENGINEERING_ROADMAP.md). Multicurrency banking, real fraud scoring, regulatory reporting and production bank operations remain outside scope.
 
 ## Contribute or share
 

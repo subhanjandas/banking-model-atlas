@@ -58,7 +58,7 @@ Applies to: `card_transaction`, `card_authorization`, `payment`, `account_entry`
 
 ## R10 — conditional
 
-Exactly the source reference corresponding to kind is populated: CARD→card_transaction_id, PAYMENT→payment_id, FEE→fee_type_id, REVERSAL→reverses_entry_id, DEPOSIT_PAYMENT→payment_order_id, LOAN_DRAW→loan_disbursement_id, LOAN_REPAYMENT→loan_repayment_id. ADJUSTMENT has none. All other source references are null.
+Exactly the source reference corresponding to kind is populated: CARD→card_transaction_id, PAYMENT→payment_id, FEE→fee_type_id, REVERSAL→reverses_entry_id, DEPOSIT_PAYMENT→payment_order_id, LOAN_DRAW→loan_disbursement_id, LOAN_REPAYMENT→loan_repayment_id. ADJUSTMENT has none. All other source references are null. PAYMENT_RETURN entries use payment_return_id as their sole source reference.
 
 Applies to: `account_entry`, `card_transaction`, `payment`, `fee_type`.
 
@@ -232,7 +232,7 @@ Applies to: `gl_account`, `journal_line`.
 
 ## R39 — cross_row
 
-Full internal reversals follow POSTED; full outbound returns follow SETTLED. Preserve original entries and append one equal opposite entry per original entry, on the same account and a later or equal business date. Partial and repeated reversals are excluded.
+Full internal reversals preserve original entries and append one equal opposite entry per original entry on the same account. Outbound returns use payment_return installments and new PAYMENT_RETURN credits; partial and full returned totals are reconciled separately.
 
 Applies to: `payment_order`, `payment_event`, `account_entry`.
 
@@ -277,4 +277,10 @@ Applies to: `reward_program`, `reward_membership`, `reward_earn`, `reward_redemp
 Request events and complaint resolutions cannot precede intake. Account-specific requests require a valid customer relationship. Documents are references only and contain no credentials.
 
 Applies to: `service_request`, `service_request_event`, `complaint`, `complaint_resolution`, `communication`, `document_reference`.
+
+## R47 — cross_row
+
+Returned installments are positive, follow outbound settlement and cumulatively do not exceed it. Each installment has one equal credit on the original source account. PARTIALLY_RETURNED means a positive total below the original amount; RETURNED means the full amount.
+
+Applies to: `payment_return`, `payment_order`, `payment_event`, `account_entry`.
 

@@ -62,7 +62,7 @@
         "R26"
       ],
       "description": "Posted deposit orders have exactly the expected customer-account entries.",
-      "sql": "WITH latest AS (SELECT payment_order_id,status FROM payment_event QUALIFY row_number() OVER(PARTITION BY payment_order_id ORDER BY occurred_at DESC)=1),\ncounts AS (SELECT o.payment_order_id,o.kind,o.amount,o.source_account_id,o.destination_account_id,o.beneficiary_id,o.currency_id,\ncount(e.account_entry_id) AS n,\ncount(e.account_entry_id) FILTER(WHERE e.account_id=o.source_account_id AND e.direction='DEBIT' AND e.amount=o.amount AND a.currency_id=o.currency_id) AS debits,\ncount(e.account_entry_id) FILTER(WHERE e.account_id=o.destination_account_id AND e.direction='CREDIT' AND e.amount=o.amount AND a.currency_id=o.currency_id) AS credits\nFROM payment_order o JOIN latest s USING(payment_order_id) LEFT JOIN account_entry e ON e.payment_order_id=o.payment_order_id AND e.kind='DEPOSIT_PAYMENT'\nLEFT JOIN account a ON a.account_id=e.account_id WHERE s.status IN ('POSTED','SETTLED','REVERSED','RETURNED') GROUP BY ALL)\nSELECT payment_order_id FROM counts WHERE debits<>1 OR (kind='INTERNAL' AND (n<>2 OR credits<>1 OR destination_account_id IS NULL OR source_account_id=destination_account_id OR beneficiary_id IS NOT NULL)) OR (kind='OUTBOUND' AND (n<>1 OR beneficiary_id IS NULL OR destination_account_id IS NOT NULL))",
+      "sql": "WITH latest AS (SELECT payment_order_id,status FROM payment_event QUALIFY row_number() OVER(PARTITION BY payment_order_id ORDER BY occurred_at DESC)=1),\ncounts AS (SELECT o.payment_order_id,o.kind,o.amount,o.source_account_id,o.destination_account_id,o.beneficiary_id,o.currency_id,\ncount(e.account_entry_id) AS n,\ncount(e.account_entry_id) FILTER(WHERE e.account_id=o.source_account_id AND e.direction='DEBIT' AND e.amount=o.amount AND a.currency_id=o.currency_id) AS debits,\ncount(e.account_entry_id) FILTER(WHERE e.account_id=o.destination_account_id AND e.direction='CREDIT' AND e.amount=o.amount AND a.currency_id=o.currency_id) AS credits\nFROM payment_order o JOIN latest s USING(payment_order_id) LEFT JOIN account_entry e ON e.payment_order_id=o.payment_order_id AND e.kind='DEPOSIT_PAYMENT'\nLEFT JOIN account a ON a.account_id=e.account_id WHERE s.status IN ('POSTED','SETTLED','REVERSED','RETURNED','PARTIALLY_RETURNED') GROUP BY ALL)\nSELECT payment_order_id FROM counts WHERE debits<>1 OR (kind='INTERNAL' AND (n<>2 OR credits<>1 OR destination_account_id IS NULL OR source_account_id=destination_account_id OR beneficiary_id IS NOT NULL)) OR (kind='OUTBOUND' AND (n<>1 OR beneficiary_id IS NULL OR destination_account_id IS NOT NULL))",
       "coverage_limit": "Checks booked entry shape, including subsequently corrected payments. Does not validate product eligibility."
     },
     {
@@ -71,8 +71,8 @@
         "R27"
       ],
       "description": "Outbound settlement agrees with instructions and SETTLED status has evidence.",
-      "sql": "SELECT s.payment_settlement_id AS item FROM payment_settlement s JOIN payment_order o USING(payment_order_id)\nWHERE o.kind<>'OUTBOUND' OR s.settled_amount<>o.amount OR s.currency_id<>o.currency_id\nUNION ALL SELECT o.payment_order_id FROM payment_order o JOIN (SELECT payment_order_id,status FROM payment_event QUALIFY row_number() OVER(PARTITION BY payment_order_id ORDER BY occurred_at DESC)=1) e USING(payment_order_id)\nLEFT JOIN payment_settlement s USING(payment_order_id) WHERE e.status IN ('SETTLED','RETURNED') AND (s.payment_settlement_id IS NULL OR o.kind<>'OUTBOUND')",
-      "coverage_limit": "Full outbound settlement and return only; partial settlement and rail calendars are excluded."
+      "sql": "SELECT s.payment_settlement_id AS item FROM payment_settlement s JOIN payment_order o USING(payment_order_id)\nWHERE o.kind<>'OUTBOUND' OR s.settled_amount<>o.amount OR s.currency_id<>o.currency_id\nUNION ALL SELECT o.payment_order_id FROM payment_order o JOIN (SELECT payment_order_id,status FROM payment_event QUALIFY row_number() OVER(PARTITION BY payment_order_id ORDER BY occurred_at DESC)=1) e USING(payment_order_id)\nLEFT JOIN payment_settlement s USING(payment_order_id) WHERE e.status IN ('SETTLED','RETURNED','PARTIALLY_RETURNED') AND (s.payment_settlement_id IS NULL OR o.kind<>'OUTBOUND')",
+      "coverage_limit": "Original outbound settlement is full; returns can arrive in installments. Rail calendars and fees remain excluded."
     },
     {
       "id": "C09",
@@ -107,7 +107,7 @@
         "R10"
       ],
       "description": "Every account entry uses exactly its permitted source reference.",
-      "sql": "SELECT account_entry_id FROM account_entry WHERE\n (CASE WHEN card_transaction_id IS NOT NULL THEN 1 ELSE 0 END + CASE WHEN payment_id IS NOT NULL THEN 1 ELSE 0 END + CASE WHEN fee_type_id IS NOT NULL THEN 1 ELSE 0 END + CASE WHEN reverses_entry_id IS NOT NULL THEN 1 ELSE 0 END + CASE WHEN payment_order_id IS NOT NULL THEN 1 ELSE 0 END + CASE WHEN loan_disbursement_id IS NOT NULL THEN 1 ELSE 0 END + CASE WHEN loan_repayment_id IS NOT NULL THEN 1 ELSE 0 END) <> CASE WHEN kind='ADJUSTMENT' THEN 0 ELSE 1 END\n OR (kind='CARD' AND card_transaction_id IS NULL) OR (kind='PAYMENT' AND payment_id IS NULL) OR (kind='FEE' AND fee_type_id IS NULL) OR (kind='REVERSAL' AND reverses_entry_id IS NULL) OR (kind='DEPOSIT_PAYMENT' AND payment_order_id IS NULL) OR (kind='LOAN_DRAW' AND loan_disbursement_id IS NULL) OR (kind='LOAN_REPAYMENT' AND loan_repayment_id IS NULL)",
+      "sql": "SELECT account_entry_id FROM account_entry WHERE\n (CASE WHEN card_transaction_id IS NOT NULL THEN 1 ELSE 0 END + CASE WHEN payment_id IS NOT NULL THEN 1 ELSE 0 END + CASE WHEN fee_type_id IS NOT NULL THEN 1 ELSE 0 END + CASE WHEN reverses_entry_id IS NOT NULL THEN 1 ELSE 0 END + CASE WHEN payment_order_id IS NOT NULL THEN 1 ELSE 0 END + CASE WHEN loan_disbursement_id IS NOT NULL THEN 1 ELSE 0 END + CASE WHEN loan_repayment_id IS NOT NULL THEN 1 ELSE 0 END + CASE WHEN payment_return_id IS NOT NULL THEN 1 ELSE 0 END) <> CASE WHEN kind='ADJUSTMENT' THEN 0 ELSE 1 END\n OR (kind='CARD' AND card_transaction_id IS NULL) OR (kind='PAYMENT' AND payment_id IS NULL) OR (kind='FEE' AND fee_type_id IS NULL) OR (kind='REVERSAL' AND reverses_entry_id IS NULL) OR (kind='DEPOSIT_PAYMENT' AND payment_order_id IS NULL) OR (kind='LOAN_DRAW' AND loan_disbursement_id IS NULL) OR (kind='LOAN_REPAYMENT' AND loan_repayment_id IS NULL) OR (kind='PAYMENT_RETURN' AND payment_return_id IS NULL)",
       "coverage_limit": "Source linkage alone does not validate the source amount or lifecycle."
     },
     {
@@ -134,9 +134,9 @@
       "rule_ids": [
         "R39"
       ],
-      "description": "Terminal corrected payments have exactly one reversal per original entry and correct payment kind.",
-      "sql": "WITH latest AS (SELECT payment_order_id,status FROM payment_event QUALIFY row_number() OVER(PARTITION BY payment_order_id ORDER BY occurred_at DESC)=1)\nSELECT o.payment_order_id FROM payment_order o JOIN latest s USING(payment_order_id) WHERE (s.status='REVERSED' AND o.kind<>'INTERNAL') OR (s.status='RETURNED' AND o.kind<>'OUTBOUND')\nUNION ALL SELECT e.account_entry_id FROM account_entry e JOIN latest s USING(payment_order_id) LEFT JOIN account_entry r ON r.reverses_entry_id=e.account_entry_id WHERE e.kind='DEPOSIT_PAYMENT' GROUP BY e.account_entry_id,s.status HAVING count(r.account_entry_id)<>CASE WHEN s.status IN ('REVERSED','RETURNED') THEN 1 ELSE 0 END",
-      "coverage_limit": "Does not model partial returns, fees, network messages or reversal-of-reversal."
+      "description": "Full internal reversals have one opposite entry per original; outbound returns use installments.",
+      "sql": "WITH latest AS (SELECT payment_order_id,status FROM payment_event QUALIFY row_number() OVER(PARTITION BY payment_order_id ORDER BY occurred_at DESC)=1)\nSELECT o.payment_order_id FROM payment_order o JOIN latest s USING(payment_order_id) WHERE (s.status='REVERSED' AND o.kind<>'INTERNAL') OR (s.status='RETURNED' AND o.kind<>'OUTBOUND')\nUNION ALL SELECT e.account_entry_id FROM account_entry e JOIN latest s USING(payment_order_id) LEFT JOIN account_entry r ON r.reverses_entry_id=e.account_entry_id WHERE e.kind='DEPOSIT_PAYMENT' GROUP BY e.account_entry_id,s.status HAVING count(r.account_entry_id)<>CASE WHEN s.status IN ('REVERSED') THEN 1 ELSE 0 END",
+      "coverage_limit": "C20-C22 validate outbound installments separately. Reversal-of-reversal remains unsupported."
     },
     {
       "id": "C16",
@@ -144,7 +144,7 @@
         "R40"
       ],
       "description": "payment_event history follows its explicit transition matrix.",
-      "sql": "WITH history AS (SELECT *,lag(status) OVER(PARTITION BY payment_order_id ORDER BY occurred_at) previous FROM payment_event) SELECT payment_event_id FROM history WHERE (previous IS NULL AND status<>'RECEIVED') OR (previous IS NOT NULL AND NOT ((previous='RECEIVED' AND status IN ('VALIDATED','FAILED','CANCELLED')) OR (previous='VALIDATED' AND status IN ('POSTED','FAILED','CANCELLED')) OR (previous='POSTED' AND status IN ('SETTLED','REVERSED')) OR (previous='SETTLED' AND status IN ('RETURNED'))))",
+      "sql": "WITH history AS (SELECT *,lag(status) OVER(PARTITION BY payment_order_id ORDER BY occurred_at) previous FROM payment_event) SELECT payment_event_id FROM history WHERE (previous IS NULL AND status<>'RECEIVED') OR (previous IS NOT NULL AND NOT ((previous='RECEIVED' AND status IN ('VALIDATED','FAILED','CANCELLED')) OR (previous='VALIDATED' AND status IN ('POSTED','FAILED','CANCELLED')) OR (previous='POSTED' AND status IN ('SETTLED','REVERSED')) OR (previous='SETTLED' AND status IN ('PARTIALLY_RETURNED','RETURNED')) OR (previous='PARTIALLY_RETURNED' AND status IN ('PARTIALLY_RETURNED','RETURNED'))))",
       "coverage_limit": "Requires complete effective-time histories. Corrections, late arrivals and same-time sequencing are not supported."
     },
     {
@@ -173,6 +173,78 @@
       "description": "Every account and entry has complete, correctly targeted ledger mappings.",
       "sql": "SELECT a.account_id AS item FROM account a LEFT JOIN account_gl_mapping m USING(account_id) WHERE m.account_id IS NULL\nUNION ALL SELECT e.account_entry_id FROM account_entry e LEFT JOIN posting_link p USING(account_entry_id) GROUP BY e.account_entry_id,e.amount HAVING coalesce(sum(p.allocated_amount),0)<>e.amount\nUNION ALL SELECT p.posting_link_id FROM posting_link p JOIN account_entry e USING(account_entry_id) JOIN account_gl_mapping m USING(account_id) JOIN journal_line l USING(journal_line_id) WHERE l.gl_account_id<>m.gl_account_id",
       "coverage_limit": "Completeness is relative to supplied source rows, not an external bank feed."
+    },
+    {
+      "id": "C20",
+      "rule_ids": [
+        "R47"
+      ],
+      "description": "Return installments follow settlement, are positive and never exceed the order amount.",
+      "sql": "SELECT r.payment_return_id FROM payment_return r JOIN payment_order o USING(payment_order_id) LEFT JOIN payment_settlement s USING(payment_order_id) WHERE o.kind<>'OUTBOUND' OR r.amount<=0 OR s.payment_settlement_id IS NULL OR r.returned_on<s.settled_on\nUNION ALL SELECT r.payment_order_id FROM payment_return r JOIN payment_order o USING(payment_order_id) GROUP BY r.payment_order_id,o.amount HAVING sum(r.amount)>o.amount",
+      "coverage_limit": "Single-currency full original settlement, with no return fees or FX."
+    },
+    {
+      "id": "C21",
+      "rule_ids": [
+        "R47"
+      ],
+      "description": "Each installment has exactly one equal customer credit on the source account and matching booking date.",
+      "sql": "SELECT r.payment_return_id FROM payment_return r JOIN payment_order o USING(payment_order_id) LEFT JOIN account_entry e ON e.payment_return_id=r.payment_return_id GROUP BY r.payment_return_id,r.amount,r.returned_on,o.source_account_id HAVING count(e.account_entry_id)<>1 OR count(e.account_entry_id) FILTER(WHERE e.kind='PAYMENT_RETURN' AND e.direction='CREDIT' AND e.amount=r.amount AND e.account_id=o.source_account_id AND e.posted_on=r.returned_on)<>1",
+      "coverage_limit": "Ledger mapping and balances are checked separately; does not prove receipt from a real network."
+    },
+    {
+      "id": "C22",
+      "rule_ids": [
+        "R47"
+      ],
+      "description": "Return status agrees with cumulative returned funds as of every return-state event and latest state.",
+      "sql": "WITH cumulative AS (SELECT e.payment_event_id,e.status,o.amount,coalesce(sum(r.amount),0) total FROM payment_event e JOIN payment_order o USING(payment_order_id) LEFT JOIN payment_return r ON r.payment_order_id=o.payment_order_id AND r.returned_on<=CAST(e.occurred_at AS DATE) WHERE e.status IN ('PARTIALLY_RETURNED','RETURNED') GROUP BY ALL)\nSELECT payment_event_id FROM cumulative WHERE (status='RETURNED' AND total<>amount) OR (status='PARTIALLY_RETURNED' AND (total<=0 OR total>=amount))\nUNION ALL SELECT o.payment_order_id FROM payment_order o JOIN (SELECT payment_order_id,status FROM payment_event QUALIFY row_number() OVER(PARTITION BY payment_order_id ORDER BY occurred_at DESC)=1) e USING(payment_order_id) JOIN payment_return r USING(payment_order_id) WHERE e.status NOT IN ('PARTIALLY_RETURNED','RETURNED')\nUNION ALL SELECT o.payment_order_id FROM payment_order o JOIN (SELECT payment_order_id,status FROM payment_event QUALIFY row_number() OVER(PARTITION BY payment_order_id ORDER BY occurred_at DESC)=1) e USING(payment_order_id) JOIN payment_return r USING(payment_order_id) GROUP BY o.payment_order_id,o.amount,e.status HAVING (e.status='PARTIALLY_RETURNED' AND sum(r.amount)>=o.amount) OR (e.status='RETURNED' AND sum(r.amount)<>o.amount)",
+      "coverage_limit": "Return observations use business dates; intraday ordering of same-day installments is not modeled."
+    },
+    {
+      "id": "C23",
+      "rule_ids": [
+        "R43"
+      ],
+      "description": "Fraud case links have a matching card user or account holder, and decisions follow case opening.",
+      "sql": "SELECT x.fraud_case_alert_id FROM fraud_case_alert x JOIN fraud_case f USING(fraud_case_id) JOIN fraud_alert a USING(fraud_alert_id) JOIN card_transaction t USING(card_transaction_id) JOIN card c USING(card_id) WHERE NOT EXISTS(SELECT 1 FROM card_assignment ca WHERE ca.card_id=c.card_id AND ca.customer_id=f.customer_id AND ca.valid_from<=t.posted_on AND (ca.valid_to IS NULL OR ca.valid_to>t.posted_on)) AND NOT EXISTS(SELECT 1 FROM account_holder h WHERE h.account_id=c.account_id AND h.customer_id=f.customer_id AND h.valid_from<=t.posted_on AND (h.valid_to IS NULL OR h.valid_to>t.posted_on))\nUNION ALL SELECT d.fraud_decision_id FROM fraud_decision d JOIN fraud_case f USING(fraud_case_id) WHERE d.decided_at<f.opened_at",
+      "coverage_limit": "Does not perform fraud detection, validate action execution or confirm the assessment is correct."
+    },
+    {
+      "id": "C24",
+      "rule_ids": [
+        "R44"
+      ],
+      "description": "Collections values, promise dates, support intervals and account relationships are structurally coherent.",
+      "sql": "SELECT delinquency_snapshot_id FROM delinquency_snapshot WHERE days_past_due<0 OR overdue_amount<0\nUNION ALL SELECT promise_to_pay_id FROM promise_to_pay WHERE promised_amount<=0 OR due_on<promised_on\nUNION ALL SELECT hardship_plan_id FROM hardship_plan WHERE ends_on<=starts_on\nUNION ALL SELECT c.collection_case_id FROM collection_case c WHERE NOT EXISTS(SELECT 1 FROM account_holder h WHERE h.customer_id=c.customer_id AND h.account_id=c.account_id AND h.valid_from<=c.opened_on AND (h.valid_to IS NULL OR h.valid_to>c.opened_on))",
+      "coverage_limit": "Days past due and overdue amount are supplied, not calculated. Promise fulfillment and legal eligibility are not implemented."
+    },
+    {
+      "id": "C25",
+      "rule_ids": [
+        "R45"
+      ],
+      "description": "Points snapshots reconcile independently aggregated earnings, fulfilled redemptions and adjustments.",
+      "sql": "SELECT b.reward_balance_snapshot_id FROM reward_balance_snapshot b WHERE b.points_balance<>coalesce((SELECT sum(e.points) FROM reward_earn e WHERE e.reward_membership_id=b.reward_membership_id AND e.earned_on<=b.as_of_date),0)-coalesce((SELECT sum(r.points) FROM reward_redemption r WHERE r.reward_membership_id=b.reward_membership_id AND r.status='FULFILLED' AND CAST(r.requested_at AS DATE)<=b.as_of_date),0)+coalesce((SELECT sum(a.points_delta) FROM reward_adjustment a WHERE a.reward_membership_id=b.reward_membership_id AND a.adjusted_on<=b.as_of_date),0)",
+      "coverage_limit": "Assumes zero points at enrollment and complete lifetime records. Fulfillment timing is simplified to request date for fulfilled rows."
+    },
+    {
+      "id": "C26",
+      "rule_ids": [
+        "R45"
+      ],
+      "description": "Reward awards use the membership account and valid positive purchase units; corrections stay in membership.",
+      "sql": "SELECT e.reward_earn_id FROM reward_earn e JOIN reward_membership m USING(reward_membership_id) JOIN card_transaction t USING(card_transaction_id) JOIN card c USING(card_id) WHERE e.points<=0 OR t.kind<>'PURCHASE' OR c.account_id<>m.account_id OR e.earned_on<m.enrolled_on OR e.earned_on<t.posted_on\nUNION ALL SELECT reward_redemption_id FROM reward_redemption WHERE points<=0\nUNION ALL SELECT a.reward_adjustment_id FROM reward_adjustment a LEFT JOIN reward_earn e USING(reward_earn_id) WHERE a.points_delta=0 OR (a.reward_earn_id IS NOT NULL AND a.reward_membership_id<>e.reward_membership_id)",
+      "coverage_limit": "Earning rates, redemption availability and refund clawback policies are supplied, not calculated."
+    },
+    {
+      "id": "C27",
+      "rule_ids": [
+        "R46"
+      ],
+      "description": "Service and complaint events respect intake dates and customer-account relationships.",
+      "sql": "SELECT e.service_request_event_id FROM service_request_event e JOIN service_request s USING(service_request_id) WHERE e.occurred_at<s.opened_at\nUNION ALL SELECT c.complaint_id FROM complaint c JOIN service_request s USING(service_request_id) WHERE c.received_on<CAST(s.opened_at AS DATE)\nUNION ALL SELECT r.complaint_resolution_id FROM complaint_resolution r JOIN complaint c USING(complaint_id) WHERE r.resolved_on<c.received_on\nUNION ALL SELECT s.service_request_id FROM service_request s WHERE s.account_id IS NOT NULL AND NOT EXISTS(SELECT 1 FROM account_holder h WHERE h.account_id=s.account_id AND h.customer_id=s.customer_id AND h.valid_from<=CAST(s.opened_at AS DATE) AND (h.valid_to IS NULL OR h.valid_to>CAST(s.opened_at AS DATE)))",
+      "coverage_limit": "No regulatory deadlines, delivery confirmation verification or full service workflow transition engine."
     }
   ]
 }

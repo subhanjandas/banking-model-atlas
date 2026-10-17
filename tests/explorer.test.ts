@@ -4,7 +4,7 @@ import {initialState,parseState,serializeState,visibleModel,searchModel,dictiona
 import {graphElements} from '../src/graph';
 describe('Explorer behavior',()=>{
  it('shows all sixteen domains initially',()=>expect(graphElements(initialState).filter(e=>e.data.kind==='domain')).toHaveLength(16));
- it('loads all 80 entities and 128 relationships in table view',()=>{const v=visibleModel({...initialState,view:'tables'});expect(v.entities).toHaveLength(80);expect(v.relationships).toHaveLength(128);});
+ it('loads all 81 entities and 130 relationships in table view',()=>{const v=visibleModel({...initialState,view:'tables'});expect(v.entities).toHaveLength(81);expect(v.relationships).toHaveLength(130);});
  it('filters a domain and counts omitted cross-domain relationships',()=>{const v=visibleModel({...initialState,domain:'cards'});expect(v.entities.map(e=>e.id)).toEqual(['card','card_assignment','card_status_event']);expect(v.omitted).toBeGreaterThan(0);expect(v.relationships.every(r=>v.entities.some(e=>e.id===r.source_entity)&&v.entities.some(e=>e.id===r.target_entity))).toBe(true);});
  it.each(model.journeys)('renders only the selected edges in $id',j=>{const v=visibleModel({...initialState,journey:j.id});expect(v.relationships.map(r=>r.id).sort()).toEqual([...j.relationship_ids].sort());expect(v.entities).toHaveLength(j.steps.length);const g=graphElements({...initialState,view:'tables',journey:j.id});expect(g.filter(e=>e.data.kind==='group')).toHaveLength(0);expect(g.filter(e=>e.data.kind==='entity')).toHaveLength(j.steps.length);});
  it('searches column descriptions and names case-insensitively',()=>expect(searchModel('ORIGINAL_TRANSACTION_ID').some(r=>r.entity.id==='card_transaction'&&r.columns.some(c=>c.id==='original_transaction_id'))).toBe(true));
@@ -16,6 +16,6 @@ describe('Explorer behavior',()=>{
  it('preserves a self-reference relationship bookmark',()=>expect(parseState('?edge=card__replaces_card_id').state.edge).toBe('card__replaces_card_id'));
  it('includes the seed and immediate neighbours in focus mode',()=>{const ids=neighbours('statement_line');expect(ids.has('statement')).toBe(true);expect(ids.has('account_entry')).toBe(true);expect(ids.has('customer')).toBe(false);});
  it('exports every column into the dictionary',()=>{const text=dictionary();for(const e of model.entities)for(const c of e.columns)expect(text).toContain(c.id);});
- it('constructs a valid Cytoscape graph including compound nodes and self-loops',()=>{const cy=cytoscape({headless:true,elements:graphElements({...initialState,view:'tables'})});expect(cy.nodes().filter(n=>n.data('kind')==='entity')).toHaveLength(80);expect(cy.edges()).toHaveLength(128);expect(cy.edges().filter(e=>e.source().id()===e.target().id()).length).toBe(3);cy.destroy();});
+ it('constructs a valid Cytoscape graph including compound nodes and self-loops',()=>{const cy=cytoscape({headless:true,elements:graphElements({...initialState,view:'tables'})});expect(cy.nodes().filter(n=>n.data('kind')==='entity')).toHaveLength(81);expect(cy.edges()).toHaveLength(130);expect(cy.edges().filter(e=>e.source().id()===e.target().id()).length).toBe(3);cy.destroy();});
  it('uses stable node IDs and deterministic positions',()=>expect(graphElements({...initialState,view:'tables'})).toEqual(graphElements({...initialState,view:'tables'})));
 });

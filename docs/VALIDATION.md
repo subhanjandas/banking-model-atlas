@@ -1,15 +1,20 @@
 # Validation evidence
 
-Portfolio application 1.0.0 / model 0.4.0.
+Application 1.1.0 / model 0.5.0.
 
-- 18 metadata regression tests: keys, types, references, cardinalities and connected journeys.
-- 30 executable SQL/demo tests: valid records, 19 bad-data mutations, referential integrity and ledger checks.
-- 24 explorer unit tests: filtering, search, links, journey subgraphs and graph construction.
-- 10 browser scenarios: navigation, downloads, mobile layout, theme persistence, system theme and schema-only extension journeys.
-- A separate post-deploy capture opens the public GitHub Pages URL and saves real screenshots with commit/time provenance.
+| Layer | Automated tests |
+|---|---:|
+| Metadata | 18 |
+| SQL, domain fixtures, partial returns and ledger reconciliation | 43 |
+| Source ingestion, completeness and publication safety | 16 |
+| Explorer unit tests | 24 |
+| Browser scenarios | 10 |
+| Total | 111 |
 
-The demo creates 80 tables and loads 175 synthetic records in 49 tables. Nineteen SQL business checks and opening-to-closing reconciliation pass for the supplied CAD scenario. The new four domains have no data fixtures; their DDL and metadata are checked, not their operational behavior.
+The replay creates all 81 tables, loads 207 synthetic records across 74 tables, checks 130 relationships and executes 27 business queries. Eleven posted journals balance. Customer and ledger balances reconcile independently. The ingestion replay checks four deliveries against a separate manifest: three source versions become two curated return facts totaling CAD 75.
 
-Run python3 replay.py, npm test and npm run build. Actions runs the Chromium suite before deployment. The Actions result for a commit is the authoritative evidence of its execution. See generated/demo-report.json for reproducible data results and docs/assets/provenance.json for published screenshot provenance.
+The query tests include deliberate excessive returns, invalid partial states, wrong reward balances and inconsistent case dates. Ingestion tests include same-count content corruption, missing versions, repeat deliveries, out-of-order input, unsupported contracts and preservation of the last good file after rejection.
 
-Remaining limits: complete rule enforcement, external source completeness, production concurrency, legal compliance and operational bank certification are not claimed.
+Run python3 replay.py, npm test and npm run build. Actions runs Chromium before deployment and captures the public website afterward. Current Actions status is the authoritative evidence for the committed version. Generated reports reproduce the dataset results. README gallery captures retain their explicit 1.0.0 provenance until refreshed; the latest public-site captures are available in Actions artifacts.
+
+Not claimed: full business policy coverage, completeness beyond the synthetic producer manifest, distributed exactly-once processing, persistent streaming state, post-close accounting restatements or production bank certification.
